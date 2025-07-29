@@ -1,0 +1,182 @@
+@import "tailwindcss";
+
+@theme {
+    /* Base colors */
+    --background: #ffffff;
+    --foreground: #171717;
+
+    /* Colors from e-infra - softened */
+    --color-infra-secondary: oklch(85% 0.11 213.05); /* modra - lighter */
+    --color-infra-accent: oklch(75% 0.17 325.02); /* acc - softer */
+    --color-infra-violet-dark: oklch(35% 0.08 289.42); /* lily - slightly lighter */
+    --color-infra-primary: oklch(62% 0.22 294.44); /* fialova - softer */
+    --color-infra-violet-light: oklch(90% 0.07 300.06); /* fialova light - lighter */
+    --color-infra-gray-light: oklch(98% 0.003 228.82); /* sedobila - even lighter */
+    --color-white: oklch(100% 0 0); /* bila */
+    --color-infra-gray: oklch(75% 0.03 285.57); /* seda - lighter */
+    --color-black: oklch(20% 0 0); /* cerna - not pure black */
+    
+    /* Status colors - softened */
+    --color-infra-success: oklch(75% 0.12 150); /* Success states - softer */
+    --color-infra-warning: oklch(80% 0.12 80); /* Warning states - softer */
+    --color-infra-error: oklch(70% 0.20 25); /* Error states - softer */
+    
+    /* Surface and background colors */
+    --color-infra-background: linear-gradient(135deg, oklch(99% 0.01 270), oklch(97% 0.01 220));
+    --color-infra-surface: var(--color-white);
+    --color-infra-border: oklch(92% 0.015 285); /* Softer border */
+    
+    /* Text colors */
+    --color-infra-text-primary: var(--color-infra-violet-dark);
+    --color-infra-text-secondary: var(--color-infra-gray);
+    
+    /* Gradient colors - softer */
+    --color-infra-gradient-start: oklch(65% 0.18 290);
+    --color-infra-gradient-end: oklch(70% 0.15 320);
+    
+    /* Typography */
+    --font-display: "Montserrat", "sans-serif";
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", monospace;
+    
+    /* Font sizes */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    
+    /* Spacing */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    
+    /* Shadows - softer */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.03), 0 4px 6px rgba(0, 0, 0, 0.02);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.03), 0 10px 10px rgba(0, 0, 0, 0.02);
+    
+    /* Glows for highlights - softer */
+    --glow-sm: 0 0 6px rgba(123, 97, 255, 0.15);
+    --glow-md: 0 0 12px rgba(123, 97, 255, 0.2);
+    
+    /* Border radius - rounder */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+}
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+}
+
+body {
+    background: var(--color-infra-background);
+    color: var(--color-infra-text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base styling for common elements */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: var(--text-4xl);
+    background: linear-gradient(135deg, var(--color-infra-primary), var(--color-infra-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+h2 {
+    font-size: var(--text-3xl);
+}
+
+h3 {
+    font-size: var(--text-2xl);
+}
+
+h4 {
+    font-size: var(--text-xl);
+}
+
+h5 {
+    font-size: var(--text-lg);
+}
+
+h6 {
+    font-size: var(--text-base);
+}
+
+a {
+    color: var(--color-infra-primary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+code {
+    font-family: var(--font-mono);
+    font-size: 90%;
+    background: var(--color-infra-gray-light);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-full);
+}
+
+/* Transition defaults */
+.transition-default {
+    transition-property: color, background-color, border-color, transform, opacity, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 250ms;
+}
+
+/* Add gradient overlay to background */
+.bg-gradient-soft {
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.5), rgba(240,240,255,0.7));
+}
+
+/* Add soft card styles */
+.card-soft {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-md);
+}
+
+/* Add soft hover effect */
+.hover-lift {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
