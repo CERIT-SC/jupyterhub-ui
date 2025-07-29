@@ -34,6 +34,7 @@ import {
   mockS3Buckets,
   s3SelectionOptions,
 } from "@/config/hub/jupyterOptions";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
 
 interface SpawnOptionsFormProps {
   options: JupyterHubServerOptions;
@@ -591,64 +592,76 @@ export function SpawnOptionsForm({
                       Create new persistent home
                     </Label>
                   </div>
+
+                    {phomeType === "new" && (
+                        <div className="ml-6 mt-3">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    checked={options.phome === "delete"}
+                                    id="phome-delete"
+                                    onCheckedChange={handlePhomeDeleteChange}
+                                />
+                                <Label className="font-medium" htmlFor="phome-delete">
+                                    Erase if home already exists
+                                </Label>
+                            </div>
+                            <HelpText
+                                shortDescription="If checked, any existing home directory with the same name will be erased and recreated."
+                                tooltip="Warning: This will permanently delete any existing data in a persistent home with the same name."
+                            />
+                        </div>
+                    )}
+
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem id="phome-existing" value="existing" />
                     <Label className="font-medium" htmlFor="phome-existing">
                       Use existing persistent home
                     </Label>
                   </div>
+
+
+                    {phomeType === "existing" && (
+                        <Alert variant={"destructive"}>
+                            <AlertTitle>Feature not supported</AlertTitle>
+                            <AlertDescription>
+                                Selecting existing persistent home is not implemented
+                            </AlertDescription>
+                        </Alert>
+                        // <FormField
+                        //     className="ml-6 mt-3"
+                        //     description="Choose from your previously created persistent home directories"
+                        //     id="existing-phome"
+                        //     label="Select existing persistent home:"
+                        //     maxWidth="max-w-md"
+                        // >
+                        //     <Select
+                        //         value={
+                        //             typeof options.phome === "string" &&
+                        //             options.phome !== "delete" &&
+                        //             options.phome !== "remain"
+                        //                 ? options.phome
+                        //                 : undefined
+                        //         }
+                        //         onValueChange={handleExistingPhomeChange}
+                        //     >
+                        //         <SelectTrigger id="existing-phome">
+                        //             <SelectValue placeholder="Select a persistent home" />
+                        //         </SelectTrigger>
+                        //         <SelectContent>
+                        //             {mockPvcNames.map((pvc) => (
+                        //                 <SelectItem key={pvc.value} value={pvc.value}>
+                        //                     {pvc.label}
+                        //                 </SelectItem>
+                        //             ))}
+                        //         </SelectContent>
+                        //     </Select>
+                        // </FormField>
+                    )}
+
                 </RadioGroup>
 
-                {phomeType === "new" && (
-                  <div className="ml-6 mt-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={options.phome === "delete"}
-                        id="phome-delete"
-                        onCheckedChange={handlePhomeDeleteChange}
-                      />
-                      <Label className="font-medium" htmlFor="phome-delete">
-                        Erase if home already exists
-                      </Label>
-                    </div>
-                    <HelpText
-                      shortDescription="If checked, any existing home directory with the same name will be erased and recreated."
-                      tooltip="Warning: This will permanently delete any existing data in a persistent home with the same name."
-                    />
-                  </div>
-                )}
 
-                {phomeType === "existing" && (
-                  <FormField
-                    className="ml-6 mt-3"
-                    description="Choose from your previously created persistent home directories"
-                    id="existing-phome"
-                    label="Select existing persistent home:"
-                    maxWidth="max-w-md"
-                  >
-                    <Select
-                      value={
-                        typeof options.phome === "string" &&
-                        options.phome !== "delete" &&
-                        options.phome !== "remain"
-                          ? options.phome
-                          : undefined
-                      }
-                      onValueChange={handleExistingPhomeChange}
-                    >
-                      <SelectTrigger id="existing-phome">
-                        <SelectValue placeholder="Select a persistent home" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {mockPvcNames.map((pvc) => (
-                          <SelectItem key={pvc.value} value={pvc.value}>
-                            {pvc.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                )}
+
               </div>
             </CardSection>
 

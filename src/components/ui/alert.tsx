@@ -9,7 +9,7 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-white/80 backdrop-blur-sm border-white/80 text-infra-text-primary",
+        default: "bg-white/80 backdrop-blur-sm border-gray-200 text-infra-text-primary",
         destructive:
           "border-red-100 bg-red-50/80 backdrop-blur-sm text-red-600 [&>svg]:text-red-600",
         success:

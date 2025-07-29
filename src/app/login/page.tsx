@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import { useAuthStorage } from "@/hooks/useAuthStorage";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import {Info} from "lucide-react";
 
 export default function Login() {
   const { authData } = useAuthStorage();
@@ -33,7 +35,12 @@ export default function Login() {
             Login to JupyterHub
           </CardTitle>
         </CardHeader>
+
         <CardContent className="space-y-4">
+            <CardDescription className="text-center">
+                Create and paste here API token from Jupyerhub
+            </CardDescription>
+
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="token">Access Token</Label>
@@ -48,13 +55,18 @@ export default function Login() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Switch
-                checked={isOldHub}
-                disabled={isLoading}
-                id="isOldHub"
-                onCheckedChange={setIsOldHub}
-              />
-              <Label htmlFor="isOldHub">Use Old Hub</Label>
+              {/*<Switch*/}
+              {/*  checked={isOldHub}*/}
+              {/*  disabled={isLoading}*/}
+              {/*  id="isOldHub"*/}
+              {/*  onCheckedChange={setIsOldHub}*/}
+              {/*/>*/}
+              {/*<Label htmlFor="isOldHub">Use Old Hub</Label>*/}
+                <p className={'text-sm text-gray-500'}>
+
+
+                        Using official Jupyterhub instance at https://hub.cloud.e-infra.cz/ in background
+                </p>
             </div>
 
             {error && (

@@ -24,7 +24,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   return (
     <div
-      className={cn("h-16 px-4 flex items-center justify-between ", className)}
+      className={cn("h-14 px-4 flex items-center justify-between ", className)}
     >
       <div className="flex items-center gap-3">
         {onToggleSidebar && (

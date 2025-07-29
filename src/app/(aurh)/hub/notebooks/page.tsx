@@ -163,19 +163,21 @@ export default function NotebooksPage() {
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
-              className="pl-8 border-0 shadow"
+              className="pl-8 "
               placeholder="Search notebooks..."
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button asChild>
             <Link href="/hub/spawn/options">
-              <Plus className="mr-2 h-4 w-4" />
-              New Notebook
+                <Button asChild>
+
+                <Plus className="mr-2 h-4 w-4" />
+                New Notebook
+
+                </Button>
             </Link>
-          </Button>
         </div>
 
         {Object.keys(filteredNotebooks).length > 0 ? (

@@ -79,14 +79,14 @@ function getStatusInfo(server: ServerStatus): {
     };
   }
 
-  // if (server.stopped) {
-  //   return {
-  //     status: "Stopped",
-  //     variant: "outline",
-  //     icon: <Square className="h-3 w-3" />,
-  //     className: "bg-gray-50 text-gray-700 border-gray-200",
-  //   };
-  // }
+  if (!server.started) {
+    return {
+      status: "Stopped",
+      variant: "outline",
+      icon: <Square className="h-3 w-3" />,
+      className: "bg-gray-50 text-gray-700 border-gray-200",
+    };
+  }
 
   // Default/unknown state
   return {
@@ -160,7 +160,7 @@ export function NotebookCard({
       className={cn(
         "transition-all overflow-hidden hover:shadow-md",
         server.ready
-          ? "border-green-200"
+          ? "border-infra-primary/50"
           : server.pending
             ? "border-yellow-200"
             : "border-gray-200",
@@ -278,9 +278,14 @@ export function NotebookCard({
               <Square className="h-4 w-4 mr-2" /> Stop
             </Button>
           ) : (
-            <Button disabled size="sm" variant="outline">
-              {server.pending === "spawn" ? "Starting..." : "Stopping..."}
-            </Button>
+              <Button
+                  className="flex items-center"
+                  size="sm"
+                  variant="outline"
+                  onClick={onStop}
+              >
+                  <Square className="h-4 w-4 mr-2" /> Stop
+              </Button>
           )}
         </div>
 

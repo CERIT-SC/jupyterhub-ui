@@ -153,6 +153,73 @@ export const getNodeAllocatableResources = async (): Promise<any> => {
   }
 };
 
+
+export const getGPUAllocatableNodes = async (): Promise<Set<string>> => {
+    try {
+        // Query all three metrics
+        const [allocatableResponse, unschedulableResponse, labelsResponse] =
+            await Promise.all([
+                prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
+                    params: { query: "kube_node_status_allocatable" },
+                }),
+                prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
+                    params: { query: "kube_node_spec_unschedulable" },
+                }),
+                prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
+                    params: {
+                        query: 'kube_node_labels{label_cerit_io_jupyter_workload="true"}',
+                    },
+                }),
+            ]);
+
+        const allocatableNodes = new Set();
+        const unschedulableNodes = new Set();
+        const jupyterWorkloadNodes = new Set();
+
+        // Process allocatable nodes
+        if (allocatableResponse.data?.data?.result) {
+            allocatableResponse.data.data.result.forEach((item: any) => {
+                if (item.metric?.node) {
+                    allocatableNodes.add(item.metric.node);
+                }
+            });
+        }
+
+        // Process unschedulable nodes
+        if (unschedulableResponse.data?.data?.result) {
+            unschedulableResponse.data.data.result.forEach((item: any) => {
+                if (item.metric?.node && item.value?.[1] === "1") {
+                    unschedulableNodes.add(item.metric.node);
+                }
+            });
+        }
+
+        // Process jupyter workload nodes
+        if (labelsResponse.data?.data?.result) {
+            labelsResponse.data.data.result.forEach((item: any) => {
+                if (item.metric?.node) {
+                    jupyterWorkloadNodes.add(item.metric.node);
+                }
+            });
+        }
+
+        // Return only nodes that are allocatable, schedulable (not unschedulable), and have jupyterWorkload
+        const validNodes = new Set<string>();
+
+        for (const node of jupyterWorkloadNodes) {
+            if (allocatableNodes.has(node) && !unschedulableNodes.has(node)) {
+                validNodes.add(node);
+            }
+        }
+
+        return validNodes;
+
+    } catch (error) {
+        console.error("Error getting node status:", error);
+        throw error;
+    }
+};
+
 export const getNodeStatus = async (): Promise<any> => {
   try {
     // Query all three metrics

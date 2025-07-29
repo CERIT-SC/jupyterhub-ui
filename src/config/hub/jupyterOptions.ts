@@ -44,7 +44,21 @@ export const migAmountOptions = [
 
 // Home storage options
 export const homeOptions = [
-  { value: "brno12-cerit", label: "brno12-cerit" },
+    {value: "brno12-cerit", label: "brno12-cerit"},
+    {value: "brno11-elixir", label: "brno11-elixir"},
+    {value: "brno14-ceitec", label: "brno14-ceitec"},
+    {value: "brno2", label: "brno2"},
+    {value: "budejovice1", label: "budejovice1"},
+    {value: "du-cesnet", label: "du-cesnet"},
+    {value: "liberec3-tul", label: "liberec3-tul"},
+    {value: "plzen1", label: "plzen1"},
+    {value: "plzen4-ntis", label: "plzen4-ntis"},
+    {value: "praha1", label: "praha1"},
+    {value: "praha2-natur", label: "praha2-natur"},
+    {value: "praha5-elixir", label: "praha5-elixir"},
+    {value: "praha6-fzu", label: "praha6-fzu"},
+    {value: "pruhonice1-ibot", label: "pruhonice1-ibot"},
+    {value: "vestec1-elixir", label: "vestec1-elixir"}
 ];
 
 // Phome options
