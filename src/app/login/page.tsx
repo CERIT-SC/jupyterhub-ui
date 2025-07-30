@@ -22,12 +22,7 @@ export default function Login() {
   const router = useRouter();
 
   const handleHubOauth = () => {
-    // Redirect to the JupyterHub OAuth login page
-    window.location.href =
-      `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/oauth2/authorize` +
-      `?client_id=${process.env.NEXT_PUBLIC_JUPYTERHUB_CLIENT_ID}` +
-      `&redirect_uri=${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/callback` +
-      `&response_type=code`;
+    window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/login`;
 
     // TODO: Remove dependency on localStorage token
     login("dummy_token", isOldHub);

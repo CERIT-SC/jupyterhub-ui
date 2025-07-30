@@ -1,17 +1,27 @@
 import { NextResponse } from "next/server";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
+
+import { SessionData, sessionOptions } from "../lib";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
+  const session = await getIronSession<SessionData>(
+    await cookies(),
+    sessionOptions,
+  );
 
-  // TODO: Validate `state` to prevent CSRF
+  if (session.state !== state) {
+    return new NextResponse("Invalid state", { status: 400 });
+  }
+
+  session.destroy();
 
   if (!code) {
     return new NextResponse("Missing code", { status: 400 });
   }
-
-  console.log("REQUEST", req);
 
   try {
     const tokenRes = await fetch(
