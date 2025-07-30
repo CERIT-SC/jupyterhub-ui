@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import {getUnassignedGPUsByModel} from "@/api/prometheus/prometheus-gpu-metrics";
 
 // Use Next.js proxy rewrite for Prometheus
 const PROMETHEUS_BASE_URL = "/api/prometheus";
@@ -105,7 +106,6 @@ export const getNodeAllocatableResources = async (): Promise<any> => {
       },
     });
 
-    console.log("Node allocatable resources response:", response.data);
 
     if (!response.data?.data?.result) {
       return {
@@ -154,6 +154,59 @@ export const getNodeAllocatableResources = async (): Promise<any> => {
 };
 
 
+/**
+ * Aggregates GPU details by model name and returns count for each model
+ */
+const aggregateGPUsByModel = (gpuDetails: Array<{
+    deviceId: string;
+    modelName: string;
+    nodeName: string;
+    freeMemoryMB: number;
+    totalMemoryMB: number;
+    driverVersion: string;
+    uuid: string;
+    gpuInstanceId?: string;
+    gpuInstanceProfile?: string;
+}>): Record<string, number> => {
+    const gpuCounts: Record<string, number> = {};
+
+    for (const gpu of gpuDetails) {
+        // Create dictionary key: modelName + GPU_I_PROFILE (if exists)
+        const dictionaryKey = gpu.gpuInstanceProfile
+            ? `${gpu.modelName} ${gpu.gpuInstanceProfile}`
+            : gpu.modelName;
+
+        // Add to GPU count by model (including profile)
+        if (gpuCounts[dictionaryKey]) {
+            gpuCounts[dictionaryKey]++;
+        } else {
+            gpuCounts[dictionaryKey] = 1;
+        }
+    }
+
+    return gpuCounts;
+};
+
+
+export  const getAllocatableGPUS = async (): Promise<any> => {
+    try {
+        const allocatableNodes: Set<string> = await getGPUAllocatableNodes();
+        const unusedGPUs = await getUnassignedGPUsByModel();
+
+        console.log(unusedGPUs.unassignedGPUs)
+        const filteredGpus = unusedGPUs.gpuDetails.filter(gpu => allocatableNodes.has(gpu.nodeName));
+
+        console.log(filteredGpus)
+
+        return aggregateGPUsByModel(filteredGpus);
+
+    } catch (error) {
+        console.error("Failed to get allocatable GPUs:", error);
+        return {};
+    }
+
+}
+
 export const getGPUAllocatableNodes = async (): Promise<Set<string>> => {
     try {
         // Query all three metrics
@@ -172,9 +225,9 @@ export const getGPUAllocatableNodes = async (): Promise<Set<string>> => {
                 }),
             ]);
 
-        const allocatableNodes = new Set();
-        const unschedulableNodes = new Set();
-        const jupyterWorkloadNodes = new Set();
+        const allocatableNodes = new Set<string>();
+        const unschedulableNodes = new Set<string>();
+        const jupyterWorkloadNodes = new Set<string>();
 
         // Process allocatable nodes
         if (allocatableResponse.data?.data?.result) {
@@ -211,7 +264,6 @@ export const getGPUAllocatableNodes = async (): Promise<Set<string>> => {
                 validNodes.add(node);
             }
         }
-
         return validNodes;
 
     } catch (error) {
@@ -219,6 +271,9 @@ export const getGPUAllocatableNodes = async (): Promise<Set<string>> => {
         throw error;
     }
 };
+
+
+
 
 export const getNodeStatus = async (): Promise<any> => {
   try {
@@ -306,7 +361,6 @@ export const getPrometheusMetrics = async (query?: string): Promise<any> => {
       : PROMETHEUS_ENDPOINTS.LABEL_VALUES("__name__");
     const response: AxiosResponse = await prometheusClient.get(endpoint);
 
-    console.log("Prometheus metrics:", response.data);
 
     return response.data;
   } catch (error) {
@@ -322,7 +376,6 @@ export const getPrometheusHealth = async (): Promise<any> => {
       PROMETHEUS_ENDPOINTS.HEALTH,
     );
 
-    console.log("Prometheus health:", response.data);
 
     return response.data;
   } catch (error) {

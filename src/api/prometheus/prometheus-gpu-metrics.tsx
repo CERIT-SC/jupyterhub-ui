@@ -119,10 +119,6 @@ export const getFreeGPUsByModel = async (): Promise<{
       "kube_node_spec_unschedulable",
     );
 
-    console.log("All GPUs from free memory query:", freeMemoryResponse.data);
-    console.log("Allocatable GPUs response:", allocatableGPUResponse.data);
-    console.log("Unschedulable nodes response:", unschedulableResponse.data);
-
     if (
       !freeMemoryResponse.data.result ||
       freeMemoryResponse.data.result.length === 0
@@ -833,8 +829,6 @@ export const getUnassignedGPUsByModel = async (): Promise<{
       "DCGM_FI_DEV_FB_TOTAL",
     );
 
-    console.log("All GPUs from free memory query:", freeMemoryResponse.data);
-
     if (
       !freeMemoryResponse.data.result ||
       freeMemoryResponse.data.result.length === 0
@@ -883,10 +877,6 @@ export const getUnassignedGPUsByModel = async (): Promise<{
         freeMemMetric.metric.exported_pod !== undefined &&
         freeMemMetric.metric.exported_pod !== null &&
         freeMemMetric.metric.exported_pod !== "";
-
-      console.log(
-        `GPU ${deviceId} (${modelName}${gpuInstanceProfile ? ` - ${gpuInstanceProfile}` : ""}): assigned to pod = ${isAssignedToPod}, exported_pod = ${freeMemMetric.metric.exported_pod}`,
-      );
 
       // Only include GPUs that are NOT assigned to any pod
       if (!isAssignedToPod) {
@@ -938,8 +928,6 @@ export const getUnassignedGPUsByModel = async (): Promise<{
       0,
     );
 
-    console.log("Unassigned GPUs by model:", unassignedGPUs);
-    console.log("Total unassigned GPUs:", totalUnassigned);
 
     return {
       unassignedGPUs,
