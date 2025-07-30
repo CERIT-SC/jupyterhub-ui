@@ -2,16 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Info } from "lucide-react";
 
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuthStorage } from "@/hooks/useAuthStorage";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/useAuth";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import {Info} from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Login() {
   const { authData } = useAuthStorage();
@@ -19,13 +25,6 @@ export default function Login() {
   const [tokenInput, setTokenInput] = useState(authData.token || "");
   const [isOldHub, setIsOldHub] = useState(authData.isOldHub || false);
   const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (tokenInput.trim()) {
-      login(tokenInput.trim(), isOldHub);
-    }
-  };
 
   const handleHubOauth = () => {
     // Redirect to the JupyterHub OAuth login page
@@ -49,47 +48,21 @@ export default function Login() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <button onClick={handleHubOauth}>OauthLogin</button>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="token">Access Token</Label>
-              <Input
-                disabled={isLoading}
-                id="token"
-                placeholder="Enter your access token"
-                type="password"
-                value={tokenInput}
-                onChange={(e) => setTokenInput(e.target.value)}
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              {/*<Switch*/}
-              {/*  checked={isOldHub}*/}
-              {/*  disabled={isLoading}*/}
-              {/*  id="isOldHub"*/}
-              {/*  onCheckedChange={setIsOldHub}*/}
-              {/*/>*/}
-              {/*<Label htmlFor="isOldHub">Use Old Hub</Label>*/}
-                <p className={'text-sm text-gray-500'}>
-
-
-                        Using official Jupyterhub instance at https://hub.cloud.e-infra.cz/ in background
-                </p>
-            </div>
-
+          <CardDescription className="text-center">
+            Currently in developement
+          </CardDescription>
+          <div className={"flex flex-col gap-2"}>
+            <Button onClick={handleHubOauth}>Login in using Oauth</Button>
             {error && (
-              <div className="text-red-500 text-sm">{error.message}</div>
+              <div className="text-red-500 text-sm text-center">
+                {error.message}
+              </div>
             )}
-
-            <Button
-              className="w-full"
-              disabled={isLoading || !tokenInput.trim()}
-              type="submit"
-            >
-              {isLoading ? "Logging in..." : "Login"}
-            </Button>
-          </form>
+          </div>
+          <CardDescription className="text-center">
+            Using official Jupyterhub instance at https://hub.cloud.e-infra.cz/
+            in background
+          </CardDescription>
         </CardContent>
       </Card>
     </div>
