@@ -8,6 +8,7 @@ interface NotebooksGridProps {
   onStart?: (id: string) => void;
   onStop?: (id: string) => void;
   onSettings?: (id: string) => void;
+  onRemove?: (id: string) => void;
 }
 
 export function NotebooksGrid({
@@ -15,6 +16,7 @@ export function NotebooksGrid({
   onStart,
   onStop,
   onSettings,
+  onRemove,
 }: NotebooksGridProps) {
   const notebookEntries = Object.entries(notebooks);
 
@@ -36,6 +38,7 @@ export function NotebooksGrid({
           key={id}
           name={id}
           server={server}
+          onRemove={() => onRemove?.(id)}
           onSettings={() => onSettings?.(id)}
           onStart={() => onStart?.(id)}
           onStop={() => onStop?.(id)}

@@ -30,10 +30,21 @@ export default function NotebooksPage() {
   const authContext = useContext(AuthContext);
   const [selectedTab, setSelectedTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [actionInProgress, setActionInProgress] = useState(false);
+  const [hasTransitioning, setHasTransitioning] = useState(false);
 
   // Get username from auth context
   const username = authContext?.user?.name;
+
+  // Calculate if any notebooks are in transition state (starting or stopping)
+  const hasTransitioningNotebooks = (
+    notebookData: Record<string, ServerStatus> | undefined,
+  ) => {
+    if (!notebookData) return false;
+
+    return Object.values(notebookData).some(
+      (server) => server.pending === "spawn" || server.pending === "stop",
+    );
+  };
 
   // Fetch user servers data including stopped servers
   const {
@@ -44,9 +55,23 @@ export default function NotebooksPage() {
   } = useQuery<Record<string, ServerStatus>>({
     queryKey: ["user-notebooks", username],
     queryFn: () => getUserNamedNotebooks(username),
+    // Dynamic refetch interval - 1 second when notebooks are transitioning, 5 seconds otherwise
+    refetchInterval: hasTransitioning ? 1000 : 5000,
+    // Continue refetching while page is not in focus
+    refetchIntervalInBackground: hasTransitioning,
   });
 
-  console.log(servers);
+  // Check for transitioning notebooks whenever servers data changes
+  useEffect(() => {
+    if (servers) {
+      const transitioning = Object.values(servers).some(
+        (server) => server.pending === "spawn" || server.pending === "stop",
+      );
+
+      setHasTransitioning(transitioning);
+    }
+  }, [servers]);
+
   // We no longer need to map servers to notebooks as our components now accept ServerStatus directly
 
   // We use formatTimeAgo from the jupyterHub service
@@ -81,33 +106,52 @@ export default function NotebooksPage() {
   // Handler for starting a notebook
   const handleStartNotebook = async (id: string) => {
     try {
-      setActionInProgress(true);
       await startServer(id, undefined, username);
       router.push(`/hub/spawn/progress/${id}`);
     } catch (error) {
       console.error("Failed to start notebook:", error);
     } finally {
-      setActionInProgress(false);
     }
   };
 
   // Handler for stopping a notebook
   const handleStopNotebook = async (id: string) => {
     try {
-      setActionInProgress(true);
+      // Preemptively update local state to show stopping status
+      if (servers && servers[id]) {
+        // Create a copy of the servers data with the updated status
+        const updatedServers = { ...servers };
+
+        updatedServers[id] = {
+          ...updatedServers[id],
+          pending: "stop",
+          ready: false,
+        };
+
+        // Set transition state manually to force more frequent updates
+        setHasTransitioning(true);
+      }
+
+      // Make the actual API call
       await stopServer(id, username);
-      // Refresh after a short delay to get updated status
-      setTimeout(() => refetch(), 1000);
+
+      // No need for explicit refetch, as the dynamic interval will handle it
     } catch (error) {
       console.error("Failed to stop notebook:", error);
-    } finally {
-      setActionInProgress(false);
+      // Force a refetch to get the accurate state in case of error
+      refetch();
     }
   };
 
   // Handler for opening notebook settings
   const handleOpenSettings = (id: string) => {
     router.push(`/hub/notebooks/${id}/settings`);
+  };
+
+  // Handler for notebook removal
+  const handleRemoveNotebook = async (id: string) => {
+    // Refetch the list to update UI
+    await refetch();
   };
 
   if (error) {
@@ -134,8 +178,6 @@ export default function NotebooksPage() {
 
   return (
     <div className="container mx-auto p-6">
-      {actionInProgress && <LoadingOverlay text="Processing request..." />}
-
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <PageHeader
@@ -170,19 +212,18 @@ export default function NotebooksPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-            <Link href="/hub/spawn/options">
-                <Button asChild>
-
-                <Plus className="mr-2 h-4 w-4" />
-                New Notebook
-
-                </Button>
-            </Link>
+          <Link href="/hub/spawn/options">
+            <Button asChild>
+              <Plus className="mr-2 h-4 w-4" />
+              New Notebook
+            </Button>
+          </Link>
         </div>
 
         {Object.keys(filteredNotebooks).length > 0 ? (
           <NotebooksGrid
             notebooks={filteredNotebooks}
+            onRemove={handleRemoveNotebook}
             onSettings={handleOpenSettings}
             onStart={handleStartNotebook}
             onStop={handleStopNotebook}
