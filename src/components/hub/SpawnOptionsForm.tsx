@@ -26,7 +26,6 @@ import { JupyterHubServerOptions } from "@/services/jupyterHub";
 import {
   cpuOptions,
   memoryOptions,
-  gpuOptions,
   migAmountOptions,
   homeOptions,
   phomeOptions,
@@ -35,6 +34,7 @@ import {
   s3SelectionOptions,
 } from "@/config/hub/jupyterOptions";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
 
 interface SpawnOptionsFormProps {
   options: JupyterHubServerOptions;
@@ -56,6 +56,10 @@ export function SpawnOptionsForm({
 }: SpawnOptionsFormProps) {
   // Track GPU-specific state to show/hide MIG amount selector
   const [showMigAmount, setShowMigAmount] = useState(false);
+
+  // Track available GPU options from Prometheus
+  const [gpuOptions, setGpuOptions] = useState<Array<{value: string; label: string}>>([]);
+  const [gpuOptionsLoading, setGpuOptionsLoading] = useState(true);
 
   // Track home storage state
   const [mountMetacentrumHome, setMountMetacentrumHome] = useState(
@@ -81,6 +85,36 @@ export function SpawnOptionsForm({
   useEffect(() => {
     setShowMigAmount(options.gpu.startsWith("mig"));
   }, [options.gpu]);
+
+  // Load GPU options from Prometheus API
+  useEffect(() => {
+    const loadGpuOptions = async () => {
+      try {
+        setGpuOptionsLoading(true);
+        const allocableGPUs = await getAllocatableGPUS();
+
+        // Transform the allocable GPUs data into options format
+        const options = Object.entries(allocableGPUs).map(([name, count]) => ({
+          value: name,
+          label: `${name} (${count} available)`
+        }));
+
+        // Add "None" option at the beginning
+        setGpuOptions([
+          { value: "none", label: "None" },
+          ...options
+        ]);
+      } catch (error) {
+        console.error("Failed to load GPU options:", error);
+        // Fallback to a basic option if API fails
+        setGpuOptions([{ value: "none", label: "None" }]);
+      } finally {
+        setGpuOptionsLoading(false);
+      }
+    };
+
+    loadGpuOptions();
+  }, []);
 
   // Handle image change
   const handleImageChange = (imagePath: string) => {
@@ -486,9 +520,9 @@ export function SpawnOptionsForm({
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Select value={options.gpu} onValueChange={handleGpuChange}>
+                  <Select value={options.gpu} onValueChange={handleGpuChange} disabled={gpuOptionsLoading}>
                     <SelectTrigger id="gpu-selection">
-                      <SelectValue placeholder="Select GPU type" />
+                      <SelectValue placeholder={gpuOptionsLoading ? "Loading GPU options..." : "Select GPU type"} />
                     </SelectTrigger>
                     <SelectContent>
                       {gpuOptions.map((option) => (
