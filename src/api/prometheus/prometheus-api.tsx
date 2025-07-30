@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import {getUnassignedGPUsByModel} from "@/api/prometheus/prometheus-gpu-metrics";
+
+import { getUnassignedGPUsByModel } from "@/api/prometheus/prometheus-gpu-metrics"; // Use Next.js proxy rewrite for Prometheus
 
 // Use Next.js proxy rewrite for Prometheus
 const PROMETHEUS_BASE_URL = "/api/prometheus";
@@ -106,7 +107,6 @@ export const getNodeAllocatableResources = async (): Promise<any> => {
       },
     });
 
-
     if (!response.data?.data?.result) {
       return {
         nodes: [],
@@ -153,11 +153,11 @@ export const getNodeAllocatableResources = async (): Promise<any> => {
   }
 };
 
-
 /**
  * Aggregates GPU details by model name and returns count for each model
  */
-const aggregateGPUsByModel = (gpuDetails: Array<{
+const aggregateGPUsByModel = (
+  gpuDetails: Array<{
     deviceId: string;
     modelName: string;
     nodeName: string;
@@ -167,113 +167,111 @@ const aggregateGPUsByModel = (gpuDetails: Array<{
     uuid: string;
     gpuInstanceId?: string;
     gpuInstanceProfile?: string;
-}>): Record<string, number> => {
-    const gpuCounts: Record<string, number> = {};
+  }>,
+): Record<string, number> => {
+  const gpuCounts: Record<string, number> = {};
 
-    for (const gpu of gpuDetails) {
-        // Create dictionary key: modelName + GPU_I_PROFILE (if exists)
-        const dictionaryKey = gpu.gpuInstanceProfile
-            ? `${gpu.modelName} ${gpu.gpuInstanceProfile}`
-            : gpu.modelName;
+  for (const gpu of gpuDetails) {
+    // Create dictionary key: modelName + GPU_I_PROFILE (if exists)
+    const dictionaryKey = gpu.gpuInstanceProfile
+      ? `${gpu.modelName} ${gpu.gpuInstanceProfile}`
+      : gpu.modelName;
 
-        // Add to GPU count by model (including profile)
-        if (gpuCounts[dictionaryKey]) {
-            gpuCounts[dictionaryKey]++;
-        } else {
-            gpuCounts[dictionaryKey] = 1;
-        }
+    // Add to GPU count by model (including profile)
+    if (gpuCounts[dictionaryKey]) {
+      gpuCounts[dictionaryKey]++;
+    } else {
+      gpuCounts[dictionaryKey] = 1;
     }
+  }
 
-    return gpuCounts;
+  return gpuCounts;
 };
 
+export const getAllocatableGPUS = async (): Promise<any> => {
+  try {
+    const allocatableNodes: Set<string> = await getGPUAllocatableNodes();
+    const unusedGPUs = await getUnassignedGPUsByModel();
 
-export  const getAllocatableGPUS = async (): Promise<any> => {
-    try {
-        const allocatableNodes: Set<string> = await getGPUAllocatableNodes();
-        const unusedGPUs = await getUnassignedGPUsByModel();
+    console.log(unusedGPUs.unassignedGPUs);
+    const filteredGpus = unusedGPUs.gpuDetails.filter((gpu) =>
+      allocatableNodes.has(gpu.nodeName),
+    );
 
-        console.log(unusedGPUs.unassignedGPUs)
-        const filteredGpus = unusedGPUs.gpuDetails.filter(gpu => allocatableNodes.has(gpu.nodeName));
+    console.log(filteredGpus);
 
-        console.log(filteredGpus)
+    return aggregateGPUsByModel(filteredGpus);
+  } catch (error) {
+    console.error("Failed to get allocatable GPUs:", error);
 
-        return aggregateGPUsByModel(filteredGpus);
-
-    } catch (error) {
-        console.error("Failed to get allocatable GPUs:", error);
-        return {};
-    }
-
-}
+    return {};
+  }
+};
 
 export const getGPUAllocatableNodes = async (): Promise<Set<string>> => {
-    try {
-        // Query all three metrics
-        const [allocatableResponse, unschedulableResponse, labelsResponse] =
-            await Promise.all([
-                prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
-                    params: { query: "kube_node_status_allocatable" },
-                }),
-                prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
-                    params: { query: "kube_node_spec_unschedulable" },
-                }),
-                prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
-                    params: {
-                        query: 'kube_node_labels{label_cerit_io_jupyter_workload="true"}',
-                    },
-                }),
-            ]);
+  try {
+    // Query all three metrics
+    const [allocatableResponse, unschedulableResponse, labelsResponse] =
+      await Promise.all([
+        prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
+          params: { query: "kube_node_status_allocatable" },
+        }),
+        prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
+          params: { query: "kube_node_spec_unschedulable" },
+        }),
+        prometheusClient.get(PROMETHEUS_ENDPOINTS.QUERY, {
+          params: {
+            query: 'kube_node_labels{label_cerit_io_jupyter_workload="true"}',
+          },
+        }),
+      ]);
 
-        const allocatableNodes = new Set<string>();
-        const unschedulableNodes = new Set<string>();
-        const jupyterWorkloadNodes = new Set<string>();
+    const allocatableNodes = new Set<string>();
+    const unschedulableNodes = new Set<string>();
+    const jupyterWorkloadNodes = new Set<string>();
 
-        // Process allocatable nodes
-        if (allocatableResponse.data?.data?.result) {
-            allocatableResponse.data.data.result.forEach((item: any) => {
-                if (item.metric?.node) {
-                    allocatableNodes.add(item.metric.node);
-                }
-            });
+    // Process allocatable nodes
+    if (allocatableResponse.data?.data?.result) {
+      allocatableResponse.data.data.result.forEach((item: any) => {
+        if (item.metric?.node) {
+          allocatableNodes.add(item.metric.node);
         }
-
-        // Process unschedulable nodes
-        if (unschedulableResponse.data?.data?.result) {
-            unschedulableResponse.data.data.result.forEach((item: any) => {
-                if (item.metric?.node && item.value?.[1] === "1") {
-                    unschedulableNodes.add(item.metric.node);
-                }
-            });
-        }
-
-        // Process jupyter workload nodes
-        if (labelsResponse.data?.data?.result) {
-            labelsResponse.data.data.result.forEach((item: any) => {
-                if (item.metric?.node) {
-                    jupyterWorkloadNodes.add(item.metric.node);
-                }
-            });
-        }
-
-        // Return only nodes that are allocatable, schedulable (not unschedulable), and have jupyterWorkload
-        const validNodes = new Set<string>();
-
-        for (const node of jupyterWorkloadNodes) {
-            if (allocatableNodes.has(node) && !unschedulableNodes.has(node)) {
-                validNodes.add(node);
-            }
-        }
-        return validNodes;
-
-    } catch (error) {
-        console.error("Error getting node status:", error);
-        throw error;
+      });
     }
+
+    // Process unschedulable nodes
+    if (unschedulableResponse.data?.data?.result) {
+      unschedulableResponse.data.data.result.forEach((item: any) => {
+        if (item.metric?.node && item.value?.[1] === "1") {
+          unschedulableNodes.add(item.metric.node);
+        }
+      });
+    }
+
+    // Process jupyter workload nodes
+    if (labelsResponse.data?.data?.result) {
+      labelsResponse.data.data.result.forEach((item: any) => {
+        if (item.metric?.node) {
+          jupyterWorkloadNodes.add(item.metric.node);
+        }
+      });
+    }
+
+    // Return only nodes that are allocatable, schedulable (not unschedulable), and have jupyterWorkload
+    const validNodes = new Set<string>();
+
+    for (const node of jupyterWorkloadNodes) {
+      if (allocatableNodes.has(node) && !unschedulableNodes.has(node)) {
+        validNodes.add(node);
+      }
+    }
+
+    return validNodes;
+  } catch (error) {
+    console.error("Error getting node status:", error);
+    throw error;
+  }
 };
-
-
-
 
 export const getNodeStatus = async (): Promise<any> => {
   try {
@@ -361,7 +359,6 @@ export const getPrometheusMetrics = async (query?: string): Promise<any> => {
       : PROMETHEUS_ENDPOINTS.LABEL_VALUES("__name__");
     const response: AxiosResponse = await prometheusClient.get(endpoint);
 
-
     return response.data;
   } catch (error) {
     console.error("Failed to get Prometheus metrics:", error);
@@ -375,7 +372,6 @@ export const getPrometheusHealth = async (): Promise<any> => {
     const response: AxiosResponse = await prometheusClient.get(
       PROMETHEUS_ENDPOINTS.HEALTH,
     );
-
 
     return response.data;
   } catch (error) {

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./index";
+
 /**
  * Configuration for the JupyterHub API
  */

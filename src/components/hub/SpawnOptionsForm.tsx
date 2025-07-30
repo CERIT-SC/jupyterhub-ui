@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Cpu, Server, HardDrive, Database, Cloud } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Cpu, HardDrive, Server } from "lucide-react";
 
-import { cn } from "@/lib/cn";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -16,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { FormError } from "@/components/ui/form-error";
 import { FormField } from "@/components/ui/form-field";
 import { HelpText } from "@/components/ui/help-text";
@@ -25,15 +23,13 @@ import { ImageSelector } from "@/components/hub/ImageSelector";
 import { JupyterHubServerOptions } from "@/services/jupyterHub";
 import {
   cpuOptions,
+  homeOptions,
   memoryOptions,
   migAmountOptions,
-  homeOptions,
-  phomeOptions,
   mockPvcNames,
   mockS3Buckets,
-  s3SelectionOptions,
 } from "@/config/hub/jupyterOptions";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
 
 interface SpawnOptionsFormProps {
@@ -58,7 +54,9 @@ export function SpawnOptionsForm({
   const [showMigAmount, setShowMigAmount] = useState(false);
 
   // Track available GPU options from Prometheus
-  const [gpuOptions, setGpuOptions] = useState<Array<{value: string; label: string}>>([]);
+  const [gpuOptions, setGpuOptions] = useState<
+    Array<{ value: string; label: string }>
+  >([]);
   const [gpuOptionsLoading, setGpuOptionsLoading] = useState(true);
 
   // Track home storage state
@@ -96,14 +94,11 @@ export function SpawnOptionsForm({
         // Transform the allocable GPUs data into options format
         const options = Object.entries(allocableGPUs).map(([name, count]) => ({
           value: name,
-          label: `${name} (${count} available)`
+          label: `${name} (${count} available)`,
         }));
 
         // Add "None" option at the beginning
-        setGpuOptions([
-          { value: "none", label: "None" },
-          ...options
-        ]);
+        setGpuOptions([{ value: "none", label: "None" }, ...options]);
       } catch (error) {
         console.error("Failed to load GPU options:", error);
         // Fallback to a basic option if API fails
@@ -520,9 +515,19 @@ export function SpawnOptionsForm({
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Select value={options.gpu} onValueChange={handleGpuChange} disabled={gpuOptionsLoading}>
+                  <Select
+                    disabled={gpuOptionsLoading}
+                    value={options.gpu}
+                    onValueChange={handleGpuChange}
+                  >
                     <SelectTrigger id="gpu-selection">
-                      <SelectValue placeholder={gpuOptionsLoading ? "Loading GPU options..." : "Select GPU type"} />
+                      <SelectValue
+                        placeholder={
+                          gpuOptionsLoading
+                            ? "Loading GPU options..."
+                            : "Select GPU type"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {gpuOptions.map((option) => (
@@ -627,24 +632,24 @@ export function SpawnOptionsForm({
                     </Label>
                   </div>
 
-                    {phomeType === "new" && (
-                        <div className="ml-6 mt-3">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    checked={options.phome === "delete"}
-                                    id="phome-delete"
-                                    onCheckedChange={handlePhomeDeleteChange}
-                                />
-                                <Label className="font-medium" htmlFor="phome-delete">
-                                    Erase if home already exists
-                                </Label>
-                            </div>
-                            <HelpText
-                                shortDescription="If checked, any existing home directory with the same name will be erased and recreated."
-                                tooltip="Warning: This will permanently delete any existing data in a persistent home with the same name."
-                            />
-                        </div>
-                    )}
+                  {phomeType === "new" && (
+                    <div className="ml-6 mt-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={options.phome === "delete"}
+                          id="phome-delete"
+                          onCheckedChange={handlePhomeDeleteChange}
+                        />
+                        <Label className="font-medium" htmlFor="phome-delete">
+                          Erase if home already exists
+                        </Label>
+                      </div>
+                      <HelpText
+                        shortDescription="If checked, any existing home directory with the same name will be erased and recreated."
+                        tooltip="Warning: This will permanently delete any existing data in a persistent home with the same name."
+                      />
+                    </div>
+                  )}
 
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem id="phome-existing" value="existing" />
@@ -653,49 +658,44 @@ export function SpawnOptionsForm({
                     </Label>
                   </div>
 
-
-                    {phomeType === "existing" && (
-                        <Alert variant={"destructive"}>
-                            <AlertTitle>Feature not supported</AlertTitle>
-                            <AlertDescription>
-                                Selecting existing persistent home is not implemented
-                            </AlertDescription>
-                        </Alert>
-                        // <FormField
-                        //     className="ml-6 mt-3"
-                        //     description="Choose from your previously created persistent home directories"
-                        //     id="existing-phome"
-                        //     label="Select existing persistent home:"
-                        //     maxWidth="max-w-md"
-                        // >
-                        //     <Select
-                        //         value={
-                        //             typeof options.phome === "string" &&
-                        //             options.phome !== "delete" &&
-                        //             options.phome !== "remain"
-                        //                 ? options.phome
-                        //                 : undefined
-                        //         }
-                        //         onValueChange={handleExistingPhomeChange}
-                        //     >
-                        //         <SelectTrigger id="existing-phome">
-                        //             <SelectValue placeholder="Select a persistent home" />
-                        //         </SelectTrigger>
-                        //         <SelectContent>
-                        //             {mockPvcNames.map((pvc) => (
-                        //                 <SelectItem key={pvc.value} value={pvc.value}>
-                        //                     {pvc.label}
-                        //                 </SelectItem>
-                        //             ))}
-                        //         </SelectContent>
-                        //     </Select>
-                        // </FormField>
-                    )}
-
+                  {phomeType === "existing" && (
+                    <Alert variant={"destructive"}>
+                      <AlertTitle>Feature not supported</AlertTitle>
+                      <AlertDescription>
+                        Selecting existing persistent home is not implemented
+                      </AlertDescription>
+                    </Alert>
+                    // <FormField
+                    //     className="ml-6 mt-3"
+                    //     description="Choose from your previously created persistent home directories"
+                    //     id="existing-phome"
+                    //     label="Select existing persistent home:"
+                    //     maxWidth="max-w-md"
+                    // >
+                    //     <Select
+                    //         value={
+                    //             typeof options.phome === "string" &&
+                    //             options.phome !== "delete" &&
+                    //             options.phome !== "remain"
+                    //                 ? options.phome
+                    //                 : undefined
+                    //         }
+                    //         onValueChange={handleExistingPhomeChange}
+                    //     >
+                    //         <SelectTrigger id="existing-phome">
+                    //             <SelectValue placeholder="Select a persistent home" />
+                    //         </SelectTrigger>
+                    //         <SelectContent>
+                    //             {mockPvcNames.map((pvc) => (
+                    //                 <SelectItem key={pvc.value} value={pvc.value}>
+                    //                     {pvc.label}
+                    //                 </SelectItem>
+                    //             ))}
+                    //         </SelectContent>
+                    //     </Select>
+                    // </FormField>
+                  )}
                 </RadioGroup>
-
-
-
               </div>
             </CardSection>
 

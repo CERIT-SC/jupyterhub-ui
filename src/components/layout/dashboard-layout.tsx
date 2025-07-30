@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Menu, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";

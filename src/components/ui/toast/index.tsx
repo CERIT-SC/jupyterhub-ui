@@ -4,10 +4,10 @@ import {
   Toast,
   ToastClose,
   ToastDescription,
+  type ToastProps,
   ToastProvider,
   ToastTitle,
   ToastViewport,
-  type ToastProps,
 } from "@/components/ui/toast";
 
 type ToastActionElement = React.ReactElement<typeof ToastClose>;
@@ -33,6 +33,7 @@ let count = 0;
 
 function genId() {
   count = (count + 1) % Number.MAX_VALUE;
+
   return count.toString();
 }
 
@@ -93,7 +94,7 @@ export const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
+          t.id === action.toast.id ? { ...t, ...action.toast } : t,
         ),
       };
 
@@ -118,7 +119,7 @@ export const reducer = (state: State, action: Action): State => {
                 ...t,
                 open: false,
               }
-            : t
+            : t,
         ),
       };
     }
@@ -129,6 +130,7 @@ export const reducer = (state: State, action: Action): State => {
           toasts: [],
         };
       }
+
       return {
         ...state,
         toasts: state.toasts.filter((t) => t.id !== action.toastId),
@@ -158,7 +160,8 @@ function toast({ ...props }: Toast) {
       toast: { ...props, id },
     });
 
-  const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
+  const dismiss = () =>
+    dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
 
   dispatch({
     type: actionTypes.ADD_TOAST,
@@ -184,8 +187,10 @@ function useToast() {
 
   React.useEffect(() => {
     listeners.push(setState);
+
     return () => {
       const index = listeners.indexOf(setState);
+
       if (index > -1) {
         listeners.splice(index, 1);
       }
@@ -195,7 +200,8 @@ function useToast() {
   return {
     ...state,
     toast,
-    dismiss: (toastId?: string) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
+    dismiss: (toastId?: string) =>
+      dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
   };
 }
 

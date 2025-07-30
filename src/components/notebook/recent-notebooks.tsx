@@ -2,22 +2,13 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Play,
-  Square,
-  Clock,
-  ArrowRight,
-  ExternalLink,
-  Settings,
-  Info,
-} from "lucide-react";
+import { Clock, ExternalLink, Info, Play, Square } from "lucide-react";
 
 import { NotebookDetailsDialog } from "@/components/notebook/notebook-details-dialog";
 import {
   getRecentNotebooks,
-  stopServer,
   startServer,
-  ServerStatus,
+  stopServer,
 } from "@/services/jupyterHub";
 import {
   Card,

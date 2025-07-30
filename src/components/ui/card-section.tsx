@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/cn";
 
@@ -22,12 +23,8 @@ export function CardSection({
   return (
     <div className={cn("py-4", className)}>
       {withSeparator && <Separator className="mb-4" />}
-      {title && (
-        <h3 className="text-lg font-semibold mb-3">{title}</h3>
-      )}
-      <div className="space-y-4">
-        {children}
-      </div>
+      {title && <h3 className="text-lg font-semibold mb-3">{title}</h3>}
+      <div className="space-y-4">{children}</div>
     </div>
   );
 }

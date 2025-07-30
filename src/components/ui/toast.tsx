@@ -15,11 +15,12 @@ const ToastViewport = React.forwardRef<
     ref={ref}
     className={cn(
       "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
-      className
+      className,
     )}
     {...props}
   />
 ));
+
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
@@ -30,15 +31,17 @@ const toastVariants = cva(
         default: "bg-white/80 backdrop-blur-sm border-white/80",
         destructive:
           "destructive group border-red-100 bg-red-50/80 backdrop-blur-sm text-red-600",
-        success: "border-green-100 bg-green-50/80 backdrop-blur-sm text-green-700",
-        warning: "border-yellow-100 bg-yellow-50/80 backdrop-blur-sm text-yellow-800",
+        success:
+          "border-green-100 bg-green-50/80 backdrop-blur-sm text-green-700",
+        warning:
+          "border-yellow-100 bg-yellow-50/80 backdrop-blur-sm text-yellow-800",
         info: "border-blue-100 bg-blue-50/80 backdrop-blur-sm text-blue-700",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 const Toast = React.forwardRef<
@@ -54,6 +57,7 @@ const Toast = React.forwardRef<
     />
   );
 });
+
 Toast.displayName = ToastPrimitives.Root.displayName;
 
 const ToastAction = React.forwardRef<
@@ -64,11 +68,12 @@ const ToastAction = React.forwardRef<
     ref={ref}
     className={cn(
       "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-infra-gray-light/50 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-slate-100/40 group-[.destructive]:hover:border-red-500/30 group-[.destructive]:hover:bg-red-500 group-[.destructive]:hover:text-slate-50 group-[.destructive]:focus:ring-red-500",
-      className
+      className,
     )}
     {...props}
   />
 ));
+
 ToastAction.displayName = ToastPrimitives.Action.displayName;
 
 const ToastClose = React.forwardRef<
@@ -79,7 +84,7 @@ const ToastClose = React.forwardRef<
     ref={ref}
     className={cn(
       "absolute right-2 top-2 rounded-md p-1 text-slate-500 opacity-0 transition-opacity hover:text-slate-900 focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
-      className
+      className,
     )}
     toast-close=""
     {...props}
@@ -87,6 +92,7 @@ const ToastClose = React.forwardRef<
     <X className="h-4 w-4" />
   </ToastPrimitives.Close>
 ));
+
 ToastClose.displayName = ToastPrimitives.Close.displayName;
 
 const ToastTitle = React.forwardRef<
@@ -99,6 +105,7 @@ const ToastTitle = React.forwardRef<
     {...props}
   />
 ));
+
 ToastTitle.displayName = ToastPrimitives.Title.displayName;
 
 const ToastDescription = React.forwardRef<
@@ -111,6 +118,7 @@ const ToastDescription = React.forwardRef<
     {...props}
   />
 ));
+
 ToastDescription.displayName = ToastPrimitives.Description.displayName;
 
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;

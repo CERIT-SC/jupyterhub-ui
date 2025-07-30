@@ -1,15 +1,16 @@
 import { FC, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    discoverGPUMetrics,
-    getUnassignedGPUsByModel,
-    getFreeGPUsByModel,
-    getUnschedulableNodes,
-    getAllocatableNodes,
-    getNodeStatus,
-    getNodeAllocatableResources,
-    getGPUAllocatableNodes, getAllocatableGPUS,
+  discoverGPUMetrics,
+  getAllocatableGPUS,
+  getAllocatableNodes,
+  getGPUAllocatableNodes,
+  getNodeAllocatableResources,
+  getNodeStatus,
+  getUnassignedGPUsByModel,
+  getUnschedulableNodes,
 } from "@/api/prometheus/prometheus-api";
 
 const GpuMetricsTester: FC = () => {
@@ -19,9 +20,10 @@ const GpuMetricsTester: FC = () => {
   const [unschedulableNodes, setUnschedulableNodes] = useState<any>(null);
   const [allocatableNodes, setAllocatableNodes] = useState<any>(null);
   const [nodeStatus, setNodeStatus] = useState<any>(null);
-  const [nodeAllocatableResources, setNodeAllocatableResources] = useState<any>(null);
+  const [nodeAllocatableResources, setNodeAllocatableResources] =
+    useState<any>(null);
   const [gpuAllocatableNodes, setGpuAllocatableNodes] = useState<any>(null);
-  const [allocatableGpus, setAllocatableGpus] = useState<any>(null)
+  const [allocatableGpus, setAllocatableGpus] = useState<any>(null);
 
   const handleDiscoverGPUMetrics = async () => {
     setLoading(true);
@@ -38,25 +40,24 @@ const GpuMetricsTester: FC = () => {
     }
   };
 
-    const handleGetAllocatableGpus = async () => {
-        setLoading(true);
-        try {
-            const unassignedGPUs = await getAllocatableGPUS();
+  const handleGetAllocatableGpus = async () => {
+    setLoading(true);
+    try {
+      const unassignedGPUs = await getAllocatableGPUS();
 
-            setAllocatableGpus(unassignedGPUs);
-            console.log("Unassigned GPUs by model:", unassignedGPUs);
-        } catch (error) {
-            console.error("Failed to get unassigned GPUs by model:", error);
-            setAllocatableGpus({
-                error: "Failed to get unassigned GPUs by model",
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+      setAllocatableGpus(unassignedGPUs);
+      console.log("Unassigned GPUs by model:", unassignedGPUs);
+    } catch (error) {
+      console.error("Failed to get unassigned GPUs by model:", error);
+      setAllocatableGpus({
+        error: "Failed to get unassigned GPUs by model",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
-    const handleGetUnassignedGPUsByModel = async () => {
+  const handleGetUnassignedGPUsByModel = async () => {
     setLoading(true);
     try {
       const unassignedGPUs = await getUnassignedGPUsByModel();
@@ -148,7 +149,7 @@ const GpuMetricsTester: FC = () => {
 
       const result = {
         nodes: Array.from(nodes),
-        count: nodes.size
+        count: nodes.size,
       };
 
       setGpuAllocatableNodes(result);
@@ -185,16 +186,18 @@ const GpuMetricsTester: FC = () => {
           <Button disabled={loading} onClick={handleGetNodeStatus}>
             {loading ? "Loading..." : "Get Node Status"}
           </Button>
-          <Button disabled={loading} onClick={handleGetNodeAllocatableResources}>
+          <Button
+            disabled={loading}
+            onClick={handleGetNodeAllocatableResources}
+          >
             {loading ? "Loading..." : "Get Node Allocatable Resources"}
           </Button>
           <Button disabled={loading} onClick={handleGetGPUAllocatableNodes}>
             {loading ? "Loading..." : "Get GPU Allocatable Nodes"}
           </Button>
-            <Button disabled={loading} onClick={handleGetAllocatableGpus}>
-                {loading ? "Loading..." : "Get allocatable GPUS"}
-            </Button>
-
+          <Button disabled={loading} onClick={handleGetAllocatableGpus}>
+            {loading ? "Loading..." : "Get allocatable GPUS"}
+          </Button>
         </div>
 
         {discoveredMetrics && (
@@ -210,7 +213,9 @@ const GpuMetricsTester: FC = () => {
           <div className="mt-4 p-4 bg-cyan-100 rounded text-xs">
             <h3 className="font-bold mb-2">Unused GPUs by Model:</h3>
             <div className="mb-2">
-              <strong>Total Unused: {unassignedGPUsByModel.totalUnassigned}</strong>
+              <strong>
+                Total Unused: {unassignedGPUsByModel.totalUnassigned}
+              </strong>
             </div>
             <div className="mb-2">
               <strong>By Model:</strong>
@@ -219,11 +224,13 @@ const GpuMetricsTester: FC = () => {
                   <div key={model} className="ml-4">
                     {model}: {count}
                   </div>
-                )
+                ),
               )}
             </div>
             <details className="mt-2">
-              <summary className="cursor-pointer font-semibold">GPU Details</summary>
+              <summary className="cursor-pointer font-semibold">
+                GPU Details
+              </summary>
               <pre className="whitespace-pre-wrap overflow-auto max-h-32 mt-2">
                 {JSON.stringify(unassignedGPUsByModel, null, 2)}
               </pre>
@@ -259,16 +266,20 @@ const GpuMetricsTester: FC = () => {
               <>
                 <div className="mb-4 flex gap-4">
                   <span>
-                    <strong>Total Nodes:</strong> {nodeStatus.summary?.total || 0}
+                    <strong>Total Nodes:</strong>{" "}
+                    {nodeStatus.summary?.total || 0}
                   </span>
                   <span>
-                    <strong>Allocatable:</strong> {nodeStatus.summary?.allocatable || 0}
+                    <strong>Allocatable:</strong>{" "}
+                    {nodeStatus.summary?.allocatable || 0}
                   </span>
                   <span>
-                    <strong>Schedulable:</strong> {nodeStatus.summary?.schedulable || 0}
+                    <strong>Schedulable:</strong>{" "}
+                    {nodeStatus.summary?.schedulable || 0}
                   </span>
                   <span>
-                    <strong>Jupyter Workload:</strong> {nodeStatus.summary?.jupyterWorkload || 0}
+                    <strong>Jupyter Workload:</strong>{" "}
+                    {nodeStatus.summary?.jupyterWorkload || 0}
                   </span>
                 </div>
 
@@ -279,11 +290,15 @@ const GpuMetricsTester: FC = () => {
                       key={node.name}
                       className="flex items-center gap-4 p-2 bg-white rounded"
                     >
-                      <span className="font-mono text-sm flex-1">{node.name}</span>
+                      <span className="font-mono text-sm flex-1">
+                        {node.name}
+                      </span>
                       <span
                         className={`px-2 py-1 rounded text-xs ${node.allocatable ? "bg-green-200 text-green-800" : "bg-gray-200 text-gray-800"}`}
                       >
-                        {node.allocatable ? "✓ Allocatable" : "✗ Not Allocatable"}
+                        {node.allocatable
+                          ? "✓ Allocatable"
+                          : "✗ Not Allocatable"}
                       </span>
                       <span
                         className={`px-2 py-1 rounded text-xs ${node.schedulable ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}
@@ -293,7 +308,9 @@ const GpuMetricsTester: FC = () => {
                       <span
                         className={`px-2 py-1 rounded text-xs ${node.jupyterWorkload ? "bg-blue-200 text-blue-800" : "bg-gray-200 text-gray-800"}`}
                       >
-                        {node.jupyterWorkload ? "✓ Jupyter Ready" : "✗ No Jupyter"}
+                        {node.jupyterWorkload
+                          ? "✓ Jupyter Ready"
+                          : "✗ No Jupyter"}
                       </span>
                     </div>
                   ))}
@@ -308,7 +325,9 @@ const GpuMetricsTester: FC = () => {
             <h3 className="font-bold mb-2">Node Allocatable Resources:</h3>
 
             {nodeAllocatableResources.error ? (
-              <div className="text-red-600">{nodeAllocatableResources.error}</div>
+              <div className="text-red-600">
+                {nodeAllocatableResources.error}
+              </div>
             ) : (
               <>
                 <div className="mb-4 flex gap-4">
@@ -318,12 +337,15 @@ const GpuMetricsTester: FC = () => {
                   </span>
                   <span>
                     <strong>Resource Types:</strong>{" "}
-                    {nodeAllocatableResources.summary?.resourceTypes?.length || 0}
+                    {nodeAllocatableResources.summary?.resourceTypes?.length ||
+                      0}
                   </span>
                 </div>
 
                 <div className="mb-4">
-                  <h4 className="font-semibold mb-2">Available Resource Types:</h4>
+                  <h4 className="font-semibold mb-2">
+                    Available Resource Types:
+                  </h4>
                   <div className="flex flex-wrap gap-1">
                     {nodeAllocatableResources.summary?.resourceTypes?.map(
                       (resource: string) => (
@@ -333,7 +355,7 @@ const GpuMetricsTester: FC = () => {
                         >
                           {resource}
                         </span>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -342,17 +364,27 @@ const GpuMetricsTester: FC = () => {
                   <h4 className="font-semibold">Node Resources:</h4>
                   <div className="max-h-64 overflow-y-auto">
                     {nodeAllocatableResources.nodes?.map((node: any) => (
-                      <div key={node.name} className="p-2 bg-white rounded mb-2">
+                      <div
+                        key={node.name}
+                        className="p-2 bg-white rounded mb-2"
+                      >
                         <div className="font-mono text-sm font-semibold mb-1">
                           {node.name}
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                          {Object.entries(node.resources).map(([resource, value]) => (
-                            <div key={resource} className="flex justify-between text-xs">
-                              <span className="text-gray-600">{resource}:</span>
-                              <span className="font-mono">{value}</span>
-                            </div>
-                          ))}
+                          {Object.entries(node.resources).map(
+                            ([resource, value]) => (
+                              <div
+                                key={resource}
+                                className="flex justify-between text-xs"
+                              >
+                                <span className="text-gray-600">
+                                  {resource}:
+                                </span>
+                                <span className="font-mono">{value}</span>
+                              </div>
+                            ),
+                          )}
                         </div>
                       </div>
                     ))}
@@ -371,7 +403,10 @@ const GpuMetricsTester: FC = () => {
             ) : (
               <>
                 <div className="mb-2">
-                  <strong>Total GPU Allocatable Nodes: {gpuAllocatableNodes.count || 0}</strong>
+                  <strong>
+                    Total GPU Allocatable Nodes:{" "}
+                    {gpuAllocatableNodes.count || 0}
+                  </strong>
                 </div>
                 <div className="space-y-1 max-h-48 overflow-y-auto">
                   {gpuAllocatableNodes.nodes?.map((node: string) => (
@@ -384,23 +419,21 @@ const GpuMetricsTester: FC = () => {
             )}
           </div>
         )}
-          {allocatableGpus && (
-              <div className="mt-4 p-4 bg-pink-100 rounded text-xs">
-                  <h3 className="font-bold mb-2">All Allocatable GPUS:</h3>
-                  <pre className="whitespace-pre-wrap overflow-auto max-h-32">
-                <div className="mb-2">
-              <strong>By Model:</strong>
-                    {Object.entries(allocatableGpus || {}).map(
-                        ([model, count]) => (
-                            <div key={model} className="ml-4">
-                                {model}: {count}
-                            </div>
-                        )
-                    )}
-            </div>
-            </pre>
+        {allocatableGpus && (
+          <div className="mt-4 p-4 bg-pink-100 rounded text-xs">
+            <h3 className="font-bold mb-2">All Allocatable GPUS:</h3>
+            <pre className="whitespace-pre-wrap overflow-auto max-h-32">
+              <div className="mb-2">
+                <strong>By Model:</strong>
+                {Object.entries(allocatableGpus || {}).map(([model, count]) => (
+                  <div key={model} className="ml-4">
+                    {model}: {count}
+                  </div>
+                ))}
               </div>
-          )}
+            </pre>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

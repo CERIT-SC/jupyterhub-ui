@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Plus, Search, Server, User } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import { AuthContext } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,11 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/layout/page-header";
 import { ServerStatus as StatusIndicator } from "@/components/notebook/server-status";
 import { NotebooksGrid } from "@/components/notebook/notebooks-grid";
-import { Loading, LoadingOverlay } from "@/components/ui/loading";
 import {
-  getUserInfo,
   getUserNamedNotebooks,
   ServerStatus,
-  UserInfo,
   startServer,
   stopServer,
-  formatTimeAgo,
 } from "@/services/jupyterHub";
 
 export default function NotebooksPage() {

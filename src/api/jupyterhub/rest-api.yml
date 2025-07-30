@@ -11,8 +11,8 @@ info:
 servers:
   - url: /hub/api
 security:
-  - token: []
-  - oauth2: []
+  - token: [ ]
+  - oauth2: [ ]
 paths:
   /:
     get:
@@ -98,7 +98,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/RequestIdentity"
       security:
-        - oauth2: []
+        - oauth2: [ ]
   /users:
     get:
       operationId: get-users
@@ -245,7 +245,7 @@ paths:
       responses:
         204:
           description: The user has been deleted
-          content: {}
+          content: { }
       security:
         - oauth2:
             - delete:users
@@ -335,10 +335,10 @@ paths:
           description: Successfully updated activity
         401:
           description: Authentication/Authorization error
-          content: {}
+          content: { }
         404:
           description: No such user
-          content: {}
+          content: { }
       security:
         - oauth2:
             - users:activity
@@ -364,11 +364,11 @@ paths:
       responses:
         201:
           description: The user's notebook server has started
-          content: {}
+          content: { }
         202:
           description: The user's notebook server has not yet started, but has been
             requested
-          content: {}
+          content: { }
       security:
         - oauth2:
             - servers
@@ -382,10 +382,10 @@ paths:
         202:
           description: The user's notebook server has not yet stopped as it is taking
             a while to stop
-          content: {}
+          content: { }
         204:
           description: The user's notebook server has stopped
-          content: {}
+          content: { }
       security:
         - oauth2:
             - delete:servers
@@ -410,11 +410,11 @@ paths:
       responses:
         201:
           description: The user's notebook named-server has started
-          content: {}
+          content: { }
         202:
           description: The user's notebook named-server has not yet started, but has
             been requested
-          content: {}
+          content: { }
       security:
         - oauth2:
             - servers
@@ -450,10 +450,10 @@ paths:
         202:
           description: The user's notebook named-server has not yet stopped as it
             is taking a while to stop
-          content: {}
+          content: { }
         204:
           description: The user's notebook named-server has stopped
-          content: {}
+          content: { }
       security:
         - oauth2:
             - delete:servers
@@ -525,7 +525,7 @@ paths:
           description: |
             Permission has been revoked,
             the user no longer has access to the server.
-          content: {}
+          content: { }
       security:
         - oauth2:
             - users:shares
@@ -550,10 +550,10 @@ paths:
                       $ref: "#/components/schemas/Token"
         401:
           description: Authentication/Authorization error
-          content: {}
+          content: { }
         404:
           description: No such user
-          content: {}
+          content: { }
       security:
         - oauth2:
             - read:tokens
@@ -608,10 +608,10 @@ paths:
                 $ref: "#/components/schemas/NewToken"
         400:
           description: Body must be a JSON dict or empty
-          content: {}
+          content: { }
         403:
           description: Requested role does not exist
-          content: {}
+          content: { }
       security:
         - oauth2:
             - tokens
@@ -651,7 +651,7 @@ paths:
       responses:
         204:
           description: The token has been deleted
-          content: {}
+          content: { }
       security:
         - oauth2:
             - tokens
@@ -713,7 +713,7 @@ paths:
       responses:
         204:
           description: The group has been deleted
-          content: {}
+          content: { }
       security:
         - oauth2:
             - delete:groups
@@ -781,7 +781,7 @@ paths:
           description: |
             Permission has been revoked,
             the group members no longer have access to the server.
-          content: {}
+          content: { }
       security:
         - oauth2:
             - groups:shares
@@ -847,7 +847,7 @@ paths:
       responses:
         200:
           description: The users have been removed from the group
-          content: {}
+          content: { }
       security:
         - oauth2:
             - groups
@@ -1201,7 +1201,7 @@ paths:
         204:
           description: |
             The share code has been revoked.
-          content: {}
+          content: { }
       security:
         - oauth2:
             - shares
@@ -1273,7 +1273,7 @@ paths:
       responses:
         200:
           description: Success
-          content: {}
+          content: { }
       security:
         - oauth2:
             - proxy
@@ -1305,7 +1305,7 @@ paths:
       responses:
         200:
           description: Success
-          content: {}
+          content: { }
       security:
         - oauth2:
             - proxy
@@ -1344,7 +1344,7 @@ paths:
                     description: The new API token.
         403:
           description: The user can not be authenticated.
-          content: {}
+          content: { }
       security:
         - oauth2:
             - tokens
@@ -1363,10 +1363,10 @@ paths:
       responses:
         200:
           description: The user or service identified by the API token
-          content: {}
+          content: { }
         404:
           description: A user or service is not found.
-          content: {}
+          content: { }
       security:
         - oauth2:
             - (no_scope)
@@ -1396,7 +1396,7 @@ paths:
                 $ref: "#/components/schemas/User"
         404:
           description: A user is not found.
-          content: {}
+          content: { }
       deprecated: true
   /oauth2/authorize:
     get:
@@ -1432,10 +1432,10 @@ paths:
       responses:
         200:
           description: Success
-          content: {}
+          content: { }
         400:
           description: OAuth2Error
-          content: {}
+          content: { }
   /oauth2/token:
     post:
       operationId: post-oauth-token
@@ -1509,10 +1509,10 @@ paths:
       responses:
         202:
           description: Shutdown successful
-          content: {}
+          content: { }
         400:
           description: Unexpected value for proxy or servers
-          content: {}
+          content: { }
       security:
         - oauth2:
             - shutdown
@@ -1671,7 +1671,7 @@ components:
             $ref: "#/components/schemas/Server"
         auth_state:
           type: object
-          properties: {}
+          properties: { }
           description: |
             Authentication state of the user. Only available with admin:users:auth_state
             scope. None otherwise.
@@ -1742,13 +1742,13 @@ components:
           format: date-time
         state:
           type: object
-          properties: {}
+          properties: { }
           description: Arbitrary internal state from this server's spawner. Only available
             on the hub's users list or get-user-by-name method, and only with admin:users:server_state
             scope. None otherwise.
         user_options:
           type: object
-          properties: {}
+          properties: { }
           description: User specified options for the user's spawned instance of a
             single-user server.
     RequestIdentity:
@@ -1869,7 +1869,7 @@ components:
             type: string
         info:
           type: object
-          properties: {}
+          properties: { }
           description: |
             Additional information a deployment can attach to a service.
             JupyterHub does not use this field.

@@ -1,13 +1,11 @@
 import type {
-  PrometheusResponse,
-  PrometheusQueryResult,
-  PrometheusMetric,
+  GPUAvailabilityMetrics,
   GPUMetrics,
   JupyterGPUMetrics,
-  GPUAvailabilityMetrics,
+  PrometheusMetric,
   PrometheusQueryParams,
-  GPUDevice,
-  GPUDeviceInfo,
+  PrometheusQueryResult,
+  PrometheusResponse,
 } from "../../types/prometheus";
 
 import { prometheusClient } from "./prometheus-api";
@@ -927,7 +925,6 @@ export const getUnassignedGPUsByModel = async (): Promise<{
       (sum, count) => sum + count,
       0,
     );
-
 
     return {
       unassignedGPUs,

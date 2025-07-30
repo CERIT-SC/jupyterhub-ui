@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Info, ArrowLeft, RocketIcon } from "lucide-react";
+import { ArrowLeft, Info, Loader2, RocketIcon } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Loading } from "@/components/ui/loading";
 import { useAuth } from "@/hooks/useAuth";
-import { JupyterHubServerOptions, createServer } from "@/services/jupyterHub";
+import { createServer, JupyterHubServerOptions } from "@/services/jupyterHub";
 import { SpawnOptionsForm } from "@/components/hub/SpawnOptionsForm";
 import { ServerNameInput } from "@/components/hub/ServerNameInput";
 import { PresetSelector } from "@/components/hub/PresetSelector";

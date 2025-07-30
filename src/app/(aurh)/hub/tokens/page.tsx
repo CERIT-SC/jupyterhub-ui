@@ -2,21 +2,20 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Plus, Clipboard, Eye, EyeOff, Trash2 } from "lucide-react";
+import { Clipboard, Eye, EyeOff, Loader2, Plus, Trash2 } from "lucide-react";
 
 import {
-  jupyterHubClient,
-  getUserTokens,
   createUserToken,
   deleteUserToken,
+  getUserTokens,
 } from "@/services/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Play, Square, Trash2, Loader2 } from "lucide-react";
+import { Loader2, Play, Square, Trash2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

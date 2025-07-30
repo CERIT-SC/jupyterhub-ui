@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 
 import "@/styles/globals.css";
-
-import "@/styles/globals.css";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/cn";
 import { fontSans } from "@/config/fonts";

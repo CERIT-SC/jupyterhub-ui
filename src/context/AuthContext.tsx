@@ -1,17 +1,14 @@
 import React, {
   createContext,
-  useState,
-  useEffect,
   ReactNode,
   useCallback,
+  useEffect,
+  useState,
 } from "react";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 
-import {
-  AUTH_ERROR_EVENT,
-  jupyterHubClient,
-} from "@/api/jupyterhub/axios-client";
+import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
 import { User } from "@/api/jupyterhub/models";
 import { useAuthStorage } from "@/hooks/useAuthStorage";
 

@@ -1,15 +1,13 @@
 export type SiteConfig = typeof siteConfig;
 
 import {
+  BarChart,
   Home,
   LayoutDashboard,
   LogOut,
   Server,
   Settings,
-  User,
-  BarChart,
   Users,
-  Key,
 } from "lucide-react";
 
 export const siteConfig = {

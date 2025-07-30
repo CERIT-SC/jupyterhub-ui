@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ServerIcon } from "lucide-react";
 
 import { Label } from "@/components/ui/label";

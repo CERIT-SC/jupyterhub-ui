@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import { cn } from "@/lib/cn";
 import { Label } from "@/components/ui/label";
 import { FormError } from "@/components/ui/form-error";
@@ -38,16 +39,16 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <div className={cn("space-y-2", maxWidth, className)}>
-      <Label htmlFor={id} className="font-medium">
+      <Label className="font-medium" htmlFor={id}>
         {label}
       </Label>
       {children}
       <FormError message={error} />
       {(description || tooltip) && (
         <HelpText
+          recommended={recommended}
           shortDescription={description}
           tooltip={tooltip}
-          recommended={recommended}
         />
       )}
     </div>

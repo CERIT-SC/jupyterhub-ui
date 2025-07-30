@@ -4,46 +4,25 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import {
-  Loader2,
-  Plus,
-  Server,
-  Play,
-  Square,
-  Trash2,
-  LayoutDashboard,
-  Gauge,
-  Rocket,
   CheckCircle,
+  Gauge,
+  LayoutDashboard,
+  Loader2,
   MoreHorizontal,
-  ArrowRight,
-  Clock,
-  ExternalLink,
-  Settings,
-  Info,
+  Plus,
+  Rocket,
+  Server,
 } from "lucide-react";
 
-import {
-  getUserInfo,
-  stopServer,
-  formatTimeAgo,
-  getRecentNotebooks,
-  getUserNamedNotebooks,
-} from "@/services/jupyterHub";
-import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
+import { getUserNamedNotebooks } from "@/services/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Loading } from "@/components/ui/loading";
-import { ServerList } from "@/components/notebook/server-list";
-import { RecentNotebooks } from "@/components/notebook/recent-notebooks";
-import { NotebookDetailsDialog } from "@/components/notebook/notebook-details-dialog";
 import { useAuth } from "@/hooks/useAuth";
 
 interface NotebookServer {

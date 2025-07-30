@@ -1,20 +1,24 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
-  Clock,
-  Square,
-  ExternalLink,
-  Terminal,
-  AlertTriangle,
-  HardDrive,
   Activity,
+  AlertTriangle,
+  Clock,
+  ExternalLink,
+  HardDrive,
   Info,
   LoaderCircle,
+  Square,
+  Terminal,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/cn";
-import { formatTimeAgo, deleteServer } from "@/services/jupyterHub";
+import {
+  deleteServer,
+  formatTimeAgo,
+  ServerStatus,
+} from "@/services/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,7 +34,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ServerStatus } from "@/services/jupyterHub";
 import { NotebookDetailsDialog } from "@/components/notebook/notebook-details-dialog";
 import { useAuth } from "@/hooks/useAuth";
 

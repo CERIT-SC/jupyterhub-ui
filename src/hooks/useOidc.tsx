@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserManager, User } from "oidc-client-ts";
+import { User, UserManager } from "oidc-client-ts";
 
 import oidcConfig from "@/config/oidc";
 

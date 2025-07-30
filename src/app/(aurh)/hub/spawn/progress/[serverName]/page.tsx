@@ -1,20 +1,16 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, CheckCircle, XCircle, ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  ServerStatus,
-  ServerProgress,
-  fetchServerProgress,
-} from "@/services/jupyterHub";
+import { fetchServerProgress } from "@/services/jupyterHub";
 import { useAuth } from "@/hooks/useAuth";
 
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";

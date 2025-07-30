@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useState } from "react";
 
-import { themeStorage, defaultThemeSettings } from "@/services/storage";
+import { defaultThemeSettings, themeStorage } from "@/services/storage";
 import { ThemeSettings } from "@/types/storage";
 
 export const useThemeStorage = () => {

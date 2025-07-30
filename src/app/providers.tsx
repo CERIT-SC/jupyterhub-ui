@@ -2,8 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import React, { useState, ReactNode, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import React, { ReactNode, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/context/AuthContext";

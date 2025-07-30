@@ -7,7 +7,6 @@ import { Bell, LogOut, Settings, User, UserCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { siteConfig } from "@/config/site";
-import { useOidc } from "@/hooks/useOidc";
 import { AppHeader } from "@/components/layout/app-header";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { SidebarNavigation } from "@/components/layout/sidebar-navigation";
@@ -20,7 +19,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {} from "@/components/ui/avatar";
 
 export default function AuthLayout({
   children,
@@ -38,10 +36,11 @@ export default function AuthLayout({
       setSidebarOpen(false);
     };
 
-    router.events && router.events.on('routeChangeComplete', handleRouteChange);
+    router.events && router.events.on("routeChangeComplete", handleRouteChange);
 
     return () => {
-      router.events && router.events.off('routeChangeComplete', handleRouteChange);
+      router.events &&
+        router.events.off("routeChangeComplete", handleRouteChange);
     };
   }, [router]);
 
@@ -54,7 +53,8 @@ export default function AuthLayout({
   // Set sidebar open by default on desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) { // md breakpoint
+      if (window.innerWidth >= 768) {
+        // md breakpoint
         setSidebarOpen(true);
       } else {
         setSidebarOpen(false);
@@ -64,8 +64,9 @@ export default function AuthLayout({
     // Initial check
     handleResize();
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogout = () => {
@@ -102,11 +103,7 @@ export default function AuthLayout({
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    className="relative "
-                    size="icon"
-                    variant="ghost"
-                  >
+                  <Button className="relative " size="icon" variant="ghost">
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -127,7 +124,7 @@ export default function AuthLayout({
                       </DropdownMenuLabel>
                       {user?.name && (
                         <span className="text-xs text-infra-text-secondary truncate max-w-[11rem]">
-                          {user.roles?.join(', ')}
+                          {user.roles?.join(", ")}
                         </span>
                       )}
                     </div>

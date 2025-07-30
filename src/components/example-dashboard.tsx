@@ -14,13 +14,11 @@ import {
 
 import { Button } from "./ui/button";
 import { AppHeader } from "./layout/app-header";
-import { DashboardLayout } from "./layout/dashboard-layout";
-import { WaveBackground } from "./ui/wave-background";
 import { PageHeader } from "./layout/page-header";
-import { NotebooksGrid, NotebookData } from "./notebook/notebooks-grid";
+import { NotebooksGrid } from "./notebook/notebooks-grid";
 import { ServerStatus } from "./notebook/server-status";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Loading, LoadingOverlay } from "./ui/loading";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { LoadingOverlay } from "./ui/loading";
 
 import { EXAMPLE_NOTEBOOKS } from "@/mocks";
 import { Input } from "@/components/input";

@@ -1,12 +1,12 @@
 "use client";
 
 import {
+  Brain,
   ChevronRight,
+  Code,
+  Database,
   Settings,
   Zap,
-  Database,
-  Brain,
-  Code,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -14,9 +14,9 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 

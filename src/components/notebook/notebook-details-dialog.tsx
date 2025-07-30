@@ -1,20 +1,15 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
 import {
-  Info,
+  AlertTriangle,
+  Calendar,
   Clock,
   Cpu,
-  Database,
-  Calendar,
-  User,
-  Server,
-  ExternalLink,
+  Info,
   RefreshCw,
-  Zap,
-  Square,
-  Play,
+  Server,
   Trash2,
-  AlertTriangle,
+  Zap,
 } from "lucide-react";
 
 import {
@@ -24,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
