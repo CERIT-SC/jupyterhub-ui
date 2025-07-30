@@ -26,7 +26,6 @@ import { JupyterHubServerOptions } from "@/services/jupyterHub";
 import {
   cpuOptions,
   memoryOptions,
-  gpuOptions,
   migAmountOptions,
   homeOptions,
   phomeOptions,
@@ -34,6 +33,8 @@ import {
   mockS3Buckets,
   s3SelectionOptions,
 } from "@/config/hub/jupyterOptions";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
+import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
 
 interface SpawnOptionsFormProps {
   options: JupyterHubServerOptions;
@@ -55,6 +56,10 @@ export function SpawnOptionsForm({
 }: SpawnOptionsFormProps) {
   // Track GPU-specific state to show/hide MIG amount selector
   const [showMigAmount, setShowMigAmount] = useState(false);
+
+  // Track available GPU options from Prometheus
+  const [gpuOptions, setGpuOptions] = useState<Array<{value: string; label: string}>>([]);
+  const [gpuOptionsLoading, setGpuOptionsLoading] = useState(true);
 
   // Track home storage state
   const [mountMetacentrumHome, setMountMetacentrumHome] = useState(
@@ -80,6 +85,36 @@ export function SpawnOptionsForm({
   useEffect(() => {
     setShowMigAmount(options.gpu.startsWith("mig"));
   }, [options.gpu]);
+
+  // Load GPU options from Prometheus API
+  useEffect(() => {
+    const loadGpuOptions = async () => {
+      try {
+        setGpuOptionsLoading(true);
+        const allocableGPUs = await getAllocatableGPUS();
+
+        // Transform the allocable GPUs data into options format
+        const options = Object.entries(allocableGPUs).map(([name, count]) => ({
+          value: name,
+          label: `${name} (${count} available)`
+        }));
+
+        // Add "None" option at the beginning
+        setGpuOptions([
+          { value: "none", label: "None" },
+          ...options
+        ]);
+      } catch (error) {
+        console.error("Failed to load GPU options:", error);
+        // Fallback to a basic option if API fails
+        setGpuOptions([{ value: "none", label: "None" }]);
+      } finally {
+        setGpuOptionsLoading(false);
+      }
+    };
+
+    loadGpuOptions();
+  }, []);
 
   // Handle image change
   const handleImageChange = (imagePath: string) => {
@@ -485,9 +520,9 @@ export function SpawnOptionsForm({
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Select value={options.gpu} onValueChange={handleGpuChange}>
+                  <Select value={options.gpu} onValueChange={handleGpuChange} disabled={gpuOptionsLoading}>
                     <SelectTrigger id="gpu-selection">
-                      <SelectValue placeholder="Select GPU type" />
+                      <SelectValue placeholder={gpuOptionsLoading ? "Loading GPU options..." : "Select GPU type"} />
                     </SelectTrigger>
                     <SelectContent>
                       {gpuOptions.map((option) => (
@@ -591,64 +626,76 @@ export function SpawnOptionsForm({
                       Create new persistent home
                     </Label>
                   </div>
+
+                    {phomeType === "new" && (
+                        <div className="ml-6 mt-3">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    checked={options.phome === "delete"}
+                                    id="phome-delete"
+                                    onCheckedChange={handlePhomeDeleteChange}
+                                />
+                                <Label className="font-medium" htmlFor="phome-delete">
+                                    Erase if home already exists
+                                </Label>
+                            </div>
+                            <HelpText
+                                shortDescription="If checked, any existing home directory with the same name will be erased and recreated."
+                                tooltip="Warning: This will permanently delete any existing data in a persistent home with the same name."
+                            />
+                        </div>
+                    )}
+
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem id="phome-existing" value="existing" />
                     <Label className="font-medium" htmlFor="phome-existing">
                       Use existing persistent home
                     </Label>
                   </div>
+
+
+                    {phomeType === "existing" && (
+                        <Alert variant={"destructive"}>
+                            <AlertTitle>Feature not supported</AlertTitle>
+                            <AlertDescription>
+                                Selecting existing persistent home is not implemented
+                            </AlertDescription>
+                        </Alert>
+                        // <FormField
+                        //     className="ml-6 mt-3"
+                        //     description="Choose from your previously created persistent home directories"
+                        //     id="existing-phome"
+                        //     label="Select existing persistent home:"
+                        //     maxWidth="max-w-md"
+                        // >
+                        //     <Select
+                        //         value={
+                        //             typeof options.phome === "string" &&
+                        //             options.phome !== "delete" &&
+                        //             options.phome !== "remain"
+                        //                 ? options.phome
+                        //                 : undefined
+                        //         }
+                        //         onValueChange={handleExistingPhomeChange}
+                        //     >
+                        //         <SelectTrigger id="existing-phome">
+                        //             <SelectValue placeholder="Select a persistent home" />
+                        //         </SelectTrigger>
+                        //         <SelectContent>
+                        //             {mockPvcNames.map((pvc) => (
+                        //                 <SelectItem key={pvc.value} value={pvc.value}>
+                        //                     {pvc.label}
+                        //                 </SelectItem>
+                        //             ))}
+                        //         </SelectContent>
+                        //     </Select>
+                        // </FormField>
+                    )}
+
                 </RadioGroup>
 
-                {phomeType === "new" && (
-                  <div className="ml-6 mt-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={options.phome === "delete"}
-                        id="phome-delete"
-                        onCheckedChange={handlePhomeDeleteChange}
-                      />
-                      <Label className="font-medium" htmlFor="phome-delete">
-                        Erase if home already exists
-                      </Label>
-                    </div>
-                    <HelpText
-                      shortDescription="If checked, any existing home directory with the same name will be erased and recreated."
-                      tooltip="Warning: This will permanently delete any existing data in a persistent home with the same name."
-                    />
-                  </div>
-                )}
 
-                {phomeType === "existing" && (
-                  <FormField
-                    className="ml-6 mt-3"
-                    description="Choose from your previously created persistent home directories"
-                    id="existing-phome"
-                    label="Select existing persistent home:"
-                    maxWidth="max-w-md"
-                  >
-                    <Select
-                      value={
-                        typeof options.phome === "string" &&
-                        options.phome !== "delete" &&
-                        options.phome !== "remain"
-                          ? options.phome
-                          : undefined
-                      }
-                      onValueChange={handleExistingPhomeChange}
-                    >
-                      <SelectTrigger id="existing-phome">
-                        <SelectValue placeholder="Select a persistent home" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {mockPvcNames.map((pvc) => (
-                          <SelectItem key={pvc.value} value={pvc.value}>
-                            {pvc.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormField>
-                )}
+
               </div>
             </CardSection>
 

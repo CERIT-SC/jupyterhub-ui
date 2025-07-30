@@ -169,7 +169,7 @@ export default function TokensPage1() {
               {tokens.map((token) => (
                 <div
                   key={token.id}
-                  className="p-4 border rounded-md flex items-center justify-between"
+                  className="p-4 border border-gray-200 shadow-sm rounded-md flex items-center justify-between"
                 >
                   <div>
                     <div className="font-medium">

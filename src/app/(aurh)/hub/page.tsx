@@ -62,6 +62,15 @@ interface ServerStatus {
 export default function HubDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
+  // Check if any notebooks are in transition states
+  const hasTransitioningNotebooks = (notebookData: any) => {
+    if (!notebookData) return false;
+
+    return Object.values(notebookData).some(
+      (server: any) => server.pending === "spawn" || server.pending === "stop",
+    );
+  };
+
   const {
     data: namedNotebooks,
     isLoading,
@@ -70,16 +79,45 @@ export default function HubDashboard() {
   } = useQuery({
     queryKey: ["user-notebooks"],
     queryFn: () => getUserNamedNotebooks(user?.name),
+    // Dynamic refetch interval - 1 second when notebooks are transitioning, 5 seconds otherwise
+    refetchInterval: hasTransitioning ? 1000 : 5000,
+    // Continue refetching while page is not in focus
+    refetchIntervalInBackground: true,
   });
 
   const handleStopServer = async (serverName: string) => {
     try {
+      // Preemptively update local state to show stopping status
+      if (namedNotebooks && namedNotebooks[serverName]) {
+        // Manually update the pending state
+        namedNotebooks[serverName].pending = "stop";
+        namedNotebooks[serverName].ready = false;
+
+        // Set transition state manually to increase polling frequency
+        setHasTransitioning(true);
+      }
+
+      // Make the actual API call
       await jupyterHubClient.delete(`/users/me/servers/${serverName}`);
-      refetch();
+
+      // No need for explicit refetch, as the dynamic interval will handle it
     } catch (error) {
       console.error("Failed to stop server:", error);
+      // Force a refetch to get the accurate state in case of error
+      refetch();
     }
   };
+
+  // Check for transitioning notebooks whenever data changes
+  useEffect(() => {
+    if (namedNotebooks) {
+      const transitioning = Object.values(namedNotebooks).some(
+        (server) => server.pending === "spawn" || server.pending === "stop",
+      );
+
+      setHasTransitioning(transitioning);
+    }
+  }, [namedNotebooks]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

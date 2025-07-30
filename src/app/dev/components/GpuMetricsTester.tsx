@@ -2,24 +2,26 @@ import { FC, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  discoverGPUMetrics,
-  getUnassignedGPUsByModel,
-  getFreeGPUsByModel,
-  getUnschedulableNodes,
-  getAllocatableNodes,
-  getNodeStatus,
-  getNodeAllocatableResources,
+    discoverGPUMetrics,
+    getUnassignedGPUsByModel,
+    getFreeGPUsByModel,
+    getUnschedulableNodes,
+    getAllocatableNodes,
+    getNodeStatus,
+    getNodeAllocatableResources,
+    getGPUAllocatableNodes, getAllocatableGPUS,
 } from "@/api/prometheus/prometheus-api";
 
 const GpuMetricsTester: FC = () => {
   const [loading, setLoading] = useState(false);
   const [unassignedGPUsByModel, setUnassignedGPUsByModel] = useState<any>(null);
-  const [freeGPUsByModel, setFreeGPUsByModel] = useState<any>(null);
   const [discoveredMetrics, setDiscoveredMetrics] = useState<any>(null);
   const [unschedulableNodes, setUnschedulableNodes] = useState<any>(null);
   const [allocatableNodes, setAllocatableNodes] = useState<any>(null);
   const [nodeStatus, setNodeStatus] = useState<any>(null);
   const [nodeAllocatableResources, setNodeAllocatableResources] = useState<any>(null);
+  const [gpuAllocatableNodes, setGpuAllocatableNodes] = useState<any>(null);
+  const [allocatableGpus, setAllocatableGpus] = useState<any>(null)
 
   const handleDiscoverGPUMetrics = async () => {
     setLoading(true);
@@ -36,7 +38,25 @@ const GpuMetricsTester: FC = () => {
     }
   };
 
-  const handleGetUnassignedGPUsByModel = async () => {
+    const handleGetAllocatableGpus = async () => {
+        setLoading(true);
+        try {
+            const unassignedGPUs = await getAllocatableGPUS();
+
+            setAllocatableGpus(unassignedGPUs);
+            console.log("Unassigned GPUs by model:", unassignedGPUs);
+        } catch (error) {
+            console.error("Failed to get unassigned GPUs by model:", error);
+            setAllocatableGpus({
+                error: "Failed to get unassigned GPUs by model",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    const handleGetUnassignedGPUsByModel = async () => {
     setLoading(true);
     try {
       const unassignedGPUs = await getUnassignedGPUsByModel();
@@ -64,23 +84,6 @@ const GpuMetricsTester: FC = () => {
       console.error("Failed to get unschedulable nodes:", error);
       setUnschedulableNodes({
         error: "Failed to get unschedulable nodes",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGetFreeGPUsByModel = async () => {
-    setLoading(true);
-    try {
-      const freeGPUs = await getFreeGPUsByModel();
-
-      setFreeGPUsByModel(freeGPUs);
-      console.log("Free GPUs by model:", freeGPUs);
-    } catch (error) {
-      console.error("Failed to get free GPUs by model:", error);
-      setFreeGPUsByModel({
-        error: "Failed to get free GPUs by model",
       });
     } finally {
       setLoading(false);
@@ -138,6 +141,28 @@ const GpuMetricsTester: FC = () => {
     }
   };
 
+  const handleGetGPUAllocatableNodes = async () => {
+    setLoading(true);
+    try {
+      const nodes = await getGPUAllocatableNodes();
+
+      const result = {
+        nodes: Array.from(nodes),
+        count: nodes.size
+      };
+
+      setGpuAllocatableNodes(result);
+      console.log("GPU allocatable nodes:", result);
+    } catch (error) {
+      console.error("Failed to get GPU allocatable nodes:", error);
+      setGpuAllocatableNodes({
+        error: "Failed to get GPU allocatable nodes",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -151,9 +176,6 @@ const GpuMetricsTester: FC = () => {
           <Button disabled={loading} onClick={handleGetUnassignedGPUsByModel}>
             {loading ? "Loading..." : "Get Unused GPUs"}
           </Button>
-          <Button disabled={loading} onClick={handleGetFreeGPUsByModel}>
-            {loading ? "Loading..." : "Get Free GPUs"}
-          </Button>
           <Button disabled={loading} onClick={handleGetUnschedulableNodes}>
             {loading ? "Loading..." : "Get Unschedulable Nodes"}
           </Button>
@@ -166,6 +188,13 @@ const GpuMetricsTester: FC = () => {
           <Button disabled={loading} onClick={handleGetNodeAllocatableResources}>
             {loading ? "Loading..." : "Get Node Allocatable Resources"}
           </Button>
+          <Button disabled={loading} onClick={handleGetGPUAllocatableNodes}>
+            {loading ? "Loading..." : "Get GPU Allocatable Nodes"}
+          </Button>
+            <Button disabled={loading} onClick={handleGetAllocatableGpus}>
+                {loading ? "Loading..." : "Get allocatable GPUS"}
+            </Button>
+
         </div>
 
         {discoveredMetrics && (
@@ -274,53 +303,6 @@ const GpuMetricsTester: FC = () => {
           </div>
         )}
 
-        {freeGPUsByModel && (
-          <div className="mt-4 p-4 bg-teal-100 rounded text-xs">
-            <h3 className="font-bold mb-2">Free GPUs by Model:</h3>
-
-            {freeGPUsByModel.error ? (
-              <div className="text-red-600">{freeGPUsByModel.error}</div>
-            ) : (
-              <>
-                <div className="mb-2">
-                  <strong>Total Free: {freeGPUsByModel.totalFree}</strong>
-                </div>
-
-                <div className="mb-2">
-                  <strong>Free by Model:</strong>
-                  {Object.entries(freeGPUsByModel.freeGPUs || {}).map(
-                    ([model, count]) => (
-                      <div key={model} className="ml-4">
-                        {model}: {count}
-                      </div>
-                    )
-                  )}
-                </div>
-
-                <details className="mt-2">
-                  <summary className="cursor-pointer font-semibold">GPU Details</summary>
-                  <div className="mt-2 max-h-32 overflow-y-auto">
-                    {freeGPUsByModel.gpuDetails?.map((gpu: any, index: number) => (
-                      <div key={index} className="mb-2 p-2 bg-white rounded">
-                        <div className="font-mono text-xs">
-                          <strong>{gpu.modelName}</strong> - {gpu.deviceId}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          Node: {gpu.nodeName} | Memory: {gpu.freeMemoryMB}MB/
-                          {gpu.totalMemoryMB}MB
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          UUID: {gpu.uuid} | Driver: {gpu.driverVersion}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </details>
-              </>
-            )}
-          </div>
-        )}
-
         {nodeAllocatableResources && (
           <div className="mt-4 p-4 bg-indigo-100 rounded text-xs">
             <h3 className="font-bold mb-2">Node Allocatable Resources:</h3>
@@ -380,6 +362,45 @@ const GpuMetricsTester: FC = () => {
             )}
           </div>
         )}
+
+        {gpuAllocatableNodes && (
+          <div className="mt-4 p-4 bg-purple-100 rounded text-xs">
+            <h3 className="font-bold mb-2">GPU Allocatable Nodes:</h3>
+            {gpuAllocatableNodes.error ? (
+              <div className="text-red-600">{gpuAllocatableNodes.error}</div>
+            ) : (
+              <>
+                <div className="mb-2">
+                  <strong>Total GPU Allocatable Nodes: {gpuAllocatableNodes.count || 0}</strong>
+                </div>
+                <div className="space-y-1 max-h-48 overflow-y-auto">
+                  {gpuAllocatableNodes.nodes?.map((node: string) => (
+                    <div key={node} className="p-1 bg-white rounded">
+                      <span className="font-mono text-sm">{node}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+          {allocatableGpus && (
+              <div className="mt-4 p-4 bg-pink-100 rounded text-xs">
+                  <h3 className="font-bold mb-2">All Allocatable GPUS:</h3>
+                  <pre className="whitespace-pre-wrap overflow-auto max-h-32">
+                <div className="mb-2">
+              <strong>By Model:</strong>
+                    {Object.entries(allocatableGpus || {}).map(
+                        ([model, count]) => (
+                            <div key={model} className="ml-4">
+                                {model}: {count}
+                            </div>
+                        )
+                    )}
+            </div>
+            </pre>
+              </div>
+          )}
       </CardContent>
     </Card>
   );

@@ -40,6 +40,7 @@ export interface NotebookCardProps {
   onStart?: () => void;
   onStop?: () => void;
   onSettings?: () => void;
+  onRemove?: () => void;
   className?: string;
 }
 
@@ -79,14 +80,14 @@ function getStatusInfo(server: ServerStatus): {
     };
   }
 
-  // if (server.stopped) {
-  //   return {
-  //     status: "Stopped",
-  //     variant: "outline",
-  //     icon: <Square className="h-3 w-3" />,
-  //     className: "bg-gray-50 text-gray-700 border-gray-200",
-  //   };
-  // }
+  if (!server.started) {
+    return {
+      status: "Stopped",
+      variant: "outline",
+      icon: <Square className="h-3 w-3" />,
+      className: "bg-gray-50 text-gray-700 border-gray-200",
+    };
+  }
 
   // Default/unknown state
   return {
@@ -137,6 +138,7 @@ export function NotebookCard({
   name,
   onStart,
   onStop,
+  onRemove,
   className,
 }: NotebookCardProps) {
   const { user } = useAuth();
@@ -158,12 +160,14 @@ export function NotebookCard({
   return (
     <Card
       className={cn(
-        "transition-all overflow-hidden hover:shadow-md",
+        "transition-all overflow-hidden",
         server.ready
-          ? "border-green-200"
-          : server.pending
-            ? "border-yellow-200"
-            : "border-gray-200",
+          ? "hover:shadow-md border-infra-primary/50"
+          : server.pending === "stop"
+            ? "opacity-85 border-orange-200"
+            : server.pending
+              ? "hover:shadow-md border-yellow-200"
+              : "hover:shadow-md border-gray-200",
         className,
       )}
     >
@@ -264,7 +268,14 @@ export function NotebookCard({
               className="flex items-center"
               size="sm"
               variant="destructive"
-              onClick={() => deleteServer(name, user?.name)}
+              onClick={async () => {
+                try {
+                  await deleteServer(name, user?.name);
+                  if (onRemove) onRemove();
+                } catch (error) {
+                  console.error("Failed to remove notebook:", error);
+                }
+              }}
             >
               <Trash2 className="h-4 w-4 mr-2" /> Remove
             </Button>
@@ -277,9 +288,23 @@ export function NotebookCard({
             >
               <Square className="h-4 w-4 mr-2" /> Stop
             </Button>
+          ) : server.pending === "stop" ? (
+            <Button
+              disabled
+              className="flex items-center"
+              size="sm"
+              variant="outline"
+            >
+              <LoaderCircle className="h-4 w-4 mr-2 animate-spin" /> Stopping...
+            </Button>
           ) : (
-            <Button disabled size="sm" variant="outline">
-              {server.pending === "spawn" ? "Starting..." : "Stopping..."}
+            <Button
+              className="flex items-center"
+              size="sm"
+              variant="outline"
+              onClick={onStop}
+            >
+              <Square className="h-4 w-4 mr-2" /> Stop
             </Button>
           )}
         </div>
@@ -293,7 +318,14 @@ export function NotebookCard({
               Details
             </Button>
           }
-          onDelete={() => deleteServer(name, user?.name)}
+          onDelete={async () => {
+            try {
+              await deleteServer(name, user?.name);
+              if (onRemove) onRemove();
+            } catch (error) {
+              console.error("Failed to remove notebook:", error);
+            }
+          }}
         />
       </CardFooter>
     </Card>

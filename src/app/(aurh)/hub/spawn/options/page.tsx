@@ -188,7 +188,7 @@ export default function SpawnPage() {
       />
 
       {/* Spawn button */}
-      <div className="fixed bottom-0 left-0 right-0 py-4 px-6 bg-background border-t z-10">
+      <div className="fixed bottom-0 left-0 right-0 py-4 px-6 bg-background border-t border-gray-200 z-10">
         <div className="container mx-auto flex justify-end">
           <Button
             className="gap-2"

@@ -103,7 +103,7 @@ export default function AuthLayout({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    className="relative hover:bg-infra-gray-light/30"
+                    className="relative "
                     size="icon"
                     variant="ghost"
                   >
@@ -125,9 +125,9 @@ export default function AuthLayout({
                       <DropdownMenuLabel className="p-0 font-medium">
                         {getDisplayName()}
                       </DropdownMenuLabel>
-                      {user?.email && (
+                      {user?.name && (
                         <span className="text-xs text-infra-text-secondary truncate max-w-[11rem]">
-                          {user.email}
+                          {user.roles?.join(', ')}
                         </span>
                       )}
                     </div>
