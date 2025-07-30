@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: [
     "hub-dev-react.cloud.e-infra.cz",
     "hub-dev-python.cloud.e-infra.cz",
-      "https://hub-dev-react.dyn.cloud.e-infra.cz"
+    "https://hub-dev-react.dyn.cloud.e-infra.cz",
+    "https://hub-dev-python.cloud.e-infra.cz/",
   ],
   async rewrites() {
     return [

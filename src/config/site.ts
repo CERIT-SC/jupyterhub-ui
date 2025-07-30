@@ -55,11 +55,11 @@ export const siteConfig = {
     {
       section: "Settings",
       items: [
-        {
-          name: "Profile",
-          icon: User,
-          path: "/profile",
-        },
+        // {
+        //   name: "Profile",
+        //   icon: User,
+        //   path: "/profile",
+        // },
         {
           name: "Preferences",
           icon: Settings,

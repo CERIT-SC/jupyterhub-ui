@@ -335,12 +335,15 @@ export default function SpawnProgress() {
               <p className="text-green-700 mb-3">
                 Your server has been successfully spawned and is ready to use.
               </p>
-              <Button
-                className="bg-green-600 hover:bg-green-700"
-                onClick={openServer}
+              <Link
+                href={
+                  `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/` + server.url
+                }
               >
-                Open Server
-              </Button>
+                <Button asChild className="bg-green-600 hover:bg-green-700">
+                  Open Server
+                </Button>
+              </Link>
             </div>
           )}
 

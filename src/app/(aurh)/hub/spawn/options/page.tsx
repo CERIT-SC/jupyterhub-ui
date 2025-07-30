@@ -17,13 +17,6 @@ import { PresetSelector } from "@/components/hub/PresetSelector";
 import { defaultJupyterHubServerOptions } from "@/config/hub";
 import { ServerPreset, serverPresets } from "@/config/presets";
 
-// Add global style to ensure tooltips are not covered by cards
-const tooltipStyle = `
-  .radix-tooltip-content {
-    z-index: 9999 !important;
-  }
-`;
-
 export default function SpawnPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -117,9 +110,6 @@ export default function SpawnPage() {
 
   return (
     <div className="container mx-auto p-6 pb-24 space-y-6">
-      <style global jsx>
-        {tooltipStyle}
-      </style>
       {/* Back button */}
       <div className="flex items-center space-x-2">
         <Button
@@ -139,13 +129,12 @@ export default function SpawnPage() {
       />
 
       {/* Info alert */}
-      <Alert>
+      <Alert variant={"info"}>
         <Info className="h-4 w-4" />
-        <AlertTitle>Resource Allocation</AlertTitle>
+        <AlertTitle>Feature in developement</AlertTitle>
         <AlertDescription>
-          The notebook is spawned only when a node fulfills all your
-          requirements. Resources cannot be shared among nodes. For larger
-          resource requests, check availability before spawning.
+          Options are unavailable for the time being. You can spawn only basic
+          notebook server.
         </AlertDescription>
       </Alert>
 
@@ -192,7 +181,8 @@ export default function SpawnPage() {
         <div className="container mx-auto flex justify-end">
           <Button
             className="gap-2"
-            disabled={isSpawning || !serverName}
+            // disabled={isSpawning || !serverName}
+            disabled={true}
             size="lg"
             onClick={handleSpawn}
           >

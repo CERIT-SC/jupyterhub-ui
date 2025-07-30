@@ -199,7 +199,10 @@ export function NotebookCard({
                     variant="ghost"
                   >
                     <Link
-                      href={"https://hub.cloud.e-infra.cz/hub/" + server.url}
+                      href={
+                        `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/` +
+                        server.url
+                      }
                       rel="noopener noreferrer"
                       target="_blank"
                     >

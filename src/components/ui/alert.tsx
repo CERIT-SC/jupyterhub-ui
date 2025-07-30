@@ -9,21 +9,21 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-white/80 backdrop-blur-sm border-gray-200 text-infra-text-primary",
+        default:
+          "bg-white backdrop-blur-sm border-gray-200 text-infra-text-primary",
         destructive:
-          "border-red-100 bg-red-50/80 backdrop-blur-sm text-red-600 [&>svg]:text-red-600",
+          "border-red-200 bg-red-50/80 backdrop-blur-sm text-red-600 [&>svg]:text-red-600",
         success:
-          "border-green-100 bg-green-50/80 backdrop-blur-sm text-green-700 [&>svg]:text-green-700",
+          "border-green-200 bg-green-50/80 backdrop-blur-sm text-green-700 [&>svg]:text-green-700",
         warning:
-          "border-yellow-100 bg-yellow-50/80 backdrop-blur-sm text-yellow-800 [&>svg]:text-yellow-800",
-        info:
-          "border-blue-100 bg-blue-50/80 backdrop-blur-sm text-blue-700 [&>svg]:text-blue-700",
+          "border-yellow-200 bg-yellow-50/80 backdrop-blur-sm text-yellow-800 [&>svg]:text-yellow-800",
+        info: "border-blue-200 bg-blue-50/80 backdrop-blur-sm text-blue-700 [&>svg]:text-blue-700",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 );
 
 const alertIconMap = {
@@ -41,22 +41,26 @@ interface AlertProps
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
-  ({ className, variant = "default", showIcon = true, children, ...props }, ref) => {
+  (
+    { className, variant = "default", showIcon = true, children, ...props },
+    ref,
+  ) => {
     const IconComponent = alertIconMap[variant || "default"];
 
     return (
       <div
         ref={ref}
-        role="alert"
         className={cn(alertVariants({ variant }), className)}
+        role="alert"
         {...props}
       >
         {showIcon && <IconComponent className="h-4 w-4" />}
         {children}
       </div>
     );
-  }
+  },
 );
+
 Alert.displayName = "Alert";
 
 const AlertTitle = React.forwardRef<
@@ -69,6 +73,7 @@ const AlertTitle = React.forwardRef<
     {...props}
   />
 ));
+
 AlertTitle.displayName = "AlertTitle";
 
 const AlertDescription = React.forwardRef<
@@ -81,6 +86,7 @@ const AlertDescription = React.forwardRef<
     {...props}
   />
 ));
+
 AlertDescription.displayName = "AlertDescription";
 
 export { Alert, AlertTitle, AlertDescription };
