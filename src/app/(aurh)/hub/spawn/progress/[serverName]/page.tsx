@@ -33,27 +33,48 @@ export default function SpawnProgress() {
   const [pageState, setPageState] = useState<PageState>("starting");
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
 
-  const counter = useRef<number>(0);
-
   const { data, isError, error, isFetched } = useQuery({
     queryKey: ["user", "server", serverName],
     queryFn: () => {
-      counter.current += 1;
       const username = user?.name;
-
-      console.log("counter", counter.current);
 
       return fetchServerProgress(serverName, username);
     },
     enabled: running,
-    refetchInterval: 1,
+    // Use a very short refetch interval (500ms) while server is starting
+    // to get near real-time updates during server initialization
+    refetchInterval: running ? 5 : false,
+    // Keep fetching even when window is not focused
+    refetchIntervalInBackground: true,
+    // Don't stale the data quickly so we can see updates
+    staleTime: 0,
+    // Don't cache the progress data for long
     retry: 3,
     retryDelay: 1000,
   });
 
+  console.log("data", data);
+  // Store previous progress value to detect changes
+  const prevProgressRef = useRef<number>(0);
+
   // Track message history and update state based on progress
   useEffect(() => {
     if (data) {
+      // Check if progress has changed
+      if (data.progress !== prevProgressRef.current) {
+        // Add progress update to message history
+        const progressChange = data.progress - prevProgressRef.current;
+
+        if (progressChange > 0) {
+          const timestamp = new Date().toLocaleTimeString();
+
+          setMessageHistory((prev) => [
+            ...prev,
+            `[${timestamp}] Progress update: ${prevProgressRef.current}% → ${data.progress}% (+${progressChange}%)`,
+          ]);
+        }
+        prevProgressRef.current = data.progress;
+      }
       // Update state based on progress and ready/failed status
       if (data.progress === 0) {
         setPageState("starting");
@@ -77,7 +98,11 @@ export default function SpawnProgress() {
             return prev;
           }
 
-          return [...prev, data.message];
+          // Include timestamp with message for more detailed history
+          const timestamp = new Date().toLocaleTimeString();
+          const messageWithTime = `[${timestamp}] ${data.message}`;
+
+          return [...prev, messageWithTime];
         });
       }
     }
@@ -247,7 +272,15 @@ export default function SpawnProgress() {
           {/* Message History */}
           <div className="mt-4">
             <h3 className="text-sm font-medium mb-2">Message History</h3>
-            <div className="border rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50">
+            <div
+              ref={(el) => {
+                // Auto-scroll to bottom when new messages are added
+                if (el) {
+                  el.scrollTop = el.scrollHeight;
+                }
+              }}
+              className="border rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50"
+            >
               {messageHistory.length > 0 ? (
                 <div className="space-y-2">
                   {messageHistory.map((message, index) => (
@@ -319,7 +352,7 @@ export default function SpawnProgress() {
                 <div className="mt-2 p-2 bg-gray-100 rounded">
                   <p>State: {pageState}</p>
                   <p>Running: {running.toString()}</p>
-                  <p>Poll count: {counter.current}</p>
+
                   <p>Fetched: {isFetched.toString()}</p>
                   <p>Server Name: {serverName}</p>
                   <p>Username: {user?.name}</p>
