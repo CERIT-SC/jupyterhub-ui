@@ -25,6 +25,18 @@ export default function Login() {
     }
   };
 
+  const handleHubOauth = () => {
+    // Redirect to the JupyterHub OAuth login page
+    window.location.href =
+      `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/oauth2/authorize` +
+      `?client_id=${process.env.NEXT_PUBLIC_JUPYTERHUB_CLIENT_ID}` +
+      `&redirect_uri=${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/callback` +
+      `&response_type=code`;
+
+    // TODO: Remove dependency on localStorage token
+    login("dummy_token", isOldHub);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
@@ -34,6 +46,7 @@ export default function Login() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <button onClick={handleHubOauth}>OauthLogin</button>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="token">Access Token</Label>
