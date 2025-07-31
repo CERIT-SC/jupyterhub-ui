@@ -37,11 +37,12 @@ export function DashboardLayout({
             {/* Sidebar */}
             <aside
               className={cn(
-                "border-r border-gray-200 bg-white overflow-y-auto transition-all duration-300 ease-in-out z-50",
-                "md:sticky md:w-64 md:p-4 md:opacity-100 md:pointer-events-auto",
+                "fixed left-0 border-r h-full w-full border-gray-200 bg-white overflow-y-auto transition-all duration-300 ease-in-out z-50",
+                "sm:w-64",
+                "md:sticky md:w-64 md:p-4 md:pointer-events-auto ",
                 sidebarOpen
-                  ? "fixed left-0 w-64  translate-x-0 opacity-100 pointer-events-auto"
-                  : "fixed  left-0 w-64  -translate-x-full opacity-0 pointer-events-none",
+                  ? "translate-x-0 opacity-100 pointer-events-auto"
+                  : "-translate-x-full opacity-0 pointer-events-none",
               )}
             >
               {sidebar}
@@ -56,6 +57,25 @@ export function DashboardLayout({
                 <X className="h-4 w-4" />
               </Button>
             </aside>
+            <div
+              aria-label="Close sidebar"
+              className={cn(
+                "fixed inset-0 bg-white/50 backdrop-blur-sm md:hidden",
+                sidebarOpen
+                  ? "opacity-100 pointer-events-auto"
+                  : "opacity-0 pointer-events-none",
+              )}
+              role="button"
+              tabIndex={0}
+              onClick={onSidebarToggle}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  if (onSidebarToggle && sidebarOpen) {
+                    onSidebarToggle();
+                  }
+                }
+              }}
+            />
           </>
         )}
 
