@@ -14,11 +14,7 @@ import {
 import Link from "next/link";
 
 import { cn } from "@/lib/cn";
-import {
-  deleteServer,
-  formatTimeAgo,
-  ServerStatus,
-} from "@/services/jupyterHub";
+import { formatTimeAgo, ServerStatus } from "@/services/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -35,7 +31,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NotebookDetailsDialog } from "@/components/notebook/notebook-details-dialog";
-import { useAuth } from "@/hooks/useAuth";
 
 export interface NotebookCardProps {
   server: ServerStatus;
@@ -143,7 +138,6 @@ export function NotebookCard({
   onRemove,
   className,
 }: NotebookCardProps) {
-  const { user } = useAuth();
   // Get status information from server
   const statusInfo = getStatusInfo(server);
 
@@ -270,14 +264,7 @@ export function NotebookCard({
               className="flex items-center"
               size="sm"
               variant="destructive"
-              onClick={async () => {
-                try {
-                  await deleteServer(name, user?.name);
-                  if (onRemove) onRemove();
-                } catch (error) {
-                  console.error("Failed to remove notebook:", error);
-                }
-              }}
+              onClick={onRemove}
             >
               <Trash2 className="h-4 w-4 mr-2" /> Remove
             </Button>
@@ -320,14 +307,7 @@ export function NotebookCard({
               Details
             </Button>
           }
-          onDelete={async () => {
-            try {
-              await deleteServer(name, user?.name);
-              if (onRemove) onRemove();
-            } catch (error) {
-              console.error("Failed to remove notebook:", error);
-            }
-          }}
+          onDelete={onRemove}
         />
       </CardFooter>
     </Card>

@@ -27,7 +27,7 @@ interface ImageSelectorProps {
   /**
    * Callback when image is selected
    */
-  onChange: (imagePath: string) => void;
+  onChangeImageAction: (imagePath: string) => void;
   /**
    * Additional CSS class
    */
@@ -39,7 +39,7 @@ interface ImageSelectorProps {
  */
 export function ImageSelector({
   value = getDefaultImage(),
-  onChange,
+  onChangeImageAction, // Updated parameter name
   className,
 }: ImageSelectorProps) {
   // Track the current category
@@ -76,7 +76,7 @@ export function ImageSelector({
     if (typedCategory === "custom") {
       // If switching to custom, use the custom image value if available
       if (customImage) {
-        onChange(customImage);
+        onChangeImageAction(customImage); // Updated function call
       }
     } else {
       // When switching categories, select the first image in that category
@@ -86,7 +86,7 @@ export function ImageSelector({
 
       if (firstImageKey) {
         setSelectedImage(firstImageKey);
-        onChange(firstImageKey);
+        onChangeImageAction(firstImageKey); // Updated function call
       }
     }
   };
@@ -94,7 +94,7 @@ export function ImageSelector({
   // Handle specific image selection within a category
   const handleImageSelect = (newSelectedImage: string) => {
     setSelectedImage(newSelectedImage);
-    onChange(newSelectedImage);
+    onChangeImageAction(newSelectedImage); // Updated function call
   };
 
   // Handle custom image input
@@ -102,7 +102,7 @@ export function ImageSelector({
     const newValue = e.target.value;
 
     setCustomImage(newValue);
-    onChange(newValue);
+    onChangeImageAction(newValue); // Updated function call
   };
 
   return (
@@ -135,12 +135,8 @@ export function ImageSelector({
         {category !== "custom" ? (
           <div className="space-y-2">
             <Label htmlFor="image-select">Step 2: Select Specific Image</Label>
-            <Select
-              id="image-select"
-              value={selectedImage}
-              onValueChange={handleImageSelect}
-            >
-              <SelectTrigger>
+            <Select value={selectedImage} onValueChange={handleImageSelect}>
+              <SelectTrigger id="image-select">
                 <SelectValue placeholder="Choose a specific image" />
               </SelectTrigger>
               <SelectContent>

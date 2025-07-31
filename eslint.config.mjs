@@ -94,7 +94,7 @@ export default defineConfig([globalIgnores([
     "jsx-a11y/click-events-have-key-events": "warn",
     "jsx-a11y/interactive-supports-focus": "warn",
     "prettier/prettier": "warn",
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "unused-imports/no-unused-vars": "warn",
     "unused-imports/no-unused-imports": "warn",
     "react/no-unescaped-entities": "warn",

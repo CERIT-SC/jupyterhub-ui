@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { ServerStatus as StatusIndicator } from "@/components/notebook/server-status";
 import { NotebooksGrid } from "@/components/notebook/notebooks-grid";
 import {
+  deleteServer,
   getUserNamedNotebooks,
   ServerStatus,
   startServer,
@@ -135,7 +136,12 @@ export default function NotebooksPage() {
   // Handler for notebook removal
   const handleRemoveNotebook = async (id: string) => {
     // Refetch the list to update UI
-    await refetch();
+    try {
+      await deleteServer(id, username);
+      await refetch();
+    } catch (error) {
+      console.error("Failed to remove notebook:", error);
+    }
   };
 
   if (error) {

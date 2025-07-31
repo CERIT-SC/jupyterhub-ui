@@ -37,7 +37,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const {
     isLoaded: tokenIsLoaded,
-    authData,
     hasToken,
     updateAuth,
     clearAuth,

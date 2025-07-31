@@ -131,7 +131,7 @@ export function NotebookDetailsDialog({
               </div>
             </div>
 
-            {notebook.progress_url && (
+            {notebook.url && (
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm hover:bg-gray-100 transition-colors">
                 <div className="flex items-center mb-3">
                   <Info className="h-4 w-4 text-gray-500 mr-2" />
@@ -139,7 +139,7 @@ export function NotebookDetailsDialog({
                 </div>
                 <Button asChild className="w-full" size="sm" variant="outline">
                   <a
-                    href={notebook.progress_url}
+                    href={notebook.url}
                     rel="noopener noreferrer"
                     target="_blank"
                   >

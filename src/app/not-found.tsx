@@ -41,7 +41,7 @@ export default function NotFound() {
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <Link href="/hub">
-                <Button className="w-full justify-start" variant="default">
+                <Button className="w-full justify-start" variant="primary">
                   <Home className="h-4 w-4 mr-2" />
                   Go to Dashboard
                 </Button>

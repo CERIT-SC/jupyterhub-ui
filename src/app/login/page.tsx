@@ -8,11 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuthStorage } from "@/hooks/useAuthStorage";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
-  const { authData } = useAuthStorage();
   const { login, error } = useAuth();
 
   const handleHubOauth = () => {

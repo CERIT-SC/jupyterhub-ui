@@ -248,9 +248,6 @@ export const getFreeGPUsByModel = async (): Promise<{
       0,
     );
 
-    console.log("Free GPUs by model:", freeGPUs);
-    console.log("Total free GPUs:", totalFree);
-
     return {
       freeGPUs,
       totalFree,
@@ -606,8 +603,6 @@ export const discoverGPUMetrics = async (): Promise<string[]> => {
         metric.includes("nvidia.com/gpu"),
     );
 
-    console.log("Available GPU metrics:", gpuMetrics);
-
     return gpuMetrics;
   } catch (error) {
     console.error("Failed to discover GPU metrics:", error);
@@ -660,10 +655,6 @@ export const getFreeGPUInfo = async (): Promise<{
 
     // Query GPU device names
     const deviceNameResponse = await executePrometheusQuery("DCGM_FI_DEV_NAME");
-
-    console.log("Free memory response:", freeMemoryResponse.data);
-    console.log("Total memory response:", totalMemoryResponse.data);
-    console.log("Device name response:", deviceNameResponse.data);
 
     if (
       !freeMemoryResponse.data.result ||

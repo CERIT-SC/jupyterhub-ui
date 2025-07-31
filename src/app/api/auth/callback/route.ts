@@ -3,15 +3,13 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
-  const state = searchParams.get("state");
+  // const state = searchParams.get("state");
 
   // TODO: Validate `state` to prevent CSRF
 
   if (!code) {
     return new NextResponse("Missing code", { status: 400 });
   }
-
-  console.log("REQUEST", req);
 
   try {
     const tokenRes = await fetch(

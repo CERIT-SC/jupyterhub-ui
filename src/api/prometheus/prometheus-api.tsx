@@ -60,8 +60,6 @@ export const callPrometheusServer = async (): Promise<any> => {
       PROMETHEUS_ENDPOINTS.QUERY,
     );
 
-    console.log("Prometheus response data:", response.data);
-
     return response.data;
   } catch (error) {
     console.error("Failed to call Prometheus server:", error);
@@ -193,12 +191,9 @@ export const getAllocatableGPUS = async (): Promise<any> => {
     const allocatableNodes: Set<string> = await getGPUAllocatableNodes();
     const unusedGPUs = await getUnassignedGPUsByModel();
 
-    console.log(unusedGPUs.unassignedGPUs);
     const filteredGpus = unusedGPUs.gpuDetails.filter((gpu) =>
       allocatableNodes.has(gpu.nodeName),
     );
-
-    console.log(filteredGpus);
 
     return aggregateGPUsByModel(filteredGpus);
   } catch (error) {
@@ -407,7 +402,6 @@ export {
   getGPUAvailabilityMetrics,
   getAllJupyterGPUMetrics,
   getJupyterGPUHistory,
-  createGPUMetricsMonitor,
   getFreeGPUInfo,
   getUnassignedGPUsByModel,
   getFreeGPUsByModel,

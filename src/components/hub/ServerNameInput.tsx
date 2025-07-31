@@ -18,7 +18,7 @@ interface ServerNameInputProps {
   /**
    * Callback when server name changes
    */
-  onChange: (value: string) => void;
+  onChangeNameAction: (value: string) => void;
   /**
    * Additional CSS class
    */
@@ -31,7 +31,7 @@ interface ServerNameInputProps {
 
 export function ServerNameInput({
   value,
-  onChange,
+  onChangeNameAction,
   className,
   error: externalError,
 }: ServerNameInputProps) {
@@ -89,7 +89,7 @@ export function ServerNameInput({
             id="server-name"
             placeholder="my-notebook"
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChangeNameAction(e.target.value)}
           />
           <FormError message={error === null ? undefined : error} />
           <HelpText

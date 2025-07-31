@@ -25,14 +25,6 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 
-interface NotebookServer {
-  name: string;
-  url: string;
-  ready: boolean;
-  pending: "spawn" | "stop" | null;
-  last_activity: string;
-}
-
 export default function HubDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
@@ -17,8 +17,6 @@ type PageState = "starting" | "progress" | "ready" | "failed" | "error";
 
 export default function SpawnProgress() {
   const params = useParams();
-
-  const router = useRouter();
 
   const serverName =
     typeof params.serverName === "string" ? params.serverName : "";
@@ -49,7 +47,6 @@ export default function SpawnProgress() {
     retryDelay: 1000,
   });
 
-  console.log("data", data);
   // Store previous progress value to detect changes
   const prevProgressRef = useRef<number>(0);
 
@@ -162,12 +159,6 @@ export default function SpawnProgress() {
         return "Server spawn failed";
       case "error":
         return "Error fetching server status";
-    }
-  };
-
-  const openServer = () => {
-    if (data?.url) {
-      window.open(data.url, "_blank");
     }
   };
 
@@ -333,7 +324,7 @@ export default function SpawnProgress() {
               </p>
               <Link
                 href={
-                  `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/` + server.url
+                  `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/` + data.url
                 }
               >
                 <Button asChild className="bg-green-600 hover:bg-green-700">

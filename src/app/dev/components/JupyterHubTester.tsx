@@ -48,7 +48,6 @@ const JupyterHubTester: FC = () => {
         success: true,
         message: "Successfully retrieved user info",
       });
-      console.log("JupyterHub User Info:", info);
     } catch (error) {
       console.error("Failed to get JupyterHub user info:", error);
       setActionResult({
@@ -78,7 +77,6 @@ const JupyterHubTester: FC = () => {
         success: true,
         message: `Successfully retrieved status for ${serverName}`,
       });
-      console.log(`Server status for ${serverName}:`, status);
     } catch (error) {
       console.error(`Failed to get server status for ${serverName}:`, error);
       setActionResult({
@@ -109,7 +107,6 @@ const JupyterHubTester: FC = () => {
         success: true,
         message: `Successfully started server ${serverName}`,
       });
-      console.log(`Started server ${serverName}`);
       // Get updated status
       await handleGetServerStatus();
     } catch (error) {
@@ -141,7 +138,6 @@ const JupyterHubTester: FC = () => {
         success: true,
         message: `Successfully stopped server ${serverName}`,
       });
-      console.log(`Stopped server ${serverName}`);
       // Get updated status
       setTimeout(handleGetServerStatus, 1000);
     } catch (error) {
@@ -173,7 +169,6 @@ const JupyterHubTester: FC = () => {
         success: true,
         message: `Successfully deleted server ${serverName}`,
       });
-      console.log(`Deleted server ${serverName}`);
       setServerStatus(null);
       // Refresh user info
       await handleGetUserInfo();
@@ -241,7 +236,6 @@ const JupyterHubTester: FC = () => {
                   success: true,
                   message: `Successfully created default server ${serverName}`,
                 });
-                console.log(`Created default server ${serverName}`);
                 // Get updated status
                 setTimeout(handleGetServerStatus, 1000);
               } catch (error) {
