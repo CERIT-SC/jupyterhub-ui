@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
 import { User } from "@/api/jupyterhub/models";
@@ -87,8 +87,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Log out function
   const logout = useCallback(() => {
-    clearAuth();
+    setIsLoadingUser(true);
     setUser(null);
+    clearAuth();
+    redirect("/api/auth/logout");
   }, []);
 
   const login = useCallback(
