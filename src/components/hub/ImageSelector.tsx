@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Server } from "lucide-react";
 
 import { Label } from "@/components/ui/label";

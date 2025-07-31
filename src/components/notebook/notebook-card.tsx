@@ -139,7 +139,6 @@ function ServerInfoItem({ icon, label, value, tooltip }: ServerInfoItemProps) {
 export function NotebookCard({
   server,
   name,
-  onStart,
   onStop,
   onRemove,
   className,
@@ -156,9 +155,6 @@ export function NotebookCard({
   const startedTime = server.started
     ? formatTimeAgo(new Date(server.started))
     : "Not started";
-
-  // Check for progress information
-  const progress = server.progress ? "In progress..." : null;
 
   return (
     <Card

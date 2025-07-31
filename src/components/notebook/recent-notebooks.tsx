@@ -41,7 +41,7 @@ export function RecentNotebooks({ limit = 3 }: RecentNotebooksProps) {
   const handleStopNotebook = async (id: string) => {
     try {
       await stopServer(id);
-      refetch();
+      await refetch();
     } catch (error) {
       console.error("Failed to stop notebook:", error);
     }

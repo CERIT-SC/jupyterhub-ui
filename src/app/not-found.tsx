@@ -22,8 +22,8 @@ export default function NotFound() {
             </h1>
             <h2 className="text-3xl font-bold mb-2">Page Not Found</h2>
             <p className="text-muted-foreground text-lg">
-              The notebook server or page you're looking for doesn't exist or
-              has been moved.
+              {`The notebook server or page you're looking for doesn't exist or
+              has been moved.`}
             </p>
           </div>
         </div>

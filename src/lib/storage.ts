@@ -1,5 +1,5 @@
 export class ClientStorage<T> {
-  private key: string;
+  private readonly key: string;
 
   constructor(key: string) {
     this.key = key;

@@ -31,21 +31,9 @@ export default function NotebooksPage() {
   // Get username from auth context
   const username = authContext?.user?.name;
 
-  // Calculate if any notebooks are in transition state (starting or stopping)
-  const hasTransitioningNotebooks = (
-    notebookData: Record<string, ServerStatus> | undefined,
-  ) => {
-    if (!notebookData) return false;
-
-    return Object.values(notebookData).some(
-      (server) => server.pending === "spawn" || server.pending === "stop",
-    );
-  };
-
   // Fetch user servers data including stopped servers
   const {
     data: servers,
-    isLoading,
     error,
     refetch,
   } = useQuery<Record<string, ServerStatus>>({
@@ -135,7 +123,7 @@ export default function NotebooksPage() {
     } catch (error) {
       console.error("Failed to stop notebook:", error);
       // Force a refetch to get the accurate state in case of error
-      refetch();
+      await refetch();
     }
   };
 
@@ -160,9 +148,7 @@ export default function NotebooksPage() {
                 Error Loading Notebooks
               </h2>
               <p className="text-gray-600">
-                {error instanceof Error
-                  ? error.message
-                  : "Failed to load notebooks. Please try again."}
+                Failed to load notebooks. Please try again.
               </p>
               <Button onClick={() => refetch()}>Retry</Button>
             </div>

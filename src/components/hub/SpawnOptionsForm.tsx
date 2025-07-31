@@ -414,8 +414,8 @@ export function SpawnOptionsForm({
                       </li>
                     </ul>
                     <p className="mt-2 italic text-muted-foreground">
-                      Note: More cores don't always mean better performance for
-                      all tasks.
+                      {`Note: More cores don't always mean better performance for
+                      all tasks.`}
                     </p>
                   </>
                 }
@@ -825,8 +825,8 @@ export function SpawnOptionsForm({
                       </p>
                       <ul className="list-disc pl-4 mt-1 space-y-1">
                         <li>
-                          Ideal for large datasets that won't fit in your
-                          notebook storage
+                          {`Ideal for large datasets that won't fit in your
+                          notebook storage`}
                         </li>
                         <li>Access the same data from multiple notebooks</li>
                         <li>Share data with collaborators</li>

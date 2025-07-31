@@ -6,7 +6,7 @@ import type {
   PrometheusQueryParams,
   PrometheusQueryResult,
   PrometheusResponse,
-} from "../../types/prometheus";
+} from "@/types/prometheus";
 
 import { prometheusClient } from "./prometheus-api";
 
@@ -585,46 +585,6 @@ export const getJupyterGPUHistory = async (
 };
 
 /**
- * Monitor GPU metrics with real-time updates
- */
-export const createGPUMetricsMonitor = (
-  notebookId: string,
-  callback: (metrics: JupyterGPUMetrics | null) => void,
-  interval: number = 30000, // 30 seconds
-): { stop: () => void } => {
-  let isRunning = true;
-  let timeoutId: NodeJS.Timeout;
-
-  const fetchMetrics = async () => {
-    if (!isRunning) return;
-
-    try {
-      const metrics = await getJupyterGPUMetrics(notebookId);
-
-      callback(metrics);
-    } catch (error) {
-      console.error("Error fetching GPU metrics:", error);
-      callback(null);
-    }
-
-    if (isRunning) {
-      timeoutId = setTimeout(fetchMetrics, interval);
-    }
-  };
-
-  // Start monitoring
-  fetchMetrics();
-
-  return {
-    stop: () => {
-      isRunning = false;
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    },
-  };
-};
-
 /**
  * Discover available GPU-related metrics in Prometheus
  */

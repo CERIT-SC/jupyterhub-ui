@@ -33,27 +33,13 @@ interface NotebookServer {
   last_activity: string;
 }
 
-interface ServerStatus {
-  servers: Record<string, NotebookServer>;
-  pending: Record<string, "spawn" | "stop">;
-}
-
 export default function HubDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
-  // Check if any notebooks are in transition states
-  const hasTransitioningNotebooks = (notebookData: any) => {
-    if (!notebookData) return false;
-
-    return Object.values(notebookData).some(
-      (server: any) => server.pending === "spawn" || server.pending === "stop",
-    );
-  };
 
   const {
     data: namedNotebooks,
-    isLoading,
-    error,
+
     refetch,
   } = useQuery({
     queryKey: ["user-notebooks"],
@@ -75,12 +61,12 @@ export default function HubDashboard() {
 
   // Calculate stats
   const totalServers = serverEntries.length;
-  const runningServers = serverEntries.filter(([_, s]) => s.ready).length;
+  const runningServers = serverEntries.filter(([, s]) => s.ready).length;
   const startingServers = serverEntries.filter(
-    ([_, s]) => s.pending === "spawn",
+    ([, s]) => s.pending === "spawn",
   ).length;
   const stoppingServers = serverEntries.filter(
-    ([_, s]) => s.pending === "stop",
+    ([, s]) => s.pending === "stop",
   ).length;
   const stoppedServers =
     totalServers - runningServers - startingServers - stoppingServers;

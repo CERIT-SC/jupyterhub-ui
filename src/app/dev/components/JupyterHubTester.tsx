@@ -26,7 +26,7 @@ const JupyterHubTester: FC = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [serverStatus, setServerStatus] = useState<ServerStatus | null>(null);
   const [serverName, setServerName] = useState("test-server");
-  const [serverOptions, setServerOptions] = useState<ServerOptions>({
+  const [serverOptions] = useState<ServerOptions>({
     name: "test-server",
     image: getDefaultImage(), // Use the image property instead of images
     cpuselection: "1",
@@ -111,7 +111,7 @@ const JupyterHubTester: FC = () => {
       });
       console.log(`Started server ${serverName}`);
       // Get updated status
-      handleGetServerStatus();
+      await handleGetServerStatus();
     } catch (error) {
       console.error(`Failed to start server ${serverName}:`, error);
       setActionResult({
@@ -176,7 +176,7 @@ const JupyterHubTester: FC = () => {
       console.log(`Deleted server ${serverName}`);
       setServerStatus(null);
       // Refresh user info
-      handleGetUserInfo();
+      await handleGetUserInfo();
     } catch (error) {
       console.error(`Failed to delete server ${serverName}:`, error);
       setActionResult({

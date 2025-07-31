@@ -43,10 +43,6 @@ export function NotebookDetailsDialog({
 }: NotebookDetailsDialogProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleDeleteClick = () => {
-    setShowDeleteConfirm(true);
-  };
-
   const handleDeleteConfirm = () => {
     if (onDelete) {
       onDelete();
@@ -164,8 +160,8 @@ export function NotebookDetailsDialog({
                 <h3 className="font-medium text-red-800">Confirm Deletion</h3>
               </div>
               <p className="text-sm text-red-700 mb-4">
-                Are you sure you want to delete the notebook "{notebookName}"?
-                This action cannot be undone.
+                {`Are you sure you want to delete the notebook "${notebookName}"?
+                This action cannot be undone.`}
               </p>
               <div className="flex justify-end gap-2">
                 <Button

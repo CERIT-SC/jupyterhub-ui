@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,10 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
   const { authData } = useAuthStorage();
-  const { isLoading, login, error } = useAuth();
-  const [tokenInput, setTokenInput] = useState(authData.token || "");
-  const [isOldHub, setIsOldHub] = useState(authData.isOldHub || false);
-  const router = useRouter();
+  const { login, error } = useAuth();
 
   const handleHubOauth = () => {
     // Redirect to the JupyterHub OAuth login page
@@ -30,7 +24,7 @@ export default function Login() {
       `&response_type=code`;
 
     // TODO: Remove dependency on localStorage token
-    login("dummy_token", isOldHub);
+    login("dummy_token", true);
   };
 
   return (
