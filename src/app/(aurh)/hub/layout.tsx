@@ -33,6 +33,7 @@ export default function AuthLayout({
   // Close sidebar on route change (for mobile)
   useEffect(() => {
     const isMobile = window.innerWidth < 768; // md breakpoint
+
     if (isMobile) {
       setSidebarOpen(false);
     }
