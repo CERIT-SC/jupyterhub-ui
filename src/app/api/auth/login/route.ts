@@ -4,12 +4,12 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 
-import { SessionData, sessionOptions } from "../lib";
+import { SessionData, getSessionOptions } from "../lib";
 
 export async function GET() {
   const session = await getIronSession<SessionData>(
     await cookies(),
-    sessionOptions,
+    getSessionOptions(),
   );
 
   session.state = randomBytes(32).toString("hex");

@@ -9,15 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { redirect } from "next/navigation";
 
 export default function Login() {
   const { login, error } = useAuth();
 
   const handleHubOauth = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/login`;
-
     // TODO: Remove dependency on localStorage token
     login("dummy_token", true);
+    redirect("/api/auth/login");
   };
 
   return (

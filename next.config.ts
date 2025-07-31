@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   allowedDevOrigins: [
     "hub-dev-react.cloud.e-infra.cz",
     "hub-dev-python.cloud.e-infra.cz",

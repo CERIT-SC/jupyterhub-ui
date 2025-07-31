@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
-import { SessionData, sessionOptions } from "../lib";
+import { SessionData, getSessionOptions } from "../lib";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   const state = searchParams.get("state");
   const session = await getIronSession<SessionData>(
     await cookies(),
-    sessionOptions,
+    getSessionOptions(),
   );
 
   if (session.state !== state) {
