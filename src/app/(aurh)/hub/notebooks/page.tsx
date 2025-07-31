@@ -2,7 +2,6 @@
 
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
 
@@ -200,12 +199,11 @@ export default function NotebooksPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Link href="/hub/spawn/options">
-            <Button asChild>
-              <Plus className="mr-2 h-4 w-4" />
-              New Notebook
-            </Button>
-          </Link>
+
+          <Button onClick={() => router.push("/hub/spawn/options")}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Notebook
+          </Button>
         </div>
 
         {Object.keys(filteredNotebooks).length > 0 ? (
