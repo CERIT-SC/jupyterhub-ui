@@ -8,4 +8,5 @@ RUN find /app -not -path "/app/node_modules/*" -exec chown 1000:1000 {} +
 FROM base AS development
 ENV NODE_ENV=development
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "build"]
+CMD ["npm", "run", "start"]
