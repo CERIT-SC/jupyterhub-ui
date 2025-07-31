@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,21 +8,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuthStorage } from "@/hooks/useAuthStorage";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
-  const { authData } = useAuthStorage();
-  const { isLoading, login, error } = useAuth();
-  const [tokenInput, setTokenInput] = useState(authData.token || "");
-  const [isOldHub, setIsOldHub] = useState(authData.isOldHub || false);
-  const router = useRouter();
+  const { login, error } = useAuth();
 
   const handleHubOauth = () => {
     window.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/login`;
 
     // TODO: Remove dependency on localStorage token
-    login("dummy_token", isOldHub);
+    login("dummy_token", true);
   };
 
   return (

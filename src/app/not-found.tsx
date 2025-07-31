@@ -22,8 +22,8 @@ export default function NotFound() {
             </h1>
             <h2 className="text-3xl font-bold mb-2">Page Not Found</h2>
             <p className="text-muted-foreground text-lg">
-              The notebook server or page you're looking for doesn't exist or
-              has been moved.
+              {`The notebook server or page you're looking for doesn't exist or
+              has been moved.`}
             </p>
           </div>
         </div>
@@ -41,7 +41,7 @@ export default function NotFound() {
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               <Link href="/hub">
-                <Button className="w-full justify-start" variant="default">
+                <Button className="w-full justify-start" variant="primary">
                   <Home className="h-4 w-4 mr-2" />
                   Go to Dashboard
                 </Button>

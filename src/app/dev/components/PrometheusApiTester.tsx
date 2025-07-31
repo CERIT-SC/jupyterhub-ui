@@ -20,7 +20,6 @@ const PrometheusApiTester: FC = () => {
       const response = await callPrometheusServer();
 
       setPrometheusResponse(response);
-      console.log("Prometheus server response:", response);
     } catch (error) {
       console.error("Failed to call Prometheus server:", error);
       setPrometheusResponse({ error: "Failed to call Prometheus server" });
@@ -35,7 +34,6 @@ const PrometheusApiTester: FC = () => {
       const metrics = await getPrometheusMetrics();
 
       setPrometheusMetrics(metrics);
-      console.log("Prometheus metrics:", metrics);
     } catch (error) {
       console.error("Failed to get Prometheus metrics:", error);
       setPrometheusMetrics({ error: "Failed to get Prometheus metrics" });
@@ -50,7 +48,6 @@ const PrometheusApiTester: FC = () => {
       const health = await getPrometheusHealth();
 
       setPrometheusHealth(health);
-      console.log("Prometheus health:", health);
     } catch (error) {
       console.error("Failed to get Prometheus health:", error);
       setPrometheusHealth({ error: "Failed to get Prometheus health" });
@@ -65,7 +62,6 @@ const PrometheusApiTester: FC = () => {
       const metrics = await getPrometheusMetrics("up");
 
       setPrometheusMetrics(metrics);
-      console.log("Prometheus 'up' query:", metrics);
     } catch (error) {
       console.error("Failed to query Prometheus metrics:", error);
       setPrometheusMetrics({ error: "Failed to query Prometheus metrics" });

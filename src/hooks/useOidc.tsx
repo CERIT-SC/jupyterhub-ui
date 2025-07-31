@@ -33,7 +33,6 @@ export const useOidc = () => {
         });
     };
     const handleTokenExpired = () => {
-      console.log("Token expired");
       setUser(null);
     };
 

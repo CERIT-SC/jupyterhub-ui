@@ -37,7 +37,6 @@ export function SidebarNavigation() {
                   href={item.disabled ? "#" : item.path}
                 >
                   <Button
-                    asChild
                     className={cn(
                       "w-full justify-start font-normal hover:bg-infra-gray-light/30",
                       active &&

@@ -368,8 +368,6 @@ export async function getUserTokens(username?: string): Promise<ApiToken[]> {
     `/users/${resolvedUsername}/tokens`,
   );
 
-  console.log(response.data.api_tokens);
-
   return response.data.api_tokens || [];
 }
 

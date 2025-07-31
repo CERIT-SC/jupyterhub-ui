@@ -1,5 +1,3 @@
-import { NotebookData } from "@/components/notebook/notebooks-grid";
-
 export type ServerStatus =
   | "running"
   | "stopped"
@@ -13,60 +11,6 @@ export type ServerType =
   | "rstudio"
   | "vscode"
   | "terminal";
-
-/**
- * Mock data for notebooks
- */
-export const EXAMPLE_NOTEBOOKS: NotebookData[] = [
-  {
-    id: "1",
-    name: "Data Analysis",
-    lastActive: "2 hours ago",
-    status: "running",
-    cpuUsage: 45,
-    memoryUsage: 32,
-  },
-  {
-    id: "2",
-    name: "Machine Learning Model",
-    lastActive: "1 day ago",
-    status: "stopped",
-    cpuUsage: 0,
-    memoryUsage: 0,
-  },
-  {
-    id: "3",
-    name: "Visualization Project",
-    lastActive: "3 days ago",
-    status: "stopped",
-    cpuUsage: 0,
-    memoryUsage: 0,
-  },
-  {
-    id: "4",
-    name: "NLP Experiment",
-    lastActive: "Just now",
-    status: "running",
-    cpuUsage: 78,
-    memoryUsage: 85,
-  },
-  {
-    id: "5",
-    name: "Time Series Analysis",
-    lastActive: "5 hours ago",
-    status: "starting",
-    cpuUsage: 12,
-    memoryUsage: 24,
-  },
-  {
-    id: "6",
-    name: "Critical Resource Test",
-    lastActive: "1 minute ago",
-    status: "running",
-    cpuUsage: 95,
-    memoryUsage: 92,
-  },
-];
 
 /**
  * Server data structure

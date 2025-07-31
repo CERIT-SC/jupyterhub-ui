@@ -159,7 +159,7 @@ export default function SpawnPage() {
       <ServerNameInput
         error={errors.serverName}
         value={serverName}
-        onChange={setServerName}
+        onChangeNameAction={setServerName}
       />
 
       {/* Spawn options form */}
@@ -172,7 +172,7 @@ export default function SpawnPage() {
           storage: errors.storage,
         }}
         options={options}
-        onOptionsChange={setOptions}
+        onOptionsChangeAction={setOptions}
       />
 
       {/* Spawn button */}

@@ -2,7 +2,6 @@
 
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
 
@@ -15,6 +14,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { ServerStatus as StatusIndicator } from "@/components/notebook/server-status";
 import { NotebooksGrid } from "@/components/notebook/notebooks-grid";
 import {
+  deleteServer,
   getUserNamedNotebooks,
   ServerStatus,
   startServer,
@@ -31,21 +31,9 @@ export default function NotebooksPage() {
   // Get username from auth context
   const username = authContext?.user?.name;
 
-  // Calculate if any notebooks are in transition state (starting or stopping)
-  const hasTransitioningNotebooks = (
-    notebookData: Record<string, ServerStatus> | undefined,
-  ) => {
-    if (!notebookData) return false;
-
-    return Object.values(notebookData).some(
-      (server) => server.pending === "spawn" || server.pending === "stop",
-    );
-  };
-
   // Fetch user servers data including stopped servers
   const {
     data: servers,
-    isLoading,
     error,
     refetch,
   } = useQuery<Record<string, ServerStatus>>({
@@ -135,7 +123,7 @@ export default function NotebooksPage() {
     } catch (error) {
       console.error("Failed to stop notebook:", error);
       // Force a refetch to get the accurate state in case of error
-      refetch();
+      await refetch();
     }
   };
 
@@ -147,7 +135,12 @@ export default function NotebooksPage() {
   // Handler for notebook removal
   const handleRemoveNotebook = async (id: string) => {
     // Refetch the list to update UI
-    await refetch();
+    try {
+      await deleteServer(id, username);
+      await refetch();
+    } catch (error) {
+      console.error("Failed to remove notebook:", error);
+    }
   };
 
   if (error) {
@@ -160,9 +153,7 @@ export default function NotebooksPage() {
                 Error Loading Notebooks
               </h2>
               <p className="text-gray-600">
-                {error instanceof Error
-                  ? error.message
-                  : "Failed to load notebooks. Please try again."}
+                Failed to load notebooks. Please try again.
               </p>
               <Button onClick={() => refetch()}>Retry</Button>
             </div>
@@ -208,12 +199,11 @@ export default function NotebooksPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Link href="/hub/spawn/options">
-            <Button asChild>
-              <Plus className="mr-2 h-4 w-4" />
-              New Notebook
-            </Button>
-          </Link>
+
+          <Button onClick={() => router.push("/hub/spawn/options")}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Notebook
+          </Button>
         </div>
 
         {Object.keys(filteredNotebooks).length > 0 ? (

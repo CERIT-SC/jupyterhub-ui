@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Bell, LogOut, Settings, User, UserCircle } from "lucide-react";
 
@@ -27,28 +27,22 @@ export default function AuthLayout({
 }>) {
   const { user } = useAuth();
   const { logout } = useAuth();
-  const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Close sidebar on route change (for mobile)
   useEffect(() => {
-    const handleRouteChange = () => {
+    const isMobile = window.innerWidth < 768; // md breakpoint
+    if (isMobile) {
       setSidebarOpen(false);
-    };
-
-    router.events && router.events.on("routeChangeComplete", handleRouteChange);
-
-    return () => {
-      router.events &&
-        router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router]);
+    }
+  }, [pathname]);
 
   useEffect(() => {
     // if (user === null) {
     //   router.push("/login");
     // }
-  }, [user, router]);
+  }, [user]);
 
   // Set sidebar open by default on desktop
   useEffect(() => {
@@ -89,7 +83,7 @@ export default function AuthLayout({
   const getDisplayName = () => {
     if (!user) return "User";
 
-    return user.name || user.email || "User";
+    return user.name || "User";
   };
 
   return (
@@ -113,7 +107,7 @@ export default function AuthLayout({
                 >
                   <div className="flex items-center gap-2 p-2">
                     <Avatar className="h-9 w-9 border border-infra-gray-light/50">
-                      <AvatarImage src={user?.image || ""} />
+                      <AvatarImage src={""} />
                       <AvatarFallback className="bg-gradient-to-br from-infra-primary to-infra-violet text-white font-medium">
                         {getUserInitials()}
                       </AvatarFallback>

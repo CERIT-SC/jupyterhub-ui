@@ -86,7 +86,7 @@ export default defineConfig([globalIgnores([
   files: ["**/*.ts", "**/*.tsx"],
 
   rules: {
-    "no-console": "warn",
+    "no-console": "off",
     "react/prop-types": "off",
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
@@ -94,7 +94,7 @@ export default defineConfig([globalIgnores([
     "jsx-a11y/click-events-have-key-events": "warn",
     "jsx-a11y/interactive-supports-focus": "warn",
     "prettier/prettier": "warn",
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
     "unused-imports/no-unused-vars": "warn",
     "unused-imports/no-unused-imports": "warn",
     "react/no-unescaped-entities": "warn",

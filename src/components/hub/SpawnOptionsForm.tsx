@@ -34,7 +34,7 @@ import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
 
 interface SpawnOptionsFormProps {
   options: JupyterHubServerOptions;
-  onOptionsChange: (options: JupyterHubServerOptions) => void;
+  onOptionsChangeAction: (options: JupyterHubServerOptions) => void;
   errors?: {
     image?: string;
     cpu?: string;
@@ -47,7 +47,7 @@ interface SpawnOptionsFormProps {
 
 export function SpawnOptionsForm({
   options,
-  onOptionsChange,
+  onOptionsChangeAction,
   errors = {},
 }: SpawnOptionsFormProps) {
   // Track GPU-specific state to show/hide MIG amount selector
@@ -113,7 +113,7 @@ export function SpawnOptionsForm({
 
   // Handle image change
   const handleImageChange = (imagePath: string) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       container_image: imagePath,
       custom: !imagePath.startsWith("cerit.io/hubs/"),
@@ -122,7 +122,7 @@ export function SpawnOptionsForm({
 
   // Handle CPU change
   const handleCpuChange = (value: string) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       cpu: value,
     });
@@ -130,7 +130,7 @@ export function SpawnOptionsForm({
 
   // Handle memory change
   const handleMemoryChange = (value: string) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       mem: value,
       shmsize: value, // Set shared memory size equal to memory
@@ -149,12 +149,12 @@ export function SpawnOptionsForm({
       newOptions.migamount = "1";
     }
 
-    onOptionsChange(newOptions);
+    onOptionsChangeAction(newOptions);
   };
 
   // Handle MIG amount change
   const handleMigAmountChange = (value: string) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       migamount: value,
     });
@@ -162,7 +162,7 @@ export function SpawnOptionsForm({
 
   // Handle SSH access change
   const handleSshChange = (checked: boolean) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       ssh: checked,
     });
@@ -176,13 +176,13 @@ export function SpawnOptionsForm({
 
     // Update options based on type
     if (newPhomeType === "new") {
-      onOptionsChange({
+      onOptionsChangeAction({
         ...options,
         phome: "remain", // Default to "remain" for new phome
       });
     } else if (mockPvcNames.length > 0) {
       // For existing, select the first PVC if available
-      onOptionsChange({
+      onOptionsChangeAction({
         ...options,
         phome: mockPvcNames[0].value,
       });
@@ -191,23 +191,23 @@ export function SpawnOptionsForm({
 
   // Handle phome delete option change
   const handlePhomeDeleteChange = (checked: boolean) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       phome: checked ? "delete" : "remain",
     });
   };
 
-  // Handle existing phome selection
-  const handleExistingPhomeChange = (value: string) => {
-    onOptionsChange({
-      ...options,
-      phome: value,
-    });
-  };
+  // // Handle existing phome selection
+  // const handleExistingPhomeChange = (value: string) => {
+  //   onOptionsChangeAction({
+  //     ...options,
+  //     phome: value,
+  //   });
+  // };
 
   // Handle mount projects change
   const handleMountProjectsChange = (checked: boolean) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       mountprojects: checked,
     });
@@ -219,14 +219,14 @@ export function SpawnOptionsForm({
 
     if (!checked) {
       // If unchecking, clear home settings
-      onOptionsChange({
+      onOptionsChangeAction({
         ...options,
         home: null,
         mounttostorage: false,
       });
     } else if (homeOptions.length > 0) {
       // If checking, set default home
-      onOptionsChange({
+      onOptionsChangeAction({
         ...options,
         home: homeOptions[0].value,
       });
@@ -235,7 +235,7 @@ export function SpawnOptionsForm({
 
   // Handle home selection change
   const handleHomeChange = (value: string) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       home: value,
     });
@@ -243,7 +243,7 @@ export function SpawnOptionsForm({
 
   // Handle storage location mount change
   const handleStorageLocationChange = (checked: boolean) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       mounttostorage: checked,
     });
@@ -262,7 +262,7 @@ export function SpawnOptionsForm({
       delete newOptions.s3accesskey;
       delete newOptions.s3secretkey;
       delete newOptions.s3existing;
-      onOptionsChange(newOptions);
+      onOptionsChangeAction(newOptions);
     }
   };
 
@@ -289,7 +289,7 @@ export function SpawnOptionsForm({
       }
     }
 
-    onOptionsChange(newOptions);
+    onOptionsChangeAction(newOptions);
   };
 
   // Handle S3 field changes
@@ -297,7 +297,7 @@ export function SpawnOptionsForm({
     field: "s3url" | "s3bucket" | "s3accesskey" | "s3secretkey",
     value: string,
   ) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       [field]: value,
     });
@@ -305,7 +305,7 @@ export function SpawnOptionsForm({
 
   // Handle existing S3 bucket selection
   const handleExistingS3Change = (value: string) => {
-    onOptionsChange({
+    onOptionsChangeAction({
       ...options,
       s3existing: value,
     });
@@ -329,7 +329,7 @@ export function SpawnOptionsForm({
 
             <ImageSelector
               value={options.container_image}
-              onChange={handleImageChange}
+              onChangeImageAction={handleImageChange}
             />
             <FormError message={errors.image} />
 
@@ -414,8 +414,8 @@ export function SpawnOptionsForm({
                       </li>
                     </ul>
                     <p className="mt-2 italic text-muted-foreground">
-                      Note: More cores don't always mean better performance for
-                      all tasks.
+                      {`Note: More cores don't always mean better performance for
+                      all tasks.`}
                     </p>
                   </>
                 }
@@ -825,8 +825,8 @@ export function SpawnOptionsForm({
                       </p>
                       <ul className="list-disc pl-4 mt-1 space-y-1">
                         <li>
-                          Ideal for large datasets that won't fit in your
-                          notebook storage
+                          {`Ideal for large datasets that won't fit in your
+                          notebook storage`}
                         </li>
                         <li>Access the same data from multiple notebooks</li>
                         <li>Share data with collaborators</li>

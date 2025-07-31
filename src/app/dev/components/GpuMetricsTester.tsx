@@ -31,7 +31,6 @@ const GpuMetricsTester: FC = () => {
       const metrics = await discoverGPUMetrics();
 
       setDiscoveredMetrics({ metrics, count: metrics.length });
-      console.log("Discovered GPU metrics:", metrics);
     } catch (error) {
       console.error("Failed to discover GPU metrics:", error);
       setDiscoveredMetrics({ error: "Failed to discover GPU metrics" });
@@ -46,7 +45,6 @@ const GpuMetricsTester: FC = () => {
       const unassignedGPUs = await getAllocatableGPUS();
 
       setAllocatableGpus(unassignedGPUs);
-      console.log("Unassigned GPUs by model:", unassignedGPUs);
     } catch (error) {
       console.error("Failed to get unassigned GPUs by model:", error);
       setAllocatableGpus({
@@ -63,7 +61,6 @@ const GpuMetricsTester: FC = () => {
       const unassignedGPUs = await getUnassignedGPUsByModel();
 
       setUnassignedGPUsByModel(unassignedGPUs);
-      console.log("Unassigned GPUs by model:", unassignedGPUs);
     } catch (error) {
       console.error("Failed to get unassigned GPUs by model:", error);
       setUnassignedGPUsByModel({
@@ -80,7 +77,6 @@ const GpuMetricsTester: FC = () => {
       const nodes = await getUnschedulableNodes();
 
       setUnschedulableNodes(nodes);
-      console.log("Unschedulable nodes:", nodes);
     } catch (error) {
       console.error("Failed to get unschedulable nodes:", error);
       setUnschedulableNodes({
@@ -97,7 +93,6 @@ const GpuMetricsTester: FC = () => {
       const nodes = await getAllocatableNodes();
 
       setAllocatableNodes(nodes);
-      console.log("Allocatable nodes:", nodes);
     } catch (error) {
       console.error("Failed to get allocatable nodes:", error);
       setAllocatableNodes({
@@ -114,7 +109,6 @@ const GpuMetricsTester: FC = () => {
       const status = await getNodeStatus();
 
       setNodeStatus(status);
-      console.log("Node status:", status);
     } catch (error) {
       console.error("Failed to get node status:", error);
       setNodeStatus({
@@ -131,7 +125,6 @@ const GpuMetricsTester: FC = () => {
       const resources = await getNodeAllocatableResources();
 
       setNodeAllocatableResources(resources);
-      console.log("Node allocatable resources:", resources);
     } catch (error) {
       console.error("Failed to get node allocatable resources:", error);
       setNodeAllocatableResources({
@@ -153,7 +146,6 @@ const GpuMetricsTester: FC = () => {
       };
 
       setGpuAllocatableNodes(result);
-      console.log("GPU allocatable nodes:", result);
     } catch (error) {
       console.error("Failed to get GPU allocatable nodes:", error);
       setGpuAllocatableNodes({
@@ -222,7 +214,7 @@ const GpuMetricsTester: FC = () => {
               {Object.entries(unassignedGPUsByModel.unassignedGPUs || {}).map(
                 ([model, count]) => (
                   <div key={model} className="ml-4">
-                    {model}: {count}
+                    {model}: {String(count)}
                   </div>
                 ),
               )}
@@ -381,7 +373,9 @@ const GpuMetricsTester: FC = () => {
                                 <span className="text-gray-600">
                                   {resource}:
                                 </span>
-                                <span className="font-mono">{value}</span>
+                                <span className="font-mono">
+                                  {String(value)}
+                                </span>
                               </div>
                             ),
                           )}
@@ -427,7 +421,7 @@ const GpuMetricsTester: FC = () => {
                 <strong>By Model:</strong>
                 {Object.entries(allocatableGpus || {}).map(([model, count]) => (
                   <div key={model} className="ml-4">
-                    {model}: {count}
+                    {model}: {String(count)}
                   </div>
                 ))}
               </div>

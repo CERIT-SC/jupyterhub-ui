@@ -53,7 +53,7 @@ export default function TokensPage1() {
         setNewToken(result.token);
       }
       setTokenNote("");
-      refetch();
+      await refetch();
     } catch (error) {
       console.error("Failed to create token:", error);
     }
@@ -62,14 +62,14 @@ export default function TokensPage1() {
   const handleRevokeToken = async (tokenId: string) => {
     try {
       await deleteUserToken(tokenId, user?.name);
-      refetch();
+      await refetch();
     } catch (error) {
       console.error("Failed to revoke token:", error);
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
   };
 
   if (isLoading) {
@@ -128,8 +128,8 @@ export default function TokensPage1() {
                     </Button>
                   </div>
                   <p className="text-yellow-700 text-sm mt-2">
-                    Save this token somewhere safe. You won't be able to see it
-                    again!
+                    Save this token somewhere safe. You won&#39;t be able to see
+                    it again!
                   </p>
                 </div>
                 <Button variant="outline" onClick={() => setNewToken(null)}>
@@ -203,7 +203,7 @@ export default function TokensPage1() {
           ) : (
             <div className="text-center p-6">
               <p className="text-muted-foreground">
-                You don't have any API tokens yet.
+                You don&#39;t have any API tokens yet.
               </p>
             </div>
           )}

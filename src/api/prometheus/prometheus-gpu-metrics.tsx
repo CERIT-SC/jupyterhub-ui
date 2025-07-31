@@ -6,7 +6,7 @@ import type {
   PrometheusQueryParams,
   PrometheusQueryResult,
   PrometheusResponse,
-} from "../../types/prometheus";
+} from "@/types/prometheus";
 
 import { prometheusClient } from "./prometheus-api";
 
@@ -247,9 +247,6 @@ export const getFreeGPUsByModel = async (): Promise<{
       (sum, count) => sum + count,
       0,
     );
-
-    console.log("Free GPUs by model:", freeGPUs);
-    console.log("Total free GPUs:", totalFree);
 
     return {
       freeGPUs,
@@ -585,46 +582,6 @@ export const getJupyterGPUHistory = async (
 };
 
 /**
- * Monitor GPU metrics with real-time updates
- */
-export const createGPUMetricsMonitor = (
-  notebookId: string,
-  callback: (metrics: JupyterGPUMetrics | null) => void,
-  interval: number = 30000, // 30 seconds
-): { stop: () => void } => {
-  let isRunning = true;
-  let timeoutId: NodeJS.Timeout;
-
-  const fetchMetrics = async () => {
-    if (!isRunning) return;
-
-    try {
-      const metrics = await getJupyterGPUMetrics(notebookId);
-
-      callback(metrics);
-    } catch (error) {
-      console.error("Error fetching GPU metrics:", error);
-      callback(null);
-    }
-
-    if (isRunning) {
-      timeoutId = setTimeout(fetchMetrics, interval);
-    }
-  };
-
-  // Start monitoring
-  fetchMetrics();
-
-  return {
-    stop: () => {
-      isRunning = false;
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    },
-  };
-};
-
 /**
  * Discover available GPU-related metrics in Prometheus
  */
@@ -645,8 +602,6 @@ export const discoverGPUMetrics = async (): Promise<string[]> => {
         metric.toLowerCase().includes("cuda") ||
         metric.includes("nvidia.com/gpu"),
     );
-
-    console.log("Available GPU metrics:", gpuMetrics);
 
     return gpuMetrics;
   } catch (error) {
@@ -700,10 +655,6 @@ export const getFreeGPUInfo = async (): Promise<{
 
     // Query GPU device names
     const deviceNameResponse = await executePrometheusQuery("DCGM_FI_DEV_NAME");
-
-    console.log("Free memory response:", freeMemoryResponse.data);
-    console.log("Total memory response:", totalMemoryResponse.data);
-    console.log("Device name response:", deviceNameResponse.data);
 
     if (
       !freeMemoryResponse.data.result ||
