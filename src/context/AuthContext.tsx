@@ -1,23 +1,15 @@
-import React, {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useCallback, useState } from "react";
 import { AxiosError } from "axios";
-import { redirect, useRouter } from "next/navigation";
 
 import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
 import { User } from "@/api/jupyterhub/models";
-import { useAuthStorage } from "@/hooks/useAuthStorage";
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
+  isLoadingUser: boolean;
   error: Error | null;
   logout: () => void;
-  login: (token: string, useOldHub: boolean) => void;
+  loadUser: () => Promise<boolean>;
 }
 
 // Create the auth context with a default undefined value
@@ -31,86 +23,49 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
+  const [isLoadingUser, setIsLoadingUser] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const router = useRouter();
 
-  const {
-    isLoaded: tokenIsLoaded,
-    hasToken,
-    updateAuth,
-    clearAuth,
-  } = useAuthStorage();
-
-  const checkToken = useCallback(async () => {
-    setIsLoadingUser(true);
-    setError(null);
-
-    if (!tokenIsLoaded) {
-      setUser(null);
-
-      return;
-    }
-
-    if (!hasToken) {
+  const loadUser = useCallback(async () => {
+    if (!isLoadingUser) {
+      setIsLoadingUser(true);
       setError(null);
-      setUser(null);
-      setIsLoadingUser(false);
 
-      return;
-    }
+      try {
+        const response = await jupyterHubClient.get<User>("/user");
 
-    try {
-      const user = await jupyterHubClient.get<User>("/user");
+        setUser(response.data);
 
-      setUser(user.data);
-      setIsLoadingUser(false);
-    } catch (error: unknown) {
-      console.error(error);
-      if (error instanceof AxiosError) {
-        setError(new Error(error.status?.toString() + error.message));
-      } else {
-        setError(
-          error instanceof Error
-            ? error
-            : new Error("An unknown error occurred"),
-        );
+        return true;
+      } catch (error: unknown) {
+        console.error("Failed to load user:", error);
+        if (error instanceof AxiosError) {
+          setError(new Error(`${error.status}: ${error.message}`));
+        } else {
+          setError(error instanceof Error ? error : new Error("Unknown error"));
+        }
+        setUser(null);
+
+        return false;
+      } finally {
+        setIsLoadingUser(false);
       }
-      setUser(null);
-      setIsLoadingUser(false);
     }
-  }, [tokenIsLoaded]);
 
-  useEffect(() => {
-    checkToken();
-  }, [checkToken]);
-
-  // Log out function
-  const logout = useCallback(() => {
-    setIsLoadingUser(true);
-    setUser(null);
-    clearAuth();
-    redirect("/api/auth/logout");
+    return false;
   }, []);
 
-  const login = useCallback(
-    (token: string, useOldHub: boolean) => {
-      updateAuth({ token: token, isOldHub: useOldHub });
-      checkToken();
-      if (error || user === null) {
-        return;
-      }
-      router.push("/hub");
-    },
-    [checkToken],
-  );
+  const logout = useCallback(() => {
+    setUser(null);
+    window.location.href = "/api/auth/logout";
+  }, []);
 
   const contextValue: AuthContextType = {
     user,
-    isLoading: isLoadingUser,
+    isLoadingUser,
     error,
     logout,
-    login,
+    loadUser,
   };
 
   return (

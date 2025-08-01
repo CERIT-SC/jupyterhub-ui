@@ -1,5 +1,7 @@
 "use client";
 
+import { redirect } from "next/navigation";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,14 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
-import { redirect } from "next/navigation";
 
 export default function Login() {
-  const { login, error } = useAuth();
+  const { error, user } = useAuth();
 
   const handleHubOauth = () => {
-    // TODO: Remove dependency on localStorage token
-    login("dummy_token", true);
     redirect("/api/auth/login");
   };
 
