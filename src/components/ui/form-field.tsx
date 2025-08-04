@@ -38,19 +38,46 @@ export function FormField({
   maxWidth = "max-w-xl",
 }: FormFieldProps) {
   return (
-    <div className={cn("space-y-2", maxWidth, className)}>
-      <Label className="font-medium" htmlFor={id}>
-        {label}
-      </Label>
-      {children}
-      <FormError message={error} />
-      {(description || tooltip) && (
-        <HelpText
-          recommended={recommended}
-          shortDescription={description}
-          tooltip={tooltip}
-        />
-      )}
+    <div className={cn("space-y-2", className)}>
+      {/* Mobile layout - stacked vertically */}
+      <div className="lg:hidden space-y-2">
+        <Label className="font-medium" htmlFor={id}>
+          {label}
+        </Label>
+        <div className={maxWidth}>{children}</div>
+        <FormError message={error} />
+        {(description || tooltip) && (
+          <HelpText
+            recommended={recommended}
+            shortDescription={description}
+            tooltip={tooltip}
+          />
+        )}
+      </div>
+
+      {/* Desktop layout - side by side */}
+      <div className="hidden lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
+        <div className="space-y-2">
+          <Label className="font-medium" htmlFor={id}>
+            {label}
+          </Label>
+          <div className="max-w-md">{children}</div>
+          <FormError message={error} />
+        </div>
+
+        {(description || tooltip) && (
+          <div className="pt-7">
+            {" "}
+            {/* Align with the input field */}
+            <HelpText
+              layout="horizontal"
+              recommended={recommended}
+              shortDescription={description}
+              tooltip={tooltip}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

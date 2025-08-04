@@ -1,14 +1,6 @@
 export type SiteConfig = typeof siteConfig;
 
-import {
-  BarChart,
-  Home,
-  LayoutDashboard,
-  LogOut,
-  Server,
-  Settings,
-  Users,
-} from "lucide-react";
+import { Home, LayoutDashboard, Server, Settings } from "lucide-react";
 
 export const siteConfig = {
   name: "JupyterHub Client",
@@ -34,22 +26,22 @@ export const siteConfig = {
         },
       ],
     },
-    {
-      section: "Admin",
-      items: [
-        {
-          name: "Manage",
-          icon: Users,
-          path: "/admin/manage",
-        },
-        {
-          name: "Statistics",
-          icon: BarChart,
-          path: "/admin/statistics",
-          disabled: false,
-        },
-      ],
-    },
+    // {
+    //   section: "Admin",
+    //   items: [
+    //     {
+    //       name: "Manage",
+    //       icon: Users,
+    //       path: "/admin/manage",
+    //     },
+    //     {
+    //       name: "Statistics",
+    //       icon: BarChart,
+    //       path: "/admin/statistics",
+    //       disabled: false,
+    //     },
+    //   ],
+    // },
     {
       section: "Settings",
       items: [
@@ -65,15 +57,15 @@ export const siteConfig = {
         },
       ],
     },
-    {
-      section: "Developement",
-      items: [
-        {
-          name: "dev",
-          icon: LogOut,
-          path: "/dev",
-        },
-      ],
-    },
+    // {
+    //   section: "Developement",
+    //   items: [
+    //     {
+    //       name: "dev",
+    //       icon: LogOut,
+    //       path: "/dev",
+    //     },
+    //   ],
+    // },
   ],
 };

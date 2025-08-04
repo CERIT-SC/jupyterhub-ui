@@ -2,17 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Info, Loader2, RocketIcon } from "lucide-react";
+import { ArrowLeft, Loader2, RocketIcon } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/useAuth";
 import { createServer, JupyterHubServerOptions } from "@/services/jupyterHub";
 import { SpawnOptionsForm } from "@/components/hub/SpawnOptionsForm";
 import { ServerNameInput } from "@/components/hub/ServerNameInput";
-import { PresetSelector } from "@/components/hub/PresetSelector";
 import { defaultJupyterHubServerOptions } from "@/config/hub";
 import { ServerPreset, serverPresets } from "@/config/presets";
 
@@ -127,17 +125,17 @@ export default function SpawnPage() {
         title="Create New Notebook"
       />
 
-      {/* Info alert */}
-      <Alert variant={"info"}>
-        <Info className="h-4 w-4" />
-        <AlertTitle>Feature in developement</AlertTitle>
-        <AlertDescription>
-          Options are unavailable for the time being. You can spawn only basic
-          notebook server.
-        </AlertDescription>
-      </Alert>
+      {/*/!* Info alert *!/*/}
+      {/*<Alert variant={"info"}>*/}
+      {/*  <Info className="h-4 w-4" />*/}
+      {/*  <AlertTitle>Feature in developement</AlertTitle>*/}
+      {/*  <AlertDescription>*/}
+      {/*    Options are unavailable for the time being. You can spawn only basic*/}
+      {/*    notebook server.*/}
+      {/*  </AlertDescription>*/}
+      {/*</Alert>*/}
 
-      <Separator />
+      {/*<Separator />*/}
 
       {/* Display general errors */}
       {errors.general && (
@@ -147,13 +145,13 @@ export default function SpawnPage() {
         </Alert>
       )}
 
-      {/* Preset selector */}
-      <PresetSelector
-        selectedPresetId={selectedPresetId}
-        onSelectPreset={handlePresetSelect}
-      />
+      {/*/!* Preset selector *!/*/}
+      {/*<PresetSelector*/}
+      {/*  selectedPresetId={selectedPresetId}*/}
+      {/*  onSelectPreset={handlePresetSelect}*/}
+      {/*/>*/}
 
-      <Separator />
+      {/*<Separator />*/}
 
       {/* Server name input */}
       <ServerNameInput
@@ -180,8 +178,7 @@ export default function SpawnPage() {
         <div className="container mx-auto flex justify-end">
           <Button
             className="gap-2"
-            // disabled={isSpawning || !serverName}
-            disabled={true}
+            disabled={isSpawning || !serverName}
             size="lg"
             onClick={handleSpawn}
           >

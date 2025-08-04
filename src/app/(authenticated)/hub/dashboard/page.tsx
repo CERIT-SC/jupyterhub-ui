@@ -70,7 +70,7 @@ export default function HubDashboard() {
           <h1 className="text-3xl font-bold">JupyterHub Dashboard</h1>
           <p className="text-muted-foreground">Manage your notebook servers</p>
         </div>
-        <Link href="/hub/spawn">
+        <Link href="/hub/spawn/options">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             New Server

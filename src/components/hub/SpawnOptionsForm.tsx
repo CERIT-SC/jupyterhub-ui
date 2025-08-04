@@ -312,7 +312,7 @@ export function SpawnOptionsForm({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-7xl mx-auto xl:max-w-[1280px]">
       {/* Image Selection */}
       <Card>
         <CardHeader>
@@ -322,7 +322,7 @@ export function SpawnOptionsForm({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto xl:max-w-none">
             <p className="text-muted-foreground mb-4">
               Select the type of environment you want to use for your notebook.
             </p>
@@ -378,7 +378,7 @@ export function SpawnOptionsForm({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto xl:max-w-none">
             <p className="text-muted-foreground mb-4">
               Specify the computing resources needed for your notebook. Each
               resource affects how your notebook will perform for different
@@ -582,7 +582,7 @@ export function SpawnOptionsForm({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto xl:max-w-none">
             <p className="text-muted-foreground mb-4">
               Configure where and how your data will be stored. The right
               storage options ensure your work is preserved and accessible
