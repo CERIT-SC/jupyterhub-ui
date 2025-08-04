@@ -13,6 +13,7 @@ export const siteConfig = {
           name: "Home",
           icon: Home,
           path: "/hub/dashboard",
+          disabled: false,
         },
         {
           name: "Notebooks",
