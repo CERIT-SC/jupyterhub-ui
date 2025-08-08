@@ -1,6 +1,8 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,16 +13,37 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export default function Login() {
-  const { error, user } = useAuth();
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const { error } = useAuth();
+
+  const [showSessionExpiredMessage, setShowSessionExpiredMessage] =
+    useState(false);
+
+  // Check for session expired parameter
+  useEffect(() => {
+    const sessionExpired = searchParams.get("sessionExpired");
+
+    if (sessionExpired === "jupyterhub") {
+      setShowSessionExpiredMessage(true);
+
+      // Clear the parameter from URL after showing the message
+      // This prevents the message from showing again if user refreshes
+      const url = new URL(window.location.href);
+
+      url.searchParams.delete("sessionExpired");
+      window.history.replaceState({}, document.title, url.pathname);
+    }
+  }, [searchParams]);
 
   const handleHubOauth = () => {
     redirect("/api/auth/login");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center container mx-auto p-6 space-y-6 max-w-7xl">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -32,6 +55,16 @@ export default function Login() {
           <CardDescription className="text-center">
             Currently in developement
           </CardDescription>
+          {showSessionExpiredMessage && (
+            <Alert variant="info">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Session Expired</AlertTitle>
+              <AlertDescription>
+                Your JupyterHub session has expired. Please sign in again to
+                continue.
+              </AlertDescription>
+            </Alert>
+          )}
           <div className={"flex flex-col gap-2"}>
             <Button onClick={handleHubOauth}>Login in using Oauth</Button>
             {error && (
@@ -47,5 +80,13 @@ export default function Login() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

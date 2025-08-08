@@ -27,9 +27,9 @@ jupyterHubClient.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// Create a custom event for auth errors
-export const AUTH_ERROR_EVENT = "jupyterhub-auth-error";
-export const authErrorEvent = new CustomEvent(AUTH_ERROR_EVENT);
+const expiredLogin = () => {
+  window.location.href = "/login?sessionExpired=jupyterhub";
+};
 
 // Add response interceptor for error handling
 jupyterHubClient.interceptors.response.use(
@@ -41,13 +41,11 @@ jupyterHubClient.interceptors.response.use(
 
       // Handle specific status codes
       if (status === 401) {
-        // Dispatch an auth error event that can be listened to elsewhere in the app
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(authErrorEvent);
-        }
         console.error("Unauthorized request to JupyterHub API");
+        expiredLogin();
       } else if (status === 403) {
         console.error("Forbidden request to JupyterHub API");
+        expiredLogin();
       } else if (status >= 500) {
         console.error("JupyterHub API server error");
       }
