@@ -63,7 +63,7 @@ export function TabsList({ className, children }: TabsListProps) {
   return (
     <div
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-full bg-white/60 backdrop-blur-sm p-1 border border-white/80 shadow-[0_3px_12px_rgba(0,0,0,0.08)]",
+        "inline-flex h-10 items-center justify-center rounded-full bg-white border border-infra-border shadow-[0_3px_12px_rgba(0,0,0,0.08)]",
         className,
       )}
     >
@@ -92,10 +92,10 @@ export function TabsTrigger({
     <button
       aria-selected={isSelected}
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-infra-primary/30 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex border border-transparent  items-center justify-center whitespace-nowrap rounded-full px-4 h-full text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-infra-primary/30 disabled:pointer-events-none disabled:opacity-50",
         isSelected
           ? "bg-gradient-to-r from-infra-gradient-start to-infra-gradient-end text-white shadow-[0_3px_10px_rgba(0,0,0,0.15)]"
-          : "text-infra-text-secondary hover:text-infra-text-primary hover:bg-white/70 hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]",
+          : "text-infra-text-secondary hover:text-infra-text-primary hover:border-infra-border hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]",
         className,
       )}
       disabled={disabled}

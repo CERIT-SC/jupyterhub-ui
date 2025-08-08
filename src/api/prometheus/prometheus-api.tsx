@@ -186,7 +186,42 @@ const aggregateGPUsByModel = (
   return gpuCounts;
 };
 
-export const getAllocatableGPUS = async (): Promise<any> => {
+/**
+ * Aggregates GPU details by model name and returns count for each model
+ */
+const aggregateGPUsByModelAndDeviceId = (
+  gpuDetails: Array<{
+    deviceId: string;
+    modelName: string;
+    nodeName: string;
+    freeMemoryMB: number;
+    totalMemoryMB: number;
+    driverVersion: string;
+    uuid: string;
+    gpuInstanceId?: string;
+    gpuInstanceProfile?: string;
+  }>,
+): Record<string, number> => {
+  const gpuCounts: Record<string, number> = {};
+
+  for (const gpu of gpuDetails) {
+    // Create dictionary key: modelName + GPU_I_PROFILE (if exists)
+    const dictionaryKey = gpu.gpuInstanceProfile
+      ? `${gpu.modelName} ${gpu.gpuInstanceProfile}`
+      : gpu.modelName;
+
+    // Add to GPU count by model (including profile)
+    if (gpuCounts[dictionaryKey]) {
+      gpuCounts[dictionaryKey]++;
+    } else {
+      gpuCounts[dictionaryKey] = 1;
+    }
+  }
+
+  return gpuCounts;
+};
+
+export const getAllocatableGPUS = async () => {
   try {
     const allocatableNodes: Set<string> = await getGPUAllocatableNodes();
     const unusedGPUs = await getUnassignedGPUsByModel();
@@ -195,11 +230,11 @@ export const getAllocatableGPUS = async (): Promise<any> => {
       allocatableNodes.has(gpu.nodeName),
     );
 
+    console.log("filteredGpus", filteredGpus);
+
     return aggregateGPUsByModel(filteredGpus);
   } catch (error) {
     console.error("Failed to get allocatable GPUs:", error);
-
-    return {};
   }
 };
 

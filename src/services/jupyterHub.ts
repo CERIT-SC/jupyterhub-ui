@@ -14,6 +14,7 @@ export interface ServerProgress {
 export interface ServerStatus {
   name: string;
   ready: boolean;
+  stopped: boolean;
   pending: "spawn" | "stop" | null;
   url?: string;
   progress?: {

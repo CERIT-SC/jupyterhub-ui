@@ -92,7 +92,7 @@ export function SpawnOptionsForm({
         const allocableGPUs = await getAllocatableGPUS();
 
         // Transform the allocable GPUs data into options format
-        const options = Object.entries(allocableGPUs).map(([name, count]) => ({
+        const options = Object.entries(allocableGPUs || {}).map(([name, count]) => ({
           value: name,
           label: `${name} (${count} available)`,
         }));

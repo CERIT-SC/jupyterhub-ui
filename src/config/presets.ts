@@ -1,59 +1,142 @@
 import { JupyterHubServerOptions } from "@/services/jupyterHub";
 
+/**
+ * Server preset configuration for simple resource selection
+ */
 export interface ServerPreset {
   id: string;
   name: string;
   description: string;
-  options: JupyterHubServerOptions;
+  icon: string;
+  options: Partial<JupyterHubServerOptions>;
+  category: "minimal" | "balanced" | "performance";
 }
 
-export const serverPresets: ServerPreset[] = [
+/**
+ * Pre-defined resource configurations for quick selection
+ */
+export const resourcePresets: ServerPreset[] = [
   {
     id: "minimal",
     name: "Minimal",
-    description: "Basic configuration with minimal resources",
+    description: "For basic data exploration and lightweight notebooks",
+    icon: "cpu",
+    category: "minimal",
     options: {
-      container_image: "cerit.io/hubs/minimalnb-cs:31-10-2024",
       cpu: "1",
-      mem: "2",
+      mem: "4",
       gpu: "none",
-      ssh: false,
-      phome: "remain",
-      mountprojects: false,
-      home: null,
-      shmsize: "2",
+      shmsize: "4",
     },
   },
   {
     id: "standard",
     name: "Standard",
-    description: "Balanced configuration for most use cases",
+    description: "Balanced resources for most data science tasks",
+    icon: "cpu",
+    category: "balanced",
     options: {
-      container_image: "cerit.io/hubs/standardnb-cs:31-10-2024",
       cpu: "2",
+      mem: "16",
+      gpu: "none",
+      shmsize: "16",
+    },
+  },
+  {
+    id: "compute",
+    name: "Compute Optimized",
+    description: "Extra CPU power for computation-heavy tasks",
+    icon: "cpu",
+    category: "performance",
+    options: {
+      cpu: "4",
+      mem: "16",
+      gpu: "none",
+      shmsize: "16",
+    },
+  },
+  {
+    id: "memory",
+    name: "Memory Optimized",
+    description: "Large memory for working with big datasets",
+    icon: "cpu",
+    category: "performance",
+    options: {
+      cpu: "2",
+      mem: "32",
+      gpu: "none",
+      shmsize: "32",
+    },
+  },
+  {
+    id: "gpu-basic",
+    name: "Basic GPU",
+    description: "Entry-level GPU acceleration for ML tasks",
+    icon: "cpu",
+    category: "performance",
+    options: {
+      cpu: "2",
+      mem: "16",
+      gpu: "mig-1g.10gb",
+      shmsize: "16",
+    },
+  },
+  {
+    id: "gpu-advanced",
+    name: "Advanced GPU",
+    description: "High-performance GPU for deep learning",
+    icon: "cpu",
+    category: "performance",
+    options: {
+      cpu: "4",
+      mem: "32",
+      gpu: "mig-2g.20gb",
+      shmsize: "32",
+    },
+  },
+];
+
+/**
+ * Quick-start presets for notebook servers
+ */
+export const quickstartServerPresets: ServerPreset[] = [
+  {
+    id: "quick-minimal",
+    name: "Minimal Resources",
+    description: "For basic analysis and small datasets",
+    icon: "cpu",
+    category: "minimal",
+    options: {
+      cpu: "1",
       mem: "4",
       gpu: "none",
-      ssh: true,
-      phome: "remain",
-      mountprojects: true,
-      home: null,
       shmsize: "4",
     },
   },
   {
-    id: "high-performance",
-    name: "High Performance",
-    description: "High-end configuration with GPU support",
+    id: "quick-balanced",
+    name: "Balanced Resources",
+    description: "For most data science workloads",
+    icon: "cpu",
+    category: "balanced",
     options: {
-      container_image: "cerit.io/hubs/highresnb-cs:31-10-2024",
-      cpu: "4",
+      cpu: "2",
       mem: "16",
-      gpu: "1",
-      ssh: true,
-      phome: "remain",
-      mountprojects: true,
-      home: null,
+      gpu: "none",
       shmsize: "16",
+    },
+  },
+  {
+    id: "quick-gpu",
+    name: "GPU Compute",
+    description: "For machine learning and deep learning",
+    icon: "cpu",
+    category: "performance",
+    options: {
+      cpu: "4",
+      mem: "32",
+      gpu: "mig-1g.10gb",
+      shmsize: "32",
     },
   },
 ];

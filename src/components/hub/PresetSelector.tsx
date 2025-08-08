@@ -1,7 +1,7 @@
 import React from "react";
 import { Cpu, MemoryStick, Zap } from "lucide-react";
 
-import { ServerPreset, serverPresets } from "@/config/presets";
+import { ServerPreset, quickstartServerPresets } from "@/config/presets";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,7 @@ export function PresetSelector({
         Select a preset configuration or customize below
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {serverPresets.map((preset) => (
+        {quickstartServerPresets.map((preset) => (
           <Card
             key={preset.id}
             className={`overflow-hidden cursor-pointer transition-all hover:shadow-md ${selectedPresetId === preset.id ? "ring-2 ring-primary" : ""}`}

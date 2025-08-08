@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ServerIcon } from "lucide-react";
+import { useEffect } from "react";
+import {
+  CheckCircle,
+  ServerIcon,
+  XCircle,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormError } from "@/components/ui/form-error";
 import { HelpText } from "@/components/ui/help-text";
 import { cn } from "@/lib/utils";
+import { useServerNameValidation } from "@/hooks/useServerNameValidation";
 
 interface ServerNameInputProps {
   /**
@@ -27,6 +34,10 @@ interface ServerNameInputProps {
    * Custom error message from parent component
    */
   error?: string;
+  /**
+   * Callback when validation state changes
+   */
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 export function ServerNameInput({
@@ -34,42 +45,59 @@ export function ServerNameInput({
   onChangeNameAction,
   className,
   error: externalError,
+  onValidationChange,
 }: ServerNameInputProps) {
-  const [internalError, setInternalError] = useState<string | null>(null);
+  // Use the custom validation hook
+  const {
+    serverName,
+    updateServerName,
+    error: validationError,
+    validationStatus,
+    isValid,
+  } = useServerNameValidation({
+    initialName: value,
+    validateOnChange: true,
+    defaultStaleTime: 5000,
+    changedValueStaleTime: 2000,
+    // debounceDelay: 10000,
+  });
 
-  // Use external error if provided, otherwise use internal validation error
-  const error = externalError || internalError;
-
-  // Validate server name when it changes
+  // Sync serverName with the parent component's value
   useEffect(() => {
-    // Server name requirements based on Kubernetes naming conventions
-    // - lowercase alphanumeric characters, '-' allowed
-    // - must start and end with alphanumeric
-    // - 63 characters or less
-
-    if (!value) {
-      setInternalError("Server name is required");
-
-      return;
+    if (value !== serverName) {
+      updateServerName(value);
     }
+  }, [value, serverName, updateServerName]);
 
-    if (value.length > 63) {
-      setInternalError("Server name must be 63 characters or less");
-
-      return;
+  // Notify parent component when validation state changes
+  useEffect(() => {
+    if (onValidationChange) {
+      onValidationChange(isValid);
     }
+  }, [isValid, onValidationChange]);
 
-    if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(value)) {
-      setInternalError(
-        "Server name must contain only lowercase letters, numbers, and hyphens, " +
-          "and must start and end with a letter or number",
-      );
+  // Handle input change and propagate to parent
+  const handleInputChange = (newValue: string) => {
+    updateServerName(newValue);
+    onChangeNameAction(newValue);
+  };
 
-      return;
+  // Use external error if provided, otherwise use validation error
+  const error = externalError || validationError;
+
+  // Render status icon based on validation state
+  const renderStatusIcon = () => {
+    switch (validationStatus) {
+      case "checking":
+        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
+      case "valid":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "invalid":
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case "idle":
+        return <AlertCircle className="h-4 w-4 text-gray-400" />;
     }
-
-    setInternalError(null);
-  }, [value]);
+  };
 
   return (
     <Card className={className}>
@@ -84,13 +112,25 @@ export function ServerNameInput({
           <Label className="font-medium" htmlFor="server-name">
             Enter a name for your notebook server:
           </Label>
-          <Input
-            className={cn("mt-2", error ? "border-red-500" : "")}
-            id="server-name"
-            placeholder="my-notebook"
-            value={value}
-            onChange={(e) => onChangeNameAction(e.target.value)}
-          />
+          <div className="relative mt-2">
+            <Input
+              className={cn(
+                "pr-10",
+                error
+                  ? "border-red-500"
+                  : validationStatus === "valid"
+                    ? "border-green-500"
+                    : "",
+              )}
+              id="server-name"
+              placeholder="my-notebook"
+              value={serverName}
+              onChange={(e) => handleInputChange(e.target.value)}
+            />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              {renderStatusIcon()}
+            </div>
+          </div>
           <FormError message={error === null ? undefined : error} />
           <HelpText
             shortDescription="Use a unique name to identify this notebook. Only lowercase letters, numbers, and hyphens are allowed."
