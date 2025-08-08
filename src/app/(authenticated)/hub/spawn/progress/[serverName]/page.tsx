@@ -26,6 +26,7 @@ export default function SpawnProgress() {
   const [running, setRunning] = useState<boolean>(true);
   const [pageState, setPageState] = useState<PageState>("starting");
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   const { data, isError, error, isFetched } = useQuery({
     queryKey: ["user", "server", serverName],
@@ -77,6 +78,10 @@ export default function SpawnProgress() {
         if (data.ready) {
           setPageState("ready");
           setRunning(false);
+          // Start countdown when server is ready
+          if (countdown === null) {
+            setCountdown(4);
+          }
         } else if (data.failed) {
           setPageState("failed");
           setRunning(false);
@@ -116,6 +121,31 @@ export default function SpawnProgress() {
     }
   }, [data, isError, error, serverName]);
 
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown !== null && countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    } else if (countdown === 0 && data?.url) {
+      // Auto-redirect when countdown reaches 0
+      const redirectUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/${data.url}`;
+
+      window.location.href = redirectUrl;
+    }
+  }, [countdown, data?.url]);
+
+  // Handle manual redirect
+  const handleOpenServer = () => {
+    if (data?.url) {
+      const redirectUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/${data.url}`;
+
+      window.location.href = redirectUrl;
+    }
+  };
+
   const getStateIcon = () => {
     switch (pageState) {
       case "ready":
@@ -154,7 +184,7 @@ export default function SpawnProgress() {
       case "progress":
         return "Server spawn in progress...";
       case "ready":
-        return "Server is ready";
+        return `Server is ready at ${data?.url || ""}`;
       case "failed":
         return "Server spawn failed";
       case "error":
@@ -183,7 +213,8 @@ export default function SpawnProgress() {
             {getStateBadge()}
           </div>
           <p className="text-sm text-muted-foreground">
-            Server: <span className="font-mono">{serverName}</span>
+            Server name:{" "}
+            <span className="text-infra-primary">{serverName}</span>
           </p>
         </CardHeader>
 
@@ -202,18 +233,18 @@ export default function SpawnProgress() {
             />
           </div>
 
-          {/* Current Message */}
-          {data?.message && (
-            <div
-              className={`p-3 rounded-lg ${pageState === "failed" ? "bg-red-50 border border-red-200" : "bg-blue-50 border border-blue-200"}`}
-            >
-              <p
-                className={`text-sm ${pageState === "failed" ? "text-red-800" : "text-blue-800"}`}
-              >
-                {data.message}
-              </p>
-            </div>
-          )}
+          {/*/!* Current Message *!/*/}
+          {/*{data?.message && (*/}
+          {/*  <div*/}
+          {/*    className={`p-3 rounded-lg ${pageState === "failed" ? "bg-red-50 border border-red-200" : "bg-blue-50 border border-blue-200"}`}*/}
+          {/*  >*/}
+          {/*    <p*/}
+          {/*      className={`text-sm ${pageState === "failed" ? "text-red-800" : "text-blue-800"}`}*/}
+          {/*    >*/}
+          {/*      {data.message}*/}
+          {/*    </p>*/}
+          {/*  </div>*/}
+          {/*)}*/}
 
           {/* Error Message */}
           {pageState === "error" && (
@@ -248,12 +279,50 @@ export default function SpawnProgress() {
             </div>
           )}
 
-          {/* HTML Message (if available) */}
-          {data?.html_message && (
-            <div
-              dangerouslySetInnerHTML={{ __html: data.html_message }}
-              className={`p-3 rounded-lg text-sm ${pageState === "failed" ? "bg-red-50 border border-red-200 text-red-800" : "bg-blue-50 border border-blue-200 text-blue-800"}`}
-            />
+          {/*/!* HTML Message (if available) *!/*/}
+          {/*{data?.html_message && (*/}
+          {/*  <div*/}
+          {/*    dangerouslySetInnerHTML={{ __html: data.html_message }}*/}
+          {/*    className={`p-3 rounded-lg text-sm ${pageState === "failed" ? "bg-red-50 border border-red-200 text-red-800" : "bg-blue-50 border border-blue-200 text-blue-800"}`}*/}
+          {/*  />*/}
+          {/*)}*/}
+
+          {/* Ready State - Show Open Server Button */}
+          {pageState === "ready" && data?.url && (
+            <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <h3 className="font-medium text-green-800">Server Ready</h3>
+              </div>
+              <p className="text-green-700 mb-3">
+                Your server has been successfully spawned and is ready to use.
+                {countdown !== null && countdown > 0 && (
+                  <span className="block mt-2 font-medium">
+                    Redirecting automatically in {countdown} second
+                    {countdown !== 1 ? "s" : ""}...
+                  </span>
+                )}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handleOpenServer}
+                >
+                  {countdown !== null && countdown > 0
+                    ? `Open Server (${countdown}s)`
+                    : "Open Server"}
+                </Button>
+                {countdown !== null && countdown > 0 && (
+                  <Button
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                    variant="outline"
+                    onClick={() => setCountdown(null)}
+                  >
+                    Cancel Auto-redirect
+                  </Button>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Message History */}
@@ -311,28 +380,6 @@ export default function SpawnProgress() {
               )}
             </div>
           </div>
-
-          {/* Ready State - Show Open Server Button */}
-          {pageState === "ready" && data?.url && (
-            <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <h3 className="font-medium text-green-800">Server Ready</h3>
-              </div>
-              <p className="text-green-700 mb-3">
-                Your server has been successfully spawned and is ready to use.
-              </p>
-              <Link
-                href={
-                  `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/` + data.url
-                }
-              >
-                <Button asChild className="bg-green-600 hover:bg-green-700">
-                  Open Server
-                </Button>
-              </Link>
-            </div>
-          )}
 
           {/* Debug Info (only in development) */}
           {process.env.NODE_ENV === "development" && (

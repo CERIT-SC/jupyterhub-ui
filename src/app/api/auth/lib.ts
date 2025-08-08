@@ -5,7 +5,7 @@ export interface SessionData {
 }
 
 export const getSessionOptions = () => {
-  const sessionSecret = process.env.SESSION_SECRET
+  const sessionSecret = process.env.SESSION_SECRET;
 
   if (!sessionSecret) {
     throw new Error("SESSION_SECRET is not set");
@@ -23,4 +23,4 @@ export const getSessionOptions = () => {
   };
 
   return sessionOptions;
-} 
+};

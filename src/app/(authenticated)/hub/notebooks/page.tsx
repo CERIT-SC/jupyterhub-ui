@@ -70,7 +70,7 @@ export default function NotebooksPage() {
           if (selectedTab === "running") {
             include = server.ready || server.pending === "spawn";
           } else if (selectedTab === "stopped") {
-            include = server.pending === "stop";
+            include = server.stopped || server.pending === "stop";
           }
 
           // Filter by search query
@@ -145,7 +145,7 @@ export default function NotebooksPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-6 space-y-6 max-w-7xl">
         <Card>
           <CardContent className="p-6">
             <div className="text-center space-y-4">
@@ -164,7 +164,7 @@ export default function NotebooksPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto px-6 py-8 max-w-7xl">
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <PageHeader
@@ -200,7 +200,7 @@ export default function NotebooksPage() {
             />
           </div>
 
-          <Button onClick={() => router.push("/hub/spawn/options")}>
+          <Button onClick={() => router.push("/hub/spawn")}>
             <Plus className="mr-2 h-4 w-4" />
             New Notebook
           </Button>

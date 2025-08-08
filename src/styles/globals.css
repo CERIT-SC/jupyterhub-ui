@@ -10,6 +10,8 @@
     --color-infra-accent: oklch(75% 0.17 325.02); /* acc - softer */
     --color-infra-violet-dark: oklch(35% 0.08 289.42); /* lily - slightly lighter */
     --color-infra-primary: oklch(62% 0.22 294.44); /* fialova - softer */
+
+    --coler-a: rgb(134, 52, 252);
     --color-infra-violet-light: oklch(90% 0.07 300.06); /* fialova light - lighter */
     --color-infra-gray-light: oklch(98% 0.003 228.82); /* sedobila - even lighter */
     --color-white: oklch(100% 0 0); /* bila */
@@ -22,10 +24,10 @@
     /* Surface and background colors */
     --color-infra-background: linear-gradient(135deg, oklch(99% 0.01 270), oklch(97% 0.01 220));
     --color-infra-surface: var(--color-white);
-    --color-infra-border: oklch(92% 0.015 285); /* Softer border */
+    --color-infra-border: var(--color-gray-300); /* Softer border */
     /* Text colors */
     --color-infra-text-primary: var(--color-infra-violet-dark);
-    --color-infra-text-secondary: var(--color-infra-gray);
+    --color-infra-text-secondary: var(--color-gray-600);
 
     /* Gradient colors - softer */
     --color-infra-gradient-start: oklch(65% 0.18 290);

@@ -26,7 +26,7 @@ export function DashboardLayout({
   return (
     <div className="h-screen flex flex-col relative">
       {header && (
-        <header className="sticky top-0 z-10 border-b border-gray-200 bg-white backdrop-blur-md shadow-sm">
+        <header className="sticky top-0 z-10 border border-infra-border bg-white backdrop-blur-md shadow-sm">
           {header}
         </header>
       )}
@@ -37,7 +37,7 @@ export function DashboardLayout({
             {/* Sidebar */}
             <aside
               className={cn(
-                "fixed left-0 border-r h-full w-full border-gray-200 bg-white overflow-y-auto transition-all duration-300 ease-in-out z-50",
+                "fixed left-0 border-r h-full w-full border-infra-border bg-white overflow-y-auto transition-all duration-300 ease-in-out z-50",
                 "sm:w-64",
                 "md:sticky md:w-64 md:p-4 md:pointer-events-auto ",
                 sidebarOpen

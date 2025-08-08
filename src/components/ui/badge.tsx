@@ -10,12 +10,12 @@ const badgeVariants = cva(
       variant: {
         default:
           "border-transparent bg-gradient-to-r from-infra-gradient-start to-infra-gradient-end text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]",
+        full: "font-bold text-white bg-infra-primary border-gray-200 shadow-none border-0 ",
         secondary:
           "border-transparent bg-infra-secondary/90 text-white shadow-[0_2px_8px_rgba(0,0,0,0.1)]",
         destructive:
           "border-transparent bg-infra-error text-white shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:bg-infra-error/90",
-        outline:
-          "text-infra-text-primary border-infra-border/50 bg-white/70 backdrop-blur-sm shadow-[0_2px_6px_rgba(0,0,0,0.06)]",
+        outline: "text-infra-text-primary border-gray-400 border-1 bg-white ",
         success:
           "border-transparent bg-infra-success/90 text-white shadow-[0_2px_8px_rgba(0,0,0,0.1)]",
         warning:

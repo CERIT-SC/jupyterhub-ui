@@ -9,6 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        default:
+          "bg-gradient-to-r from-infra-gradient-start to-infra-gradient-end text-white shadow-sm hover:shadow-md hover:opacity-90",
         primary:
           "bg-gradient-to-r from-infra-gradient-start to-infra-gradient-end text-white shadow-sm hover:shadow-md hover:opacity-90",
         secondary: "bg-infra-secondary text-white shadow-sm hover:opacity-90",
@@ -19,7 +21,7 @@ const buttonVariants = cva(
         ghost:
           "bg-transparent hover:bg-infra-primary/20 text-infra-text-primary",
         link: "text-infra-primary underline-offset-4 hover:underline p-0 h-auto",
-        soft: "bg-white border border-gray-200 text-infra-text-primary shadow hover:border-infra-primary",
+        soft: "bg-white border order-infra-border text-infra-text-primary shadow hover:border-infra-primary",
       },
       size: {
         default: "h-10 px-5 py-2",

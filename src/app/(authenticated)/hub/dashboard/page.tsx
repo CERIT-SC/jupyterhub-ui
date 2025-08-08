@@ -64,13 +64,13 @@ export default function HubDashboard() {
     totalServers - runningServers - startingServers - stoppingServers;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">JupyterHub Dashboard</h1>
           <p className="text-muted-foreground">Manage your notebook servers</p>
         </div>
-        <Link href="/hub/spawn/options">
+        <Link href="/hub/spawn">
           <Button>
             <Plus className="h-4 w-4 mr-2" />
             New Server
