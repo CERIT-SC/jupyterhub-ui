@@ -24,9 +24,10 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ServerStatus } from "@/services/jupyterHub";
+import { cn } from "@/lib/cn";
 
 interface NotebookDetailsDialogProps {
-  notebook: ServerStatus;
+  notebook?: ServerStatus | null;
   notebookName: string;
   trigger: React.ReactNode;
   /**
@@ -54,6 +55,11 @@ export function NotebookDetailsDialog({
     setShowDeleteConfirm(false);
   };
 
+  // Return null if no notebook is provided
+  if (!notebook) {
+    return null;
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -67,7 +73,14 @@ export function NotebookDetailsDialog({
               {notebookName === "Default" ? "Default Server" : notebookName}
             </DialogTitle>
             <Badge
-              className={`ml-auto ${notebook.ready ? "bg-green-100 text-green-800" : notebook.pending ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"}`}
+              className={cn(
+                `ml-auto`,
+                notebook.ready
+                  ? "bg-green-100 text-green-800"
+                  : notebook.pending
+                    ? "bg-yellow-100 text-yellow-800"
+                    : "bg-gray-100 text-gray-800",
+              )}
               variant="outline"
             >
               {notebook.ready

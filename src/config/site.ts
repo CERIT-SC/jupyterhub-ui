@@ -1,8 +1,29 @@
-export type SiteConfig = typeof siteConfig;
+import {
+  House,
+  LayoutDashboard,
+  Server,
+  Settings,
+  LucideIcon,
+} from "lucide-react";
 
-import { Home, LayoutDashboard, Server, Settings } from "lucide-react";
+export type SiteConfig = {
+  name: string;
+  description: string;
+  navigation: {
+    section: string;
+    development?: boolean;
+    items: {
+      name: string;
+      icon: LucideIcon;
+      path: string;
+      disabled?: boolean;
+      development?: boolean;
+      external?: boolean;
+    }[];
+  }[];
+};
 
-export const siteConfig = {
+export const siteConfig: SiteConfig = {
   name: "JupyterHub Client",
   description: "A modern client for JupyterHub",
   navigation: [
@@ -11,9 +32,8 @@ export const siteConfig = {
       items: [
         {
           name: "Home",
-          icon: Home,
+          icon: House,
           path: "/hub/dashboard",
-          disabled: false,
         },
         {
           name: "Notebooks",
@@ -27,46 +47,34 @@ export const siteConfig = {
         },
       ],
     },
-    // {
-    //   section: "Admin",
-    //   items: [
-    //     {
-    //       name: "Manage",
-    //       icon: Users,
-    //       path: "/admin/manage",
-    //     },
-    //     {
-    //       name: "Statistics",
-    //       icon: BarChart,
-    //       path: "/admin/statistics",
-    //       disabled: false,
-    //     },
-    //   ],
-    // },
     {
       section: "Settings",
       items: [
-        // {
-        //   name: "Profile",
-        //   icon: User,
-        //   path: "/profile",
-        // },
         {
           name: "Preferences",
           icon: Settings,
           path: "/preferences",
+          disabled: true,
         },
       ],
     },
-    // {
-    //   section: "Developement",
-    //   items: [
-    //     {
-    //       name: "dev",
-    //       icon: LogOut,
-    //       path: "/dev",
-    //     },
-    //   ],
-    // },
+    {
+      section: "Development",
+      development: true,
+      items: [
+        {
+          name: "api tester",
+          icon: Settings,
+          path: "/dev/api",
+          development: true,
+        },
+        {
+          name: "ui showcase",
+          icon: Settings,
+          path: "/dev/ui",
+          development: true,
+        },
+      ],
+    },
   ],
 };

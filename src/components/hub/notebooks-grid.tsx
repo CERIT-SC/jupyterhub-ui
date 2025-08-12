@@ -1,6 +1,6 @@
 import React from "react";
 
-import { NotebookCard } from "@/components/notebook/notebook-card";
+import { NotebookCard } from "@/components/hub/notebook-card";
 import { ServerStatus } from "@/services/jupyterHub";
 
 interface NotebooksGridProps {

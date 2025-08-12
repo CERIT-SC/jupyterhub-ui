@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import {
-  Server,
-  Code,
   BarChart,
-  Cpu,
   Calculator,
+  CheckCircle,
   Cloud,
+  Code,
+  Cpu,
   Dna,
   HardDrive,
   Loader2,
-  CheckCircle,
-  XCircle,
-  Check,
   MemoryStick,
+  Server,
+  XCircle,
   Zap,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -23,7 +20,13 @@ import { ImageSelector } from "@/components/hub/ImageSelector";
 import { resourcePresets, ServerPreset } from "@/config/presets";
 import { JupyterHubServerOptions } from "@/services/jupyterHub";
 import { hubConfig } from "@/config/hub";
-import { cpuOptions, memoryOptions } from "@/config/hub/jupyterOptions";
+import {
+  cpuOptions,
+  homeOptions,
+  memoryOptions,
+  mockPvcNames,
+  mockS3Buckets,
+} from "@/config/hub/jupyterOptions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -38,11 +41,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
-import {
-  homeOptions,
-  mockPvcNames,
-  mockS3Buckets,
-} from "@/config/hub/jupyterOptions";
 import { CardSection } from "@/components/ui/card-section";
 import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
 import { Badge } from "@/components/ui/badge";
@@ -52,7 +50,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
+import {
+  SelectionCard,
+  SelectionCardGrid,
+} from "@/components/hub/settings/cardSelection";
 
 interface OptionsComponentInterface {
   options: Partial<JupyterHubServerOptions>;
@@ -70,47 +71,6 @@ const iconMap = {
   cloud: Cloud,
   dna: Dna,
 };
-
-const SelectionCard = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { selected: boolean }
->(({ className, children, selected, ...props }, ref) => (
-  <Card
-    className={cn(
-      "relative overflow-hidden cursor-pointer group",
-      "transition-all duration-300 ease-in-out transform",
-      "hover:shadow-lg  hover:-translate-y-1",
-      "border-2 transition-colors ",
-      selected
-        ? "border-infra-primary shadow-md shadow-primary/20 bg-linear-45  from-white from-85% via-infra-primary to-infra-accent"
-        : "border-infra-border hover:border-infra-primary/30",
-      "active:scale-95",
-    )}
-    {...props}
-  >
-    {/* Check mark indicator */}
-    <div
-      className={cn(
-        "absolute top-0 right-0 z-10",
-        "size-12 rounded-full flex items-center justify-center",
-        "transition-all duration-300 ease-in-out",
-        selected
-          ? ""
-          : "bg-infra-accent/20 scale-0 opacity-0 group-hover:scale-75 group-hover:opacity-50",
-      )}
-    >
-      <Check
-        className={cn(
-          "size-7 transition-all duration-200",
-          selected ? "text-white" : "text-infra-primary",
-        )}
-      />
-    </div>
-    {children}
-  </Card>
-));
-
-SelectionCard.displayName = "SelectionCard";
 
 interface ResourcePresetCardProps {
   preset: ServerPreset;
@@ -268,8 +228,6 @@ export const ImageSettingsSimple = ({
   options,
   setOptions,
 }: OptionsComponentInterface) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   // Handle selection of an image card with toggle functionality
   const handleSelectImage = (
     image: (typeof hubConfig.simpleOptions.image)[0],
@@ -295,33 +253,10 @@ export const ImageSettingsSimple = ({
 
   // Determine which images to show
   const getVisibleImages = () => {
-    const allImages = hubConfig.simpleOptions.image;
-
-    // if (isExpanded) {
-    //   return allImages;
-    // }
-    //
-    // // If nothing is selected, always show all images
-    // if (!selectedPresetImage && !options.container_image) {
-    //   return allImages;
-    // }
-    //
-    // // If something is selected and not expanded, show selected first + 2 others
-    // const selectedImage = allImages.find((img) => img.id === currentImageId);
-    // const otherImages = allImages.filter((img) => img.id !== currentImageId);
-    //
-    // if (selectedImage) {
-    //   return [selectedImage, ...otherImages.slice(0, 2)];
-    // }
-    //
-    // // Fallback to first 3 if selected not found
-    // return allImages.slice(0, 3);
-
-    return allImages;
+    return hubConfig.simpleOptions.image;
   };
 
   const visibleImages = getVisibleImages();
-  const totalImages = hubConfig.simpleOptions.image.length;
 
   return (
     <div className="space-y-3">
@@ -479,18 +414,19 @@ export const ResourceSettingsAdvanced = ({
   // Track GPU-specific state to show/hide MIG amount selector
   const [showMigAmount, setShowMigAmount] = useState(false);
 
-  // Track available GPU options
-  const [gpuOptions, setGpuOptions] = useState<
-    Array<{ value: string; label: string }>
-  >([
-    { value: "none", label: "None" },
-    { value: "mig-1g.10gb", label: "10GB part A100" },
-    { value: "mig-2g.20gb", label: "20GB part A100" },
-    { value: "a10", label: "Whole A10" },
-    { value: "a40", label: "Whole A40" },
-  ]);
-
-  // Set up effect to handle GPU MIG amount visibility
+  //
+  // // Track available GPU options
+  // const [gpuOptions, setGpuOptions] = useState<
+  //   Array<{ value: string; label: string }>
+  // >([
+  //   { value: "none", label: "None" },
+  //   { value: "mig-1g.10gb", label: "10GB part A100" },
+  //   { value: "mig-2g.20gb", label: "20GB part A100" },
+  //   { value: "a10", label: "Whole A10" },
+  //   { value: "a40", label: "Whole A40" },
+  // ]);
+  //
+  // // Set up effect to handle GPU MIG amount visibility
   useEffect(() => {
     setShowMigAmount(!!options.gpu?.startsWith("mig"));
   }, [options.gpu]);
@@ -512,28 +448,21 @@ export const ResourceSettingsAdvanced = ({
     });
   };
 
-  // Handle GPU change
-  const handleGpuChange = (value: string) => {
-    const newOptions = { ...options, gpu: value };
-
-    // Clear migamount if not needed
-    if (!value.startsWith("mig")) {
-      delete newOptions.migamount;
-    } else if (!newOptions.migamount) {
-      // Default to 1 if selecting a MIG GPU
-      newOptions.migamount = "1";
-    }
-
-    setOptions(newOptions);
-  };
-
-  // Handle MIG amount change
-  const handleMigAmountChange = (value: string) => {
-    setOptions({
-      ...options,
-      migamount: value,
-    });
-  };
+  // // Handle GPU change
+  // const handleGpuChange = (value: string) => {
+  //   const newOptions = { ...options, gpu: value };
+  //
+  //   // Clear migamount if not needed
+  //   if (!value.startsWith("mig")) {
+  //     delete newOptions.migamount;
+  //   } else if (!newOptions.migamount) {
+  //     // Default to 1 if selecting a MIG GPU
+  //     newOptions.migamount = "1";
+  //   }
+  //
+  //   setOptions(newOptions);
+  // };
+  //
 
   return (
     <div className="space-y-6">
@@ -587,111 +516,7 @@ export const ResourceSettingsAdvanced = ({
             Memory determines how much data your notebook can work with at once
           </p>
         </div>
-
-        {/* GPU Selection */}
-        <div className="space-y-2">
-          {/*<Label htmlFor="gpu-selection">GPU Type:</Label>*/}
-          {/*<div className="grid grid-cols-1 md:grid-cols-2 gap-4">*/}
-          {/*  <Select*/}
-          {/*    value={options.gpu || "none"}*/}
-          {/*    onValueChange={handleGpuChange}*/}
-          {/*  >*/}
-          {/*    <SelectTrigger id="gpu-selection">*/}
-          {/*      <SelectValue placeholder="Select GPU type" />*/}
-          {/*    </SelectTrigger>*/}
-          {/*    <SelectContent>*/}
-          {/*      {gpuOptions.map((option) => (*/}
-          {/*        <SelectItem key={option.value} value={option.value}>*/}
-          {/*          {option.label}*/}
-          {/*        </SelectItem>*/}
-          {/*      ))}*/}
-          {/*    </SelectContent>*/}
-          {/*  </Select>*/}
-
-          {/*  {showMigAmount && (*/}
-          {/*    <Select*/}
-          {/*      value={options.migamount || "1"}*/}
-          {/*      onValueChange={handleMigAmountChange}*/}
-          {/*    >*/}
-          {/*      <SelectTrigger id="mig-amount">*/}
-          {/*        <SelectValue placeholder="Select MIG parts" />*/}
-          {/*      </SelectTrigger>*/}
-          {/*      <SelectContent>*/}
-          {/*        {migAmountOptions.map((option) => (*/}
-          {/*          <SelectItem key={option.value} value={option.value}>*/}
-          {/*            {option.label}*/}
-          {/*          </SelectItem>*/}
-          {/*        ))}*/}
-          {/*      </SelectContent>*/}
-          {/*    </Select>*/}
-          {/*  )}*/}
-          {/*</div>*/}
-          {/*<p className="text-sm text-muted-foreground">*/}
-          {/*  GPUs significantly accelerate machine learning and deep learning*/}
-          {/*  tasks*/}
-          {/*</p>*/}
-        </div>
       </div>
-    </div>
-  );
-};
-
-export const SelectionCardGrid = ({
-  cards,
-  customCard,
-  isCardSelected,
-}: {
-  cards: React.ReactNode[];
-  customCard?: React.ReactNode;
-  isCardSelected?: boolean;
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const shouldCollapse = customCard !== undefined || isCardSelected;
-
-  useEffect(() => {
-    if (isCardSelected) {
-      setIsExpanded(false);
-    }
-  }, [isCardSelected]);
-
-  const cardNum = 3;
-  const visibleCards =
-    shouldCollapse && !isExpanded
-      ? cards.slice(0, customCard ? cardNum - 1 : cardNum)
-      : cards;
-  const hasMoreCards = customCard
-    ? cards.length + 1 > cardNum
-    : cards.length > cardNum;
-
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {customCard}
-        {visibleCards}
-      </div>
-
-      {shouldCollapse && hasMoreCards && (
-        <div className="flex justify-center">
-          <Button
-            className="gap-2"
-            size="sm"
-            variant="outline"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? (
-              <>
-                Show Less
-                <ChevronUp className="h-4 w-4" />
-              </>
-            ) : (
-              <>
-                Show More ({cards.length - cardNum} more)
-                <ChevronDown className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

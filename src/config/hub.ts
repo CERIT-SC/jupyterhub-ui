@@ -41,6 +41,7 @@ export const defaultJupyterHubServerOptions: Partial<JupyterHubServerOptions> =
   };
 
 export type HubConfig = {
+  max_notebooks_per_user: number;
   simpleOptions: {
     image: {
       id: string;
@@ -55,6 +56,7 @@ export type HubConfig = {
 };
 
 export const hubConfig: HubConfig = {
+  max_notebooks_per_user: 5,
   simpleOptions: {
     image: [
       {

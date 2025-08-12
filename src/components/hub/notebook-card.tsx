@@ -30,7 +30,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { NotebookDetailsDialog } from "@/components/notebook/notebook-details-dialog";
+import { NotebookDetailsDialog } from "@/components/hub/notebook-details-dialog";
 
 export interface NotebookCardProps {
   server: ServerStatus;
@@ -138,6 +138,10 @@ export function NotebookCard({
   onRemove,
   className,
 }: NotebookCardProps) {
+  const notbookLink = server.url
+    ? `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub` + server.url
+    : "";
+
   // Get status information from server
   const statusInfo = getStatusInfo(server);
 
@@ -192,10 +196,7 @@ export function NotebookCard({
                     variant="ghost"
                   >
                     <Link
-                      href={
-                        `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/` +
-                        server.url
-                      }
+                      href={notbookLink}
                       rel="noopener noreferrer"
                       target="_blank"
                     >

@@ -18,7 +18,7 @@ export function PageHeader({
   return (
     <div className={cn("mb-8 flex items-start justify-between", className)}>
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
         {description && (
           <p className="mt-1 text-lg text-[--color-infra-text-secondary]">
             {description}

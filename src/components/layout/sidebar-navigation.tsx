@@ -21,39 +21,43 @@ export function SidebarNavigation() {
 
   return (
     <div className="space-y-6 py-2">
-      {siteConfig.navigation.map((section, index) => (
-        <div key={`${section.section}-${index}`} className="space-y-2">
-          <div className="px-2 py-1.5 text-sm font-semibold text-infra-text-primary">
-            {section.section}
-          </div>
-          <div className="space-y-1">
-            {section.items.map((item, itemIndex) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
+      {siteConfig.navigation
+        .filter((section) => !section.development)
+        .map((section, index) => (
+          <div key={`${section.section}-${index}`} className="space-y-2">
+            <div className="px-2 py-1.5 text-sm font-semibold text-infra-text-primary">
+              {section.section}
+            </div>
+            <div className="space-y-1">
+              {section.items
+                .filter((item) => !item.development)
+                .map((item, itemIndex) => {
+                  const Icon = item.icon;
+                  const active = isActive(item.path);
 
-              return (
-                <Link
-                  key={`${item.name}-${itemIndex}`}
-                  href={item.disabled ? "#" : item.path}
-                >
-                  <Button
-                    className={cn(
-                      "w-full justify-start font-normal hover:bg-infra-gray-light/30",
-                      active &&
-                        "bg-infra-gray-light/50 text-infra-primary font-medium",
-                      item.disabled && "opacity-60 pointer-events-none",
-                    )}
-                    variant={active ? "primary" : "ghost"}
-                  >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {item.name}
-                  </Button>
-                </Link>
-              );
-            })}
+                  return (
+                    <Link
+                      key={`${item.name}-${itemIndex}`}
+                      href={item.disabled ? "#" : item.path}
+                    >
+                      <Button
+                        className={cn(
+                          "w-full justify-start font-normal hover:bg-infra-gray-light/30",
+                          active &&
+                            "bg-infra-gray-light/50 text-infra-primary font-medium",
+                          item.disabled && "opacity-60 pointer-events-none",
+                        )}
+                        variant={active ? "primary" : "ghost"}
+                      >
+                        <Icon className="mr-2 h-4 w-4" />
+                        {item.name}
+                      </Button>
+                    </Link>
+                  );
+                })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
     </div>
   );
 }

@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/layout/page-header";
-import { ServerStatus as StatusIndicator } from "@/components/notebook/server-status";
-import { NotebooksGrid } from "@/components/notebook/notebooks-grid";
+import { ServerStatus as StatusIndicator } from "@/components/hub/server-status";
+import { NotebooksGrid } from "@/components/hub/notebooks-grid";
 import {
   deleteServer,
   getUserNamedNotebooks,

@@ -16,7 +16,7 @@ import {
   ImageSettings,
   ResourceSettings,
   StorageSettings,
-} from "@/components/simpleSettings";
+} from "@/components/hub/settings/simpleSettings";
 import {
   Dialog,
   DialogContent,

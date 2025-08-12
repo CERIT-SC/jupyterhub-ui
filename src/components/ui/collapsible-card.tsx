@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/cn";
 
 interface CollapsibleCardProps {
   title: React.ReactNode;
@@ -48,7 +49,7 @@ export function CollapsibleCard({
   };
 
   return (
-    <Card className={"p-0 group hover:border-infra-primary"}>
+    <Card className={cn("p-0 group hover:border-infra-primary", className)}>
       <div
         aria-expanded={isEnabled && isExpanded}
         aria-label={`Toggle ${title} section`}

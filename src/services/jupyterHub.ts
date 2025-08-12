@@ -13,19 +13,24 @@ export interface ServerProgress {
 
 export interface ServerStatus {
   name: string;
+  full_name?: string;
   ready: boolean;
   stopped: boolean;
   pending: "spawn" | "stop" | null;
+  user_options?: JupyterHubServerOptions;
   url?: string;
   progress?: {
     message: string;
     percent: number;
   };
   last_activity?: string;
-  started?: string;
+  started?: string | null;
   state?: {
     pod_name?: string;
   };
+  progress_url?: string | null;
+  full_url?: string | null;
+  full_progress_url?: string | null;
 }
 
 export interface UserInfo {
