@@ -11,7 +11,7 @@ import {
   Server,
 } from "lucide-react";
 
-import { getUserNamedNotebooks } from "@/services/jupyterHub";
+import { getUserInfo, getUserNamedNotebooks } from "@/services/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -164,6 +164,20 @@ export default function HubDashboard() {
         </Card>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Api</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button
+            onClick={() => {
+              getUserInfo(user?.name);
+            }}
+          >
+            User info print
+          </Button>
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle>Recent Notebooks</CardTitle>
