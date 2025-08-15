@@ -1,0 +1,101 @@
+import { eq } from "drizzle-orm";
+
+import { db } from "./client";
+import { savedNotebooks } from "./schema";
+
+import { JupyterHubServerOptions } from "@/services/jupyterHub";
+
+export interface SavedNotebook {
+  id: string;
+  userId: string;
+  name: string;
+  description: string | null;
+  serverOptions: JupyterHubServerOptions | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface CreateSavedNotebookData {
+  userId: string;
+  name: string;
+  description?: string;
+  serverOptions: JupyterHubServerOptions;
+}
+
+export interface UpdateSavedNotebookData {
+  name?: string;
+  description?: string;
+  serverOptions?: JupyterHubServerOptions;
+}
+
+export class SavedNotebooksRepository {
+  async findAll(): Promise<SavedNotebook[]> {
+    return db.select().from(savedNotebooks);
+  }
+
+  async findById(id: string): Promise<SavedNotebook | null> {
+    const result = await db
+      .select()
+      .from(savedNotebooks)
+      .where(eq(savedNotebooks.id, id))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async findByUserId(userId: string): Promise<SavedNotebook[]> {
+    return db
+      .select()
+      .from(savedNotebooks)
+      .where(eq(savedNotebooks.userId, userId));
+  }
+
+  async create(data: CreateSavedNotebookData): Promise<SavedNotebook> {
+    const now = new Date();
+    const result = await db
+      .insert(savedNotebooks)
+      .values({
+        ...data,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    return result[0];
+  }
+
+  async update(
+    id: string,
+    data: UpdateSavedNotebookData,
+  ): Promise<SavedNotebook | null> {
+    const now = new Date();
+    const result = await db
+      .update(savedNotebooks)
+      .set({
+        ...data,
+        updatedAt: now,
+      })
+      .where(eq(savedNotebooks.id, id))
+      .returning();
+
+    return result[0] || null;
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await db
+      .delete(savedNotebooks)
+      .where(eq(savedNotebooks.id, id));
+
+    return result.changes > 0;
+  }
+
+  async deleteByUserId(userId: string): Promise<number> {
+    const result = await db
+      .delete(savedNotebooks)
+      .where(eq(savedNotebooks.userId, userId));
+
+    return result.changes;
+  }
+}
+
+export const savedNotebooksRepository = new SavedNotebooksRepository();
