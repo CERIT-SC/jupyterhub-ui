@@ -67,15 +67,41 @@ export default function UIShowcasePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <Button>Default Button</Button>
-            <Button variant="secondary">Secondary</Button>
-            <Button variant="destructive">Destructive</Button>
-            <Button variant="outline">Outline</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button variant="link">Link</Button>
-            <Button size="sm">Small</Button>
-            <Button size="lg">Large</Button>
-            <Button disabled>Disabled</Button>
+            <div className="flex flex-col">
+              <Button size="sm">Small</Button>
+              <Button size="default">Default</Button>
+              <Button size="lg">Large</Button>
+            </div>
+            <div className="flex flex-col">
+              <Button variant="solid">Solid</Button>
+              <Button variant="solid" color="gradient">Solid</Button>
+              <Button variant="solid" color="primary">Solid</Button>
+              <Button variant="solid" color="secondary">Solid</Button>
+              <Button variant="solid" color="tetriary">Solid</Button>
+              <Button variant="solid" color="success">Solid</Button>
+              <Button variant="solid" color="warning">Solid</Button>
+              <Button variant="solid" color="danger">Solid</Button>
+            </div>
+            <div className="flex flex-col">
+              <Button variant="outline">Solid</Button>
+              <Button variant="outline" color="gradient">Outline</Button>
+              <Button variant="outline" color="primary">Outline</Button>
+              <Button variant="outline" color="secondary">Outline</Button>
+              <Button variant="outline" color="tetriary">Outline</Button>
+              <Button variant="outline" color="success">Outline</Button>
+              <Button variant="outline" color="warning">Outline</Button>
+              <Button variant="outline" color="danger">Outline</Button>
+            </div>
+            <div className="flex flex-col">
+              <Button variant="ghost">Solid</Button>
+              <Button variant="ghost" color="gradient">Outline</Button>
+              <Button variant="ghost" color="primary">Outline</Button>
+              <Button variant="ghost" color="secondary">Outline</Button>
+              <Button variant="ghost" color="tetriary">Outline</Button>
+              <Button variant="ghost" color="success">Outline</Button>
+              <Button variant="ghost" color="warning">Outline</Button>
+              <Button variant="ghost" color="danger">Outline</Button>
+            </div>
           </div>
         </CardContent>
       </Card>
