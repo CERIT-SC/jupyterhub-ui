@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { savedNotebooksService } from "@/services/savedNotebooks";
+import { savedNotebooksService } from "@/services/server/savedNotebooks";
 
 export async function GET(req: NextRequest) {
   try {

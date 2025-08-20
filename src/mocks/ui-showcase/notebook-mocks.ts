@@ -1,4 +1,7 @@
-import { ServerStatus, JupyterHubServerOptions } from "@/services/client/jupyterHub";
+import {
+  ServerStatus,
+  JupyterHubServerOptions,
+} from "@/services/client/jupyterHub";
 
 // Updated ServerStatus type that requires complete user_options
 type MockServerStatus = Omit<ServerStatus, "user_options"> & {
