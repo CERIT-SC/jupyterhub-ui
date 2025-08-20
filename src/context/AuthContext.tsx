@@ -1,7 +1,6 @@
 import React, { createContext, ReactNode, useCallback, useState } from "react";
 import { AxiosError } from "axios";
 
-import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
 import { User } from "@/api/jupyterhub/models";
 import { getUserIdentity } from "@/services/jupyterHub";
 
@@ -39,13 +38,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
           setError(new Error("User not logged in or session expired."));
 
-              return false;
+          return false;
         }
-
-
-
-        
-
 
         setUser(response);
 
