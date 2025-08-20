@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 
 import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
 import { User } from "@/api/jupyterhub/models";
+import { getUserIdentity } from "@/services/jupyterHub";
 
 interface AuthContextType {
   user: User | null;
@@ -32,9 +33,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError(null);
 
       try {
-        const response = await jupyterHubClient.get<User>("/user");
+        const response = await getUserIdentity();
 
-        setUser(response.data);
+        if (!response) {
+          setUser(null);
+          setError(new Error("User not logged in or session expired."));
+
+              return false;
+        }
+
+
+
+        
+
+
+        setUser(response);
 
         return true;
       } catch (error: unknown) {

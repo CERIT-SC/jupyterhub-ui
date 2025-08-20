@@ -1,4 +1,5 @@
 import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
+import { User } from "@/api/jupyterhub/models";
 
 export { jupyterHubClient };
 
@@ -114,6 +115,26 @@ export async function getUserInfo(username?: string): Promise<UserInfo> {
   );
 
   return response.data;
+}
+
+/**
+ * Fetch the current user's identity from JupyterHub.
+ * Returns null if the user is not logged in (401/403).
+ */
+export async function getUserIdentity(): Promise<User | null> {
+  try {
+    const response = await jupyterHubClient.get<User>("/user");
+
+    return response.data;
+  } catch (error: any) {
+    if (
+      error?.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 /**
