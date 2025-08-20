@@ -74,8 +74,8 @@ function LoginContent() {
             )}
           </div>
           <CardDescription className="text-center">
-            Using official Jupyterhub instance at https://hub.cloud.e-infra.cz/
-            in background
+            {`Using official Jupyterhub instance at ${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}
+            in background`}
           </CardDescription>
         </CardContent>
       </Card>

@@ -1,7 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-import { authStorage } from "@/services/storage";
-
 // Create an Axios instance with the JupyterHub API base URL
 const jupyterHubClient = axios.create({
   baseURL: "/api/hub", // This will be proxied through Next.js
@@ -11,21 +9,6 @@ const jupyterHubClient = axios.create({
     Accept: "application/json",
   },
 });
-
-// Add request interceptor for authentication
-jupyterHubClient.interceptors.request.use(
-  (config) => {
-    // Add authentication token if available
-    const token = authStorage.load()?.token;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error),
-);
 
 const expiredLogin = () => {
   window.location.href = "/login?sessionExpired=jupyterhub";
