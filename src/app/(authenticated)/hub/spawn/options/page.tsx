@@ -7,7 +7,7 @@ import { DialogBody } from "next/dist/client/components/react-dev-overlay/ui/com
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { JupyterHubServerOptions, createServer } from "@/services/jupyterHub";
+import { JupyterHubServerOptions, createServer } from "@/services/client/jupyterHub";
 import {
   defaultJupyterHubServerOptions,
   minimalJupyterHubServerOptions,

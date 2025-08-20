@@ -11,7 +11,7 @@ import {
   Server,
 } from "lucide-react";
 
-import { getUserNamedNotebooks } from "@/services/jupyterHub";
+import { getUserNamedNotebooks } from "@/services/client/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,

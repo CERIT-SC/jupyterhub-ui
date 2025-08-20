@@ -19,7 +19,7 @@ import {
   ServerStatus,
   startServer,
   stopServer,
-} from "@/services/jupyterHub";
+} from "@/services/client/jupyterHub";
 
 export default function NotebooksPage() {
   const router = useRouter();

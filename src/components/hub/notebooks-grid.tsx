@@ -1,7 +1,7 @@
 import React from "react";
 
 import { NotebookCard } from "@/components/hub/notebook-card";
-import { ServerStatus } from "@/services/jupyterHub";
+import { ServerStatus } from "@/services/client/jupyterHub";
 
 interface NotebooksGridProps {
   notebooks: Record<string, ServerStatus>;

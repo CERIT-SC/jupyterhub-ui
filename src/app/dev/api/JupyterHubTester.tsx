@@ -15,7 +15,7 @@ import {
   startServer,
   stopServer,
   UserInfo,
-} from "@/services/jupyterHub";
+} from "@/services/client/jupyterHub";
 import { getDefaultImage } from "@/config/hub/imageOptions";
 
 const JupyterHubTester: FC = () => {

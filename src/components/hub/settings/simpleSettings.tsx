@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { ImageSelector } from "@/components/hub/ImageSelector";
 import { resourcePresets, ServerPreset } from "@/config/presets";
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 import { hubConfig } from "@/config/hub";
 import {
   cpuOptions,

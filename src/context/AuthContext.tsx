@@ -2,7 +2,7 @@ import React, { createContext, ReactNode, useCallback, useState } from "react";
 import { AxiosError } from "axios";
 
 import { User } from "@/api/jupyterhub/models";
-import { getUserIdentity } from "@/services/jupyterHub";
+import { getUserIdentity } from "@/services/client/jupyterHub";
 
 interface AuthContextType {
   user: User | null;

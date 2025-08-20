@@ -1,12 +1,14 @@
 import { integer, sqliteTable, text, index } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 
 export const notebookPresets = sqliteTable(
   "notebook_presets",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .default(sql`lower(hex(randomblob(16)))`),
     userId: text("user_id"),
     name: text("name"),
     description: text("description"),
@@ -34,7 +36,9 @@ export const notebookPresets = sqliteTable(
 export const savedNotebooks = sqliteTable(
   "saved_notebooks",
   {
-    id: text("id").primaryKey(),
+    id: text("id")
+      .primaryKey()
+      .default(sql`lower(hex(randomblob(16)))`),
     userId: text("user_id").notNull(),
     name: text("name").notNull(),
     description: text("description"),

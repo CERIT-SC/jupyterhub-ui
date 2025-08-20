@@ -1,4 +1,4 @@
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 
 export const max_notebooks_per_user = 5;
 

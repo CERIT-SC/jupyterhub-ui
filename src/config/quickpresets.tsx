@@ -1,7 +1,7 @@
 import { Brain, Code, Database } from "lucide-react";
 import React from "react";
 
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 
 export interface ServerPreset {
   id: string;

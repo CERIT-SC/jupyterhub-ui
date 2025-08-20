@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { fetchServerProgress } from "@/services/jupyterHub";
+import { fetchServerProgress } from "@/services/client/jupyterHub";
 import { useAuth } from "@/hooks/useAuth";
 
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";

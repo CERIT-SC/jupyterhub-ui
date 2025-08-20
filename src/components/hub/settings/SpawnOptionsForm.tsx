@@ -20,7 +20,7 @@ import { FormField } from "@/components/ui/form-field";
 import { HelpText } from "@/components/ui/help-text";
 import { CardSection } from "@/components/ui/card-section";
 import { ImageSelector } from "@/components/hub/ImageSelector";
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 import {
   cpuOptions,
   homeOptions,

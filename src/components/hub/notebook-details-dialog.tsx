@@ -23,7 +23,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ServerStatus } from "@/services/jupyterHub";
+import { ServerStatus } from "@/services/client/jupyterHub";
 import { cn } from "@/lib/cn";
 
 interface NotebookDetailsDialogProps {

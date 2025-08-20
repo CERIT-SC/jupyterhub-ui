@@ -35,7 +35,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { Loading } from "@/components/ui/loading";
 import { Badge } from "@/components/ui/badge";
-import { createServer } from "@/services/jupyterHub";
+import { createServer } from "@/services/client/jupyterHub";
 import {
   defaultJupyterHubServerOptions,
   minimalJupyterHubServerOptions,

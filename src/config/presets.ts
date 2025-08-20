@@ -1,4 +1,4 @@
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 
 /**
  * Server preset configuration for simple resource selection

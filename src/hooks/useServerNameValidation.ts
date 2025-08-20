@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { getUserNamedNotebooks } from "@/services/jupyterHub";
+import { getUserNamedNotebooks } from "@/services/client/jupyterHub";
 import { useAuth } from "@/hooks/useAuth";
 
 export type ValidationStatus = "checking" | "valid" | "invalid" | "idle";

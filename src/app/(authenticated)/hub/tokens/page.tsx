@@ -8,7 +8,7 @@ import {
   createUserToken,
   deleteUserToken,
   getUserTokens,
-} from "@/services/jupyterHub";
+} from "@/services/client/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,

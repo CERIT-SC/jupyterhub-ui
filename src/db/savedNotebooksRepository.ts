@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "./client";
 import { savedNotebooks } from "./schema";
 
-import { JupyterHubServerOptions } from "@/services/jupyterHub";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 
 export interface SavedNotebook {
   id: string;
@@ -27,17 +27,16 @@ export interface UpdateSavedNotebookData {
   description?: string;
   serverOptions?: JupyterHubServerOptions;
 }
-
 export class SavedNotebooksRepository {
-  async findAll(): Promise<SavedNotebook[]> {
-    return db.select().from(savedNotebooks);
-  }
-
-  async findById(id: string): Promise<SavedNotebook | null> {
+  async findByIdForUser(
+    id: string,
+    userId: string,
+  ): Promise<SavedNotebook | null> {
     const result = await db
       .select()
       .from(savedNotebooks)
-      .where(eq(savedNotebooks.id, id))
+      .where(eq(savedNotebooks.id, id) && eq(savedNotebooks.userId, userId))
+
       .limit(1);
 
     return result[0] || null;
@@ -64,8 +63,9 @@ export class SavedNotebooksRepository {
     return result[0];
   }
 
-  async update(
+  async updateForUser(
     id: string,
+    userId: string,
     data: UpdateSavedNotebookData,
   ): Promise<SavedNotebook | null> {
     const now = new Date();
@@ -75,16 +75,16 @@ export class SavedNotebooksRepository {
         ...data,
         updatedAt: now,
       })
-      .where(eq(savedNotebooks.id, id))
+      .where(eq(savedNotebooks.id, id) && eq(savedNotebooks.userId, userId))
       .returning();
 
     return result[0] || null;
   }
 
-  async delete(id: string): Promise<boolean> {
+  async deleteForUser(id: string, userId: string): Promise<boolean> {
     const result = await db
       .delete(savedNotebooks)
-      .where(eq(savedNotebooks.id, id));
+      .where(eq(savedNotebooks.id, id) && eq(savedNotebooks.userId, userId));
 
     return result.changes > 0;
   }

@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 
 import { cn } from "@/lib/cn";
-import { formatTimeAgo, ServerStatus } from "@/services/jupyterHub";
+import { formatTimeAgo, ServerStatus } from "@/services/client/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,

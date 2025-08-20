@@ -33,7 +33,7 @@ import {
   SelectionCardGrid,
 } from "@/components/hub/settings/cardSelection";
 import { mockUIShowcaseData } from "@/mocks/ui-showcase/showcase-data";
-import { ServerStatus } from "@/services/jupyterHub";
+import { ServerStatus } from "@/services/client/jupyterHub";
 import {
   mockServers,
   mockServersRecords,
