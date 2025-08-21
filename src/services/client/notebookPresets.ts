@@ -1,28 +1,43 @@
-import { localApiClient } from "./localApiClient";
+import type {
+  NotebookPreset,
+  CreateNotebookPresetData,
+  UpdateNotebookPresetData,
+} from "@/db/notebooksPresetsRepository";
 
-export async function fetchNotebookPresets(): Promise<any> {
-  const res = await localApiClient.get("/api/db/user-nb-presets");
+import { dbApiClient } from "@/api/local/dbApiClient";
+
+const url = "user-nb-presets";
+
+export async function fetchNotebookPresets(): Promise<NotebookPreset[]> {
+  const res = await dbApiClient.get<NotebookPreset[]>(url);
 
   return res.data;
 }
 
-export async function createNotebookPreset(data: any): Promise<any> {
-  const res = await localApiClient.post("/api/db/user-nb-presets", data);
+export async function createNotebookPreset(
+  data: CreateNotebookPresetData,
+): Promise<NotebookPreset> {
+  const res = await dbApiClient.post<NotebookPreset>(url, data);
 
   return res.data;
 }
 
 export async function updateNotebookPreset(
   id: string,
-  data: any,
-): Promise<any> {
-  const res = await localApiClient.put(`/api/db/user-nb-presets/${id}`, data);
+  data: UpdateNotebookPresetData,
+): Promise<UpdateNotebookPresetData> {
+  const res = await dbApiClient.put<UpdateNotebookPresetData>(
+    `${url}/${id}`,
+    data,
+  );
 
   return res.data;
 }
 
-export async function deleteNotebookPreset(id: string): Promise<any> {
-  const res = await localApiClient.delete(`/api/db/user-nb-presets/${id}`);
+export async function deleteNotebookPreset(
+  id: string,
+): Promise<{ success: boolean }> {
+  const res = await dbApiClient.delete<{ success: boolean }>(`${url}/${id}`);
 
   return res.data;
 }

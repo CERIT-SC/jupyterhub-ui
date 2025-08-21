@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-api-types": "openapi-typescript ./src/api/jupterhub/rest-api.yml --output ./src/types/generated/jupyterhub.ts",
-    "generate-api": "orval --config orval.config.js"
+    "drizzle:migrate": "drizzle-kit generate && drizzle-kit push",
+    "drizzle:generate": "drizzle-kit generate",
+    "drizzle:push": "drizzle-kit push"
   },
   "dependencies": {
     "@eslint/compat": "^1.2.9",
@@ -45,6 +46,7 @@
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "autoprefixer": "^10.4.21",
+    "dotenv-cli": "^10.0.0",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",

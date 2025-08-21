@@ -1,30 +1,40 @@
-import { localApiClient } from "./localApiClient";
+import type {
+  SavedNotebook,
+  CreateSavedNotebookData,
+  UpdateSavedNotebookData,
+} from "@/db/savedNotebooksRepository";
 
-export async function fetchSavedNotebooks(): Promise<any> {
-  const res = await localApiClient.get("/api/db/user-saved-nb-presets");
+import { dbApiClient } from "@/api/local/dbApiClient";
 
-  return res.data;
-}
+const url = "/user-saved-nb-presets";
 
-export async function createSavedNotebook(data: any): Promise<any> {
-  const res = await localApiClient.post("/api/db/user-saved-nb-presets", data);
-
-  return res.data;
-}
-
-export async function updateSavedNotebook(id: string, data: any): Promise<any> {
-  const res = await localApiClient.put(
-    `/api/db/user-saved-nb-presets/${id}`,
-    data,
-  );
+export async function fetchSavedNotebooks(): Promise<SavedNotebook[]> {
+  const res = await dbApiClient.get<SavedNotebook[]>(url);
 
   return res.data;
 }
 
-export async function deleteSavedNotebook(id: string): Promise<any> {
-  const res = await localApiClient.delete(
-    `/api/db/user-saved-nb-presets/${id}`,
-  );
+export async function createSavedNotebook(
+  data: CreateSavedNotebookData,
+): Promise<SavedNotebook> {
+  const res = await dbApiClient.post<SavedNotebook>(url, data);
+
+  return res.data;
+}
+
+export async function updateSavedNotebook(
+  id: string,
+  data: UpdateSavedNotebookData,
+): Promise<SavedNotebook> {
+  const res = await dbApiClient.put<SavedNotebook>(`${url}/${id}`, data);
+
+  return res.data;
+}
+
+export async function deleteSavedNotebook(
+  id: string,
+): Promise<{ success: boolean }> {
+  const res = await dbApiClient.delete<{ success: boolean }>(`${url}/${id}`);
 
   return res.data;
 }

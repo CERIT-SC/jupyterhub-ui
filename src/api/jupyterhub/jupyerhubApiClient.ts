@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 
 // Create an Axios instance with the JupyterHub API base URL
 const jupyterHubClient = axios.create({
@@ -42,14 +42,4 @@ jupyterHubClient.interceptors.response.use(
   },
 );
 
-// This is the function that will be used by Orval to make API calls
-export default async function customAxiosInstance<T>(
-  config: AxiosRequestConfig,
-): Promise<T> {
-  const response = await jupyterHubClient.request<T>(config);
-
-  return response.data;
-}
-
-// Export the axios instance for direct use if needed
-export { jupyterHubClient, customAxiosInstance };
+export { jupyterHubClient };

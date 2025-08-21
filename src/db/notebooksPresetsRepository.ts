@@ -5,30 +5,10 @@ import { eq, and } from "drizzle-orm";
 import { db } from "./client";
 import { notebookPresets } from "./schema";
 
-import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
-
-export interface NotebookPreset {
-  id: string;
-  userId: string | null;
-  name: string | null;
-  description: string | null;
-  serverOptions: Partial<JupyterHubServerOptions> | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
-
-export interface CreateNotebookPresetData {
-  userId: string;
-  name: string;
-  description?: string;
-  serverOptions?: Partial<JupyterHubServerOptions>;
-}
-
-export interface UpdateNotebookPresetData {
-  name?: string;
-  description?: string;
-  serverOptions?: Partial<JupyterHubServerOptions>;
-}
+// Infer types from schema using new Drizzle syntax
+export type NotebookPreset = typeof notebookPresets.$inferSelect;
+export type CreateNotebookPresetData = typeof notebookPresets.$inferInsert;
+export type UpdateNotebookPresetData = Partial<CreateNotebookPresetData>;
 
 export class NotebookPresetsRepository {
   async findByIdForUser(

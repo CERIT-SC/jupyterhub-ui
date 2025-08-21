@@ -45,6 +45,11 @@ export const siteConfig: SiteConfig = {
           icon: Server,
           path: "/hub/tokens",
         },
+        {
+          name: "User Presets",
+          icon: Server,
+          path: "/hub/user-presets",
+        },
       ],
     },
     {

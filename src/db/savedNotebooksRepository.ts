@@ -1,32 +1,12 @@
 import { eq } from "drizzle-orm";
 
-import { db } from "./client";
 import { savedNotebooks } from "./schema";
+import { db } from "./client";
 
-import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
+export type SavedNotebook = typeof savedNotebooks.$inferSelect;
+export type CreateSavedNotebookData = typeof savedNotebooks.$inferInsert;
+export type UpdateSavedNotebookData = Partial<CreateSavedNotebookData>;
 
-export interface SavedNotebook {
-  id: string;
-  userId: string;
-  name: string;
-  description: string | null;
-  serverOptions: JupyterHubServerOptions | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
-
-export interface CreateSavedNotebookData {
-  userId: string;
-  name: string;
-  description?: string;
-  serverOptions: JupyterHubServerOptions;
-}
-
-export interface UpdateSavedNotebookData {
-  name?: string;
-  description?: string;
-  serverOptions?: JupyterHubServerOptions;
-}
 export class SavedNotebooksRepository {
   async findByIdForUser(
     id: string,
