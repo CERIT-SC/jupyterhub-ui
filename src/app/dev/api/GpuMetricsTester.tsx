@@ -11,7 +11,7 @@ import {
   getNodeStatus,
   getUnassignedGPUsByModel,
   getUnschedulableNodes,
-} from "@/api/prometheus/prometheus-api";
+} from "@/api/prometheus/prometheusApiClient";
 
 const GpuMetricsTester: FC = () => {
   const [loading, setLoading] = useState(false);

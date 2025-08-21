@@ -30,7 +30,7 @@ import {
   mockS3Buckets,
 } from "@/config/hub/jupyterOptions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
+import { getAllocatableGPUS } from "@/api/prometheus/prometheusApiClient";
 
 interface SpawnOptionsFormProps {
   options: JupyterHubServerOptions;

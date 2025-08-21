@@ -6,7 +6,7 @@ import {
   callPrometheusServer,
   getPrometheusHealth,
   getPrometheusMetrics,
-} from "@/api/prometheus/prometheus-api";
+} from "@/api/prometheus/prometheusApiClient";
 
 const PrometheusApiTester: FC = () => {
   const [loading, setLoading] = useState(false);

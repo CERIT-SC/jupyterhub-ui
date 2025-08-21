@@ -42,7 +42,7 @@ import {
 } from "@/components/ui/select";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { CardSection } from "@/components/ui/card-section";
-import { getAllocatableGPUS } from "@/api/prometheus/prometheus-api";
+import { getAllocatableGPUS } from "@/api/prometheus/prometheusApiClient";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {

@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { notebookPresetsService } from "@/services/server/notebookPresets";
+import {
+  getPresetByIdForCurrentUser,
+  getPresetsForCurrentUser,
+  createPresetForCurrentUser,
+  updatePresetForCurrentUser,
+  deletePresetForCurrentUser,
+} from "@/services/server/notebookPresets";
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,15 +14,14 @@ export async function GET(req: NextRequest) {
     const id = searchParams.get("id");
 
     if (id) {
-      const preset =
-        await notebookPresetsService.getPresetByIdForCurrentUser(id);
+      const preset = await getPresetByIdForCurrentUser(id);
 
       if (!preset)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 
       return NextResponse.json(preset);
     }
-    const presets = await notebookPresetsService.getPresetsForCurrentUser();
+    const presets = await getPresetsForCurrentUser();
 
     return NextResponse.json(presets);
   } catch (err: any) {
@@ -31,7 +36,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { name, description, serverOptions } = body;
-    const preset = await notebookPresetsService.createPresetForCurrentUser({
+    const preset = await createPresetForCurrentUser({
       name,
       description,
       serverOptions,
@@ -50,10 +55,7 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
     const { id, ...data } = body;
-    const preset = await notebookPresetsService.updatePresetForCurrentUser(
-      id,
-      data,
-    );
+    const preset = await updatePresetForCurrentUser(id, data);
 
     if (!preset)
       return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -73,7 +75,7 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get("id");
 
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
-    await notebookPresetsService.deletePresetForCurrentUser(id);
+    await deletePresetForCurrentUser(id);
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

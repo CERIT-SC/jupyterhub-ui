@@ -8,7 +8,7 @@ import type {
   PrometheusResponse,
 } from "@/types/prometheus";
 
-import { prometheusClient } from "./prometheus-api";
+import { prometheusClient } from "./prometheusApiClient";
 
 // Common GPU-related Prometheus metrics for Jupyter/Kubernetes environments
 export const GPU_METRICS_QUERIES = {
