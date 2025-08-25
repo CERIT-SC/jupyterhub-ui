@@ -14,7 +14,8 @@ import {
 import Link from "next/link";
 
 import { cn } from "@/lib/cn";
-import { formatTimeAgo, ServerStatus } from "@/services/client/jupyterHub";
+import { formatRelativeTime } from "@/lib/utils";
+import { ServerStatus } from "@/services/client/jupyterHub";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -147,11 +148,11 @@ export function NotebookCard({
 
   // Format timestamps
   const lastActive = server.last_activity
-    ? formatTimeAgo(new Date(server.last_activity))
+    ? formatRelativeTime(new Date(server.last_activity))
     : "Never";
 
   const startedTime = server.started
-    ? formatTimeAgo(new Date(server.started))
+    ? formatRelativeTime(new Date(server.started))
     : "Not started";
 
   return (
