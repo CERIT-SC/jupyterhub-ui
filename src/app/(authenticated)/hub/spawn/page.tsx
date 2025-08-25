@@ -30,7 +30,7 @@ export default function SpawnSelection() {
       </div>
 
       {/* Quick Start Section */}
-      <div className="mb-8">
+      <section aria-label="Quickstart presets" className="mb-8">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-infra-primary/10 rounded-lg">
             <Zap className="h-5 w-5 text-infra-primary" />
@@ -54,7 +54,7 @@ export default function SpawnSelection() {
           {/* Custom Configuration Card */}
           <CustomPresetCard onConfigure={handleCustomConfigure} />
         </div>
-      </div>
+      </section>
     </div>
   );
 }

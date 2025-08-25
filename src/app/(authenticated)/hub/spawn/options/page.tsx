@@ -3,11 +3,13 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Rocket, AlertCircle } from "lucide-react";
-import { DialogBody } from "next/dist/client/components/react-dev-overlay/ui/components/dialog";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { JupyterHubServerOptions, createServer } from "@/services/client/jupyterHub";
+import {
+  JupyterHubServerOptions,
+  createServer,
+} from "@/services/client/jupyterHub";
 import {
   defaultJupyterHubServerOptions,
   minimalJupyterHubServerOptions,
@@ -227,97 +229,6 @@ export default function SpawnPage() {
         title="Create New Notebook"
       />
 
-      {/*/!* Display current options from URL parameters *!/*/}
-      {/*<Card>*/}
-      {/*  <CardHeader>*/}
-      {/*    <CardTitle>Current Configuration</CardTitle>*/}
-      {/*  </CardHeader>*/}
-      {/*  <CardContent>*/}
-      {/*    <div className="space-y-2">*/}
-      {/*      <div className="grid grid-cols-2 gap-4 text-sm">*/}
-      {/*        <div>*/}
-      {/*          <span className="font-medium">Container Image:</span>*/}
-      {/*          <p className="break-all">{options.container_image}</p>*/}
-      {/*        </div>*/}
-      {/*        <div>*/}
-      {/*          <span className="font-medium">CPU:</span>*/}
-      {/*          <p>{options.cpu} cores</p>*/}
-      {/*        </div>*/}
-      {/*        <div>*/}
-      {/*          <span className="font-medium">Memory:</span>*/}
-      {/*          <p>{options.mem} GB</p>*/}
-      {/*        </div>*/}
-      {/*        <div>*/}
-      {/*          <span className="font-medium">GPU:</span>*/}
-      {/*          <p>{options.gpu === "none" ? "None" : options.gpu}</p>*/}
-      {/*        </div>*/}
-      {/*        <div>*/}
-      {/*          <span className="font-medium">SSH Access:</span>*/}
-      {/*          <p>{options.ssh ? "Enabled" : "Disabled"}</p>*/}
-      {/*        </div>*/}
-      {/*        <div>*/}
-      {/*          <span className="font-medium">Mount Projects:</span>*/}
-      {/*          <p>{options.mountprojects ? "Yes" : "No"}</p>*/}
-      {/*        </div>*/}
-      {/*        {options.home && (*/}
-      {/*          <div>*/}
-      {/*            <span className="font-medium">Home Directory:</span>*/}
-      {/*            <p>{options.home}</p>*/}
-      {/*          </div>*/}
-      {/*        )}*/}
-      {/*        {options.s3url && (*/}
-      {/*          <div>*/}
-      {/*            <span className="font-medium">S3 URL:</span>*/}
-      {/*            <p className="break-all">{options.s3url}</p>*/}
-      {/*          </div>*/}
-      {/*        )}*/}
-      {/*        {options.s3bucket && (*/}
-      {/*          <div>*/}
-      {/*            <span className="font-medium">S3 Bucket:</span>*/}
-      {/*            <p>{options.s3bucket}</p>*/}
-      {/*          </div>*/}
-      {/*        )}*/}
-      {/*        {options.migamount && (*/}
-      {/*          <div>*/}
-      {/*            <span className="font-medium">MIG Amount:</span>*/}
-      {/*            <p>{options.migamount}</p>*/}
-      {/*          </div>*/}
-      {/*        )}*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  </CardContent>*/}
-      {/*</Card>*/}
-
-      {/*/!* Debug section - can be removed later *!/*/}
-      {/*<Card>*/}
-      {/*  <CardHeader>*/}
-      {/*    <CardTitle>Debug: Raw URL Parameters</CardTitle>*/}
-      {/*  </CardHeader>*/}
-      {/*  <CardContent>*/}
-      {/*    <div className="text-sm bg-gray-100 p-4 rounded">*/}
-      {/*      <pre>*/}
-      {/*        {JSON.stringify(*/}
-      {/*          Object.fromEntries(searchParams.entries()),*/}
-      {/*          null,*/}
-      {/*          2,*/}
-      {/*        )}*/}
-      {/*      </pre>*/}
-      {/*    </div>*/}
-      {/*  </CardContent>*/}
-      {/*</Card>*/}
-
-      {/*/!* Debug section - can be removed later *!/*/}
-      {/*<Card>*/}
-      {/*  <CardHeader>*/}
-      {/*    <CardTitle>Debug: Parsed Options Object</CardTitle>*/}
-      {/*  </CardHeader>*/}
-      {/*  <CardContent>*/}
-      {/*    <div className="text-sm bg-gray-100 p-4 rounded">*/}
-      {/*      <pre>{JSON.stringify(options, null, 2)}</pre>*/}
-      {/*    </div>*/}
-      {/*  </CardContent>*/}
-      {/*</Card>*/}
-
       <div className="space-y-6  mx-auto py-6">
         <div className="flex justify-end mb-2">
           <Dialog>
@@ -328,11 +239,9 @@ export default function SpawnPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogTitle>Options Configuration</DialogTitle>
-              <DialogBody className={"h-96 overflow-auto"}>
-                <pre className="text-xs whitespace-pre-wrap">
-                  {JSON.stringify(options, null, 2)}
-                </pre>
-              </DialogBody>
+              <pre className="text-xs whitespace-pre-wrap">
+                {JSON.stringify(options, null, 2)}
+              </pre>
             </DialogContent>
           </Dialog>
         </div>
