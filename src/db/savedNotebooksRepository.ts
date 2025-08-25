@@ -9,7 +9,7 @@ export type UpdateSavedNotebookData = Partial<CreateSavedNotebookData>;
 
 export class SavedNotebooksRepository {
   async findByIdForUser(
-    id: string,
+    id: number,
     userId: string,
   ): Promise<SavedNotebook | null> {
     const result = await db
@@ -44,7 +44,7 @@ export class SavedNotebooksRepository {
   }
 
   async updateForUser(
-    id: string,
+    id: number,
     userId: string,
     data: UpdateSavedNotebookData,
   ): Promise<SavedNotebook | null> {
@@ -61,7 +61,7 @@ export class SavedNotebooksRepository {
     return result[0] || null;
   }
 
-  async deleteForUser(id: string, userId: string): Promise<boolean> {
+  async deleteForUser(id: number, userId: string): Promise<boolean> {
     const result = await db
       .delete(savedNotebooks)
       .where(eq(savedNotebooks.id, id) && eq(savedNotebooks.userId, userId));

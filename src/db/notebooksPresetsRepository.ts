@@ -1,5 +1,3 @@
-import { randomBytes } from "crypto";
-
 import { eq, and } from "drizzle-orm";
 
 import { db } from "./client";
@@ -12,7 +10,7 @@ export type UpdateNotebookPresetData = Partial<CreateNotebookPresetData>;
 
 export class NotebookPresetsRepository {
   async findByIdForUser(
-    id: string,
+    id: number,
     userId: string,
   ): Promise<NotebookPreset | null> {
     const result = await db
@@ -35,37 +33,21 @@ export class NotebookPresetsRepository {
 
   async create(data: CreateNotebookPresetData): Promise<NotebookPreset> {
     const now = new Date();
-    let attempt = 0;
 
-    while (attempt < 5) {
-      try {
-        const result = await db
-          .insert(notebookPresets)
-          .values({
-            ...data,
-            id: randomBytes(16).toString("hex"),
-            createdAt: now,
-            updatedAt: now,
-          })
-          .returning();
+    const result = await db
+      .insert(notebookPresets)
+      .values({
+        ...data,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
-        return result[0];
-      } catch (err: any) {
-        // If unique constraint failed, retry
-        if (err && err.code === "SQLITE_CONSTRAINT_PRIMARYKEY") {
-          attempt++;
-          continue;
-        }
-        throw err;
-      }
-    }
-    throw new Error(
-      "Failed to generate a unique ID for notebook preset after 5 attempts",
-    );
+    return result[0];
   }
 
   async updateForUser(
-    id: string,
+    id: number,
     userId: string,
     data: UpdateNotebookPresetData,
   ): Promise<NotebookPreset | null> {
@@ -85,7 +67,7 @@ export class NotebookPresetsRepository {
     return result[0] || null;
   }
 
-  async deleteForUser(id: string, userId: string): Promise<boolean> {
+  async deleteForUser(id: number, userId: string): Promise<boolean> {
     const result = await db
       .delete(notebookPresets)
       .where(
