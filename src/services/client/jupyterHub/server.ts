@@ -6,6 +6,7 @@ import {
   ServerOptions,
   ServerProgress,
   ServerStatus,
+  UserInfo,
 } from "./types";
 
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
@@ -138,4 +139,29 @@ export async function stopServer(
   await jupyterHubClient.delete(
     `/users/${resolvedUsername}/servers/${serverName}`,
   );
+}
+
+/**
+ * Delete a named server (must be stopped first)
+ * @param serverName - Name of the server to delete
+ * @param username - Optional username to use instead of the current user
+ */
+export async function deleteServer(
+  serverName: string,
+  username?: string,
+): Promise<void> {
+  const resolvedUsername = getUsernameOrDefault(username);
+
+  try {
+    // For already stopped servers, we can use the remove=true parameter to fully remove it
+    await jupyterHubClient.delete(
+      `/users/${resolvedUsername}/servers/${serverName}`,
+      {
+        data: { remove: true },
+      },
+    );
+  } catch (error) {
+    console.error("Error deleting server:", error);
+    throw error;
+  }
 }
