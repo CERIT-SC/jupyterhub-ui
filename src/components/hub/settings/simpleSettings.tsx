@@ -1024,7 +1024,7 @@ export const StorageSettings = ({
       // Clear home when disabling
       const newOptions = { ...options };
 
-      delete newOptions.home;
+      newOptions.home = null;
       delete newOptions.mounttostorage;
       setOptions(newOptions);
     }
