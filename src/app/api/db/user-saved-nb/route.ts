@@ -1,20 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import {
-  getNotebookByIdForCurrentUser,
+
   getNotebooksForCurrentUser,
   createNotebookForCurrentUser,
   updateNotebookForCurrentUser,
-  deleteNotebookForCurrentUser,
+  getNotebookByServerNameForCurrentUser,
+  deleteNotebookForCurrentUser
 } from "@/services/server/savedNotebooks";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url!);
-    const id = searchParams.get("id");
+    const name = searchParams.get("name");
 
-    if (id) {
-      const notebook = await getNotebookByIdForCurrentUser(id);
+    if (name) {
+      const notebook = await getNotebookByServerNameForCurrentUser(name);
 
       if (!notebook)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -35,12 +36,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, description, serverOptions } = body;
-    const notebook = await createNotebookForCurrentUser({
-      name,
-      description,
-      serverOptions,
-    });
+    const { name, ...data } = body;
+
+    const existing = await getNotebookByServerNameForCurrentUser(name);
+
+    if (existing) {
+      const notebook = await updateNotebookForCurrentUser(name, data);
+      return NextResponse.json(notebook, { status: 201 });
+    }
+
+    const notebook = await createNotebookForCurrentUser(body);
 
     return NextResponse.json(notebook, { status: 201 });
   } catch (err: any) {
@@ -51,31 +56,14 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const { id, ...data } = body;
-    const notebook = await updateNotebookForCurrentUser(id, data);
-
-    if (!notebook)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    return NextResponse.json(notebook);
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: err.message || "Failed to update notebook" },
-      { status: 400 },
-    );
-  }
-}
 
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url!);
-    const id = searchParams.get("id");
+    const name = searchParams.get("name");
 
-    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
-    await deleteNotebookForCurrentUser(id);
+    if (!name) return NextResponse.json({ error: "Missing name" }, { status: 400 });
+    await deleteNotebookForCurrentUser(name);
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

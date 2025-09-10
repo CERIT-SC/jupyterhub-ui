@@ -28,8 +28,7 @@ export const notebookPresets = sqliteTable("notebook_presets", {
 export const savedNotebooks = sqliteTable("saved_notebooks", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: text("user_id").notNull(),
-  name: text("name").notNull(),
-  description: text("description"),
+  name: text("name").notNull().unique(),
 
   // ServerOptions as JSON
   serverOptions: text("server_options", {

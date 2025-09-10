@@ -1,6 +1,5 @@
 import type {
   SavedNotebook,
-  CreateSavedNotebookData,
   UpdateSavedNotebookData,
 } from "@/db/savedNotebooksRepository";
 
@@ -14,27 +13,28 @@ export async function fetchSavedNotebooks(): Promise<SavedNotebook[]> {
   return res.data;
 }
 
-export async function createSavedNotebook(
-  data: CreateSavedNotebookData,
-): Promise<SavedNotebook> {
-  const res = await dbApiClient.post<SavedNotebook>(url, data);
+export async function fetchSavedNotebookByServerName(servername: string): Promise<SavedNotebook | null> {
+  const params = new URLSearchParams({ name: servername });
+  const res = await dbApiClient.get<SavedNotebook | null>(`${url}?${params.toString()}`);
 
   return res.data;
 }
 
-export async function updateSavedNotebook(
-  id: string,
-  data: UpdateSavedNotebookData,
+export async function createOrUpdateSavedNotebookByServerName(
+  servername: string,
+  data: UpdateSavedNotebookData
 ): Promise<SavedNotebook> {
-  const res = await dbApiClient.put<SavedNotebook>(`${url}/${id}`, data);
+
+  const res = await dbApiClient.post<SavedNotebook>(url, { name: servername, ...data });
 
   return res.data;
 }
 
-export async function deleteSavedNotebook(
-  id: string,
+export async function deleteSavedNotebookByServerName(
+  name: string,
 ): Promise<{ success: boolean }> {
-  const res = await dbApiClient.delete<{ success: boolean }>(`${url}/${id}`);
+  const params = new URLSearchParams({ name });
+  const res = await dbApiClient.delete<{ success: boolean }>(`${url}?${params.toString()}`);
 
   return res.data;
 }

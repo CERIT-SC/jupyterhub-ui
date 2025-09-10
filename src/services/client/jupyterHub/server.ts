@@ -10,6 +10,7 @@ import {
 } from "./types";
 
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
+import { deleteSavedNotebookByServerName } from "../savedNotebooks";
 
 /**
  * Get all named notebooks for a user, including stopped ones but excluding the default unnamed server
@@ -160,6 +161,7 @@ export async function deleteServer(
         data: { remove: true },
       },
     );
+    await deleteSavedNotebookByServerName(serverName);
   } catch (error) {
     console.error("Error deleting server:", error);
     throw error;

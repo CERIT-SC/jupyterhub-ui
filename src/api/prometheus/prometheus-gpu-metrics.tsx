@@ -582,7 +582,6 @@ export const getJupyterGPUHistory = async (
 };
 
 /**
-/**
  * Discover available GPU-related metrics in Prometheus
  */
 export const discoverGPUMetrics = async (): Promise<string[]> => {
