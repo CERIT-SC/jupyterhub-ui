@@ -1,3 +1,4 @@
+"use client"
 // Server-related JupyterHub functions and types
 
 import { getUsernameOrDefault } from "./utils";
@@ -10,7 +11,8 @@ import {
 } from "./types";
 
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
-import { deleteSavedNotebookByServerName } from "../savedNotebooks";
+import { createOrUpdateSavedNotebookByServerName, deleteSavedNotebookByServerName } from "../savedNotebooks";
+import { fetchSavedNotebookByServerName } from "@/services/client/savedNotebooks";
 
 /**
  * Get all named notebooks for a user, including stopped ones but excluding the default unnamed server
@@ -106,6 +108,8 @@ export async function createServer(
 ): Promise<void> {
   const resolvedUsername = getUsernameOrDefault(username);
 
+  await createOrUpdateSavedNotebookByServerName(serverName, { serverOptions: options });
+
   await jupyterHubClient.post(
     `/users/${resolvedUsername}/servers/${serverName}`,
     options,
@@ -120,14 +124,15 @@ export async function createServer(
  */
 export async function startServer(
   serverName: string,
-  options?: ServerOptions,
   username?: string,
 ): Promise<void> {
   const resolvedUsername = getUsernameOrDefault(username);
 
+  const savedNotebookOptions = await fetchSavedNotebookByServerName(serverName);
+
   await jupyterHubClient.post(
     `/users/${resolvedUsername}/servers/${serverName}`,
-    options || {},
+    savedNotebookOptions?.serverOptions || {},
   );
 }
 
@@ -140,6 +145,7 @@ export async function stopServer(
   await jupyterHubClient.delete(
     `/users/${resolvedUsername}/servers/${serverName}`,
   );
+
 }
 
 /**

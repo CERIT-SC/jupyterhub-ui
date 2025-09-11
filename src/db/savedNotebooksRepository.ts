@@ -72,7 +72,7 @@ export class SavedNotebooksRepository {
   async deleteForUserByServerName(name: string, userId: string): Promise<boolean> {
     const result = await db
       .delete(savedNotebooks)
-      .where(eq(savedNotebooks.name, name) && eq(savedNotebooks.userId, userId));
+      .where(eq(savedNotebooks.userId, userId) && eq(savedNotebooks.name, name));
 
     return result.changes > 0;
   }

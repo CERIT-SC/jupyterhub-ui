@@ -18,7 +18,6 @@ export async function getUserInfo(username?: string): Promise<UserInfo> {
 export async function getUserIdentity(): Promise<User | null> {
   try {
     const response = await jupyterHubClient.get<User>("/user");
-
     return response.data;
   } catch (error: any) {
     if (

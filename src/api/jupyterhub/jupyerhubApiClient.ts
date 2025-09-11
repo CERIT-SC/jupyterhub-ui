@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // Create an Axios instance with the JupyterHub API base URL
-const jupyterHubClient = axios.create({
-  baseURL: "/api/hub", // This will be proxied through Next.js
+const jupyterHubApiClient = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/hub`, // This will be proxied through Next.js
   timeout: 30000, // 30 seconds timeout
   headers: {
     "Content-Type": "application/json",
@@ -11,11 +11,13 @@ const jupyterHubClient = axios.create({
 });
 
 const expiredLogin = () => {
+  if (typeof window === "undefined") return;
+  // Redirect to login page with a session expired message
   window.location.href = "/login?sessionExpired=jupyterhub";
 };
 
 // Add response interceptor for error handling
-jupyterHubClient.interceptors.response.use(
+jupyterHubApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     // Global error handling
@@ -42,4 +44,4 @@ jupyterHubClient.interceptors.response.use(
   },
 );
 
-export { jupyterHubClient };
+export { jupyterHubApiClient as jupyterHubClient };

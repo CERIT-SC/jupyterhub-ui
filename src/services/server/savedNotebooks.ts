@@ -4,63 +4,44 @@ import {
   UpdateSavedNotebookData,
   SavedNotebook,
 } from "@/db/savedNotebooksRepository";
-import { getUserIdentity } from "@/services/client/jupyterHub";
 
-export async function getNotebooksForCurrentUser(): Promise<SavedNotebook[]> {
-  const user = await getUserIdentity();
-
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return savedNotebooksRepository.findByUserId(user.name);
+export async function getNotebooks(userId: string): Promise<SavedNotebook[]> {
+  return savedNotebooksRepository.findByUserId(userId);
 }
 
-export async function getNotebookByServerNameForCurrentUser(
+export async function getNotebookByServerName(
+  userId: string,
   servername: string,
 ): Promise<SavedNotebook | null> {
-  const user = await getUserIdentity();
-
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return savedNotebooksRepository.findByServerNameForUser(servername, user.name);
+  return savedNotebooksRepository.findByServerNameForUser(servername, userId);
 }
 
-export async function createNotebookForCurrentUser(
+export async function createNotebook(
+  userId: string,
   data: CreateSavedNotebookData,
 ): Promise<SavedNotebook> {
-  const user = await getUserIdentity();
 
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return savedNotebooksRepository.create(user.name, data);
+  return savedNotebooksRepository.create(userId, data);
 }
 
-export async function updateNotebookForCurrentUser(
+export async function updateNotebook(
+  userId: string,
   servername: string,
   data: UpdateSavedNotebookData,
 ): Promise<SavedNotebook | null> {
-  const user = await getUserIdentity();
 
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return savedNotebooksRepository.updateForUserByServerName(servername, user.name, data);
+  return savedNotebooksRepository.updateForUserByServerName(servername, userId, data);
 }
 
-export async function deleteNotebookForCurrentUser(servername: string): Promise<void> {
-  const user = await getUserIdentity();
-
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  const success = await savedNotebooksRepository.deleteForUserByServerName(servername, user.name);
+export async function deleteNotebook(userId: string, servername: string): Promise<void> {
+  const success = await savedNotebooksRepository.deleteForUserByServerName(servername, userId);
 
   if (!success) {
     throw new Error(`Notebook with name ${servername} not found or not owned by user`);
   }
 }
 
-export async function deleteAllNotebooksForCurrentUser(): Promise<number> {
-  const user = await getUserIdentity();
+export async function deleteAllNotebooks(userId: string): Promise<number> {
 
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return savedNotebooksRepository.deleteByUserId(user.name);
+  return savedNotebooksRepository.deleteByUserId(userId);
 }

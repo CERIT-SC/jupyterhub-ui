@@ -5,7 +5,7 @@ import type {
 
 import { dbApiClient } from "@/api/local/dbApiClient";
 
-const url = "/user-saved-nb-presets";
+const url = "/user-nb";
 
 export async function fetchSavedNotebooks(): Promise<SavedNotebook[]> {
   const res = await dbApiClient.get<SavedNotebook[]>(url);
