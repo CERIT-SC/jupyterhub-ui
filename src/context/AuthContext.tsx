@@ -1,8 +1,9 @@
 import React, { createContext, ReactNode, useCallback, useState } from "react";
 import { AxiosError } from "axios";
 
-import { jupyterHubClient } from "@/api/jupyterhub/axios-client";
 import { User } from "@/api/jupyterhub/models";
+
+import { mockUser } from "@/mocks/ui-showcase/notebook-mocks";
 
 interface AuthContextType {
   user: User | null;
@@ -32,9 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError(null);
 
       try {
-        const response = await jupyterHubClient.get<User>("/user");
-
-        setUser(response.data);
+        setUser(mockUser);
 
         return true;
       } catch (error: unknown) {

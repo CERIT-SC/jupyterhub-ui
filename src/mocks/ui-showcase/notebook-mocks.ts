@@ -1,23 +1,23 @@
+import { User } from "@/api/jupyterhub/models";
 import { ServerStatus, JupyterHubServerOptions } from "@/services/jupyterHub";
+
 
 // Updated ServerStatus type that requires complete user_options
 type MockServerStatus = Omit<ServerStatus, "user_options"> & {
   user_options: JupyterHubServerOptions;
 };
 
-export const mockUser = {
-  name: "demo-user",
+export const mockUser: User = {
+  name: "User",
   admin: false,
-  groups: ["users", "data-science"],
+  groups: ["users"],
   server: "/user/demo-user/",
-  pending: null,
-  created: "2024-01-01T00:00:00Z",
+  roles: ['user'],
   last_activity: "2024-01-16T10:30:00Z",
   servers: {
     "": {
       name: "",
       ready: true,
-      pending: null,
       url: "/user/demo-user/",
       user_options: {
         container_image: "cerit.io/hubs/minimalnb-cs:31-10-2024",
