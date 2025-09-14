@@ -1,27 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import {
-  getPresetByIdForCurrentUser,
-  getPresetsForCurrentUser,
-  createPresetForCurrentUser,
-  updatePresetForCurrentUser,
-  deletePresetForCurrentUser,
+  getPresetById,
+  getPresets,
+  createPreset,
+  updatePreset,
+  deletePreset,
 } from "@/services/server/notebookPresets";
+import { User } from "@/services/client/jupyterHub/generated_models";
+import { get } from "http";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url!);
     const id = searchParams.get("id");
 
+    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+
     if (id) {
-      const preset = await getPresetByIdForCurrentUser(id);
+      const idNum = await getNumberOrThrow(id);
+      const preset = await getPresetById(userId, idNum);
 
       if (!preset)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 
       return NextResponse.json(preset);
     }
-    const presets = await getPresetsForCurrentUser();
+    const presets = await getPresets(userId);
 
     return NextResponse.json(presets);
   } catch (err: any) {
@@ -35,12 +40,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, description, serverOptions } = body;
-    const preset = await createPresetForCurrentUser({
-      name,
-      description,
-      serverOptions,
-    });
+    const data = body;
+
+    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+
+    const preset = await createPreset(userId, data);
 
     return NextResponse.json(preset, { status: 201 });
   } catch (err: any) {
@@ -55,12 +59,14 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
     const { id, ...data } = body;
-    const preset = await updatePresetForCurrentUser(id, data);
 
-    if (!preset)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
 
-    return NextResponse.json(preset);
+    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+
+    const preset = await updatePreset(userId, id, data);
+
+    return NextResponse.json(preset, { status: 201 });
   } catch (err: any) {
     return NextResponse.json(
       { error: err.message || "Failed to update preset" },
@@ -69,13 +75,15 @@ export async function PUT(req: NextRequest) {
   }
 }
 
+
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url!);
-    const id = searchParams.get("id");
+    const id = await getNumberOrThrow(searchParams.get("id"));
 
-    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
-    await deletePresetForCurrentUser(id);
+    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+
+    await deletePreset(userId, id);
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
@@ -83,5 +91,35 @@ export async function DELETE(req: NextRequest) {
       { error: err.message || "Failed to delete preset" },
       { status: 400 },
     );
+  }
+}
+
+async function getNumberOrThrow(id: string | null): Promise<number> {
+  const idNum = Number(id);
+  if (isNaN(idNum)) {
+    throw new Error("Invalid id: must be a number");
+  }
+  return idNum;
+}
+
+async function getCurrentUserName(token: string) {
+  try {
+    console.log("####### Fetching current user with token:", token);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/user`, {
+      method: "GET",
+      headers: {
+        host: new URL(`${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}`).host,
+        authorization: `token ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`JupyterHub API error: ${response.status}`);
+    }
+    const user: User = await response.json();
+    if (!user || !user.name) throw new Error("Not authenticated");
+    return user.name;
+  } catch (error: any) {
+    throw error;
   }
 }

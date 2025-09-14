@@ -5,7 +5,7 @@ import { notebookPresets } from "./schema";
 
 // Infer types from schema using new Drizzle syntax
 export type NotebookPreset = typeof notebookPresets.$inferSelect;
-export type CreateNotebookPresetData = typeof notebookPresets.$inferInsert;
+export type CreateNotebookPresetData = Omit<typeof notebookPresets.$inferInsert, "createdAt" | "updatedAt" | "id" | "userId">;
 export type UpdateNotebookPresetData = Partial<CreateNotebookPresetData>;
 
 export class NotebookPresetsRepository {
@@ -31,7 +31,16 @@ export class NotebookPresetsRepository {
       .where(eq(notebookPresets.userId, userId));
   }
 
-  async create(data: CreateNotebookPresetData): Promise<NotebookPreset> {
+  async get(id: number, userId: string): Promise<NotebookPreset[]> {
+    return db
+      .select()
+      .from(notebookPresets)
+      .where(
+        and(eq(notebookPresets.id, id), eq(notebookPresets.userId, userId)),
+      );
+  }
+
+  async create(userId: string, data: CreateNotebookPresetData): Promise<NotebookPreset> {
     const now = new Date();
 
     const result = await db

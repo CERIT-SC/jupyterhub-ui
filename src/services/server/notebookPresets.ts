@@ -6,64 +6,47 @@ import {
 } from "@/db/notebooksPresetsRepository";
 import { getUserIdentity } from "@/services/client/jupyterHub";
 
-export async function getPresetsForCurrentUser(): Promise<NotebookPreset[]> {
-  const user = await getUserIdentity();
-
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return notebookPresetsRepository.findByUserId(user.name);
+export async function getPresets(userId: string): Promise<NotebookPreset[]> {
+  return notebookPresetsRepository.findByUserId(userId);
 }
 
-export async function getPresetByIdForCurrentUser(
-  id: string,
+export async function getPresetById(
+  userId: string,
+  id: number,
 ): Promise<NotebookPreset | null> {
-  const user = await getUserIdentity();
 
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return notebookPresetsRepository.findByIdForUser(id, user.name);
+  return notebookPresetsRepository.findByIdForUser(id, userId);
 }
 
-export async function createPresetForCurrentUser(
-  data: Omit<CreateNotebookPresetData, "userId">,
+export async function createPreset(
+  userId: string,
+  data: CreateNotebookPresetData,
 ): Promise<NotebookPreset> {
-  const user = await getUserIdentity();
 
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return notebookPresetsRepository.create({
-    ...data,
-    userId: user.name,
-  });
+  return notebookPresetsRepository.create(userId, data);
 }
 
-export async function updatePresetForCurrentUser(
-  id: string,
+export async function updatePreset(
+  userId: string,
+  id: number,
   data: UpdateNotebookPresetData,
 ): Promise<NotebookPreset | null> {
-  const user = await getUserIdentity();
 
-  if (!user || !user.name) throw new Error("Not authenticated");
-
-  return notebookPresetsRepository.updateForUser(id, user.name, data);
+  return notebookPresetsRepository.updateForUser(id, userId, data);
 }
 
-export async function deletePresetForCurrentUser(id: string): Promise<void> {
-  const user = await getUserIdentity();
+export async function deletePreset(userId: string, id: number): Promise<void> {
 
-  if (!user || !user.name) throw new Error("Not authenticated");
 
-  const success = await notebookPresetsRepository.deleteForUser(id, user.name);
+  const success = await notebookPresetsRepository.deleteForUser(id, userId);
 
   if (!success) {
     throw new Error(`Preset with id ${id} not found or not owned by user`);
   }
 }
 
-export async function deleteAllPresetsForCurrentUser(): Promise<number> {
-  const user = await getUserIdentity();
+export async function deleteAllPresets(userId: string): Promise<number> {
 
-  if (!user || !user.name) throw new Error("Not authenticated");
 
-  return notebookPresetsRepository.deleteByUserId(user.name);
+  return notebookPresetsRepository.deleteByUserId(userId);
 }
