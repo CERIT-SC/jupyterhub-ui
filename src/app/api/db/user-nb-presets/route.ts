@@ -8,20 +8,27 @@ import {
   deletePreset,
 } from "@/services/server/notebookPresets";
 import { User } from "@/services/client/jupyterHub/generated_models";
-import { get } from "http";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url!);
     const id = searchParams.get("id");
 
-    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+    const userId = await getCurrentUserName(
+      req.cookies.get("jupyterhub_token")?.value || "",
+    );
+
     console.log("####### Incoming GET request, userId:", userId, "id:", id);
     if (id) {
       const idNum = await getNumberOrThrow(id);
       const preset = await getPresetById(userId, idNum);
 
-      console.log("####### Incoming GET request with id:", id, "preset: ", preset?.name);
+      console.log(
+        "####### Incoming GET request with id:",
+        id,
+        "preset: ",
+        preset?.name,
+      );
       if (!preset)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -43,7 +50,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const data = body;
 
-    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+    const userId = await getCurrentUserName(
+      req.cookies.get("jupyterhub_token")?.value || "",
+    );
 
     const preset = await createPreset(userId, data);
 
@@ -63,7 +72,9 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const data = body;
 
-    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+    const userId = await getCurrentUserName(
+      req.cookies.get("jupyterhub_token")?.value || "",
+    );
 
     const preset = await updatePreset(userId, id, data);
 
@@ -76,13 +87,14 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url!);
     const id = await getNumberOrThrow(searchParams.get("id"));
 
-    const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
+    const userId = await getCurrentUserName(
+      req.cookies.get("jupyterhub_token")?.value || "",
+    );
 
     await deletePreset(userId, id);
 
@@ -97,28 +109,35 @@ export async function DELETE(req: NextRequest) {
 
 async function getNumberOrThrow(id: string | null): Promise<number> {
   const idNum = Number(id);
+
   if (isNaN(idNum)) {
     throw new Error("Invalid id: must be a number");
   }
+
   return idNum;
 }
 
 async function getCurrentUserName(token: string) {
   try {
     console.log("####### Fetching current user with token:", token);
-    const response = await fetch(`${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/user`, {
-      method: "GET",
-      headers: {
-        host: new URL(`${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}`).host,
-        authorization: `token ${token}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/user`,
+      {
+        method: "GET",
+        headers: {
+          host: new URL(`${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}`).host,
+          authorization: `token ${token}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`JupyterHub API error: ${response.status}`);
     }
     const user: User = await response.json();
+
     if (!user || !user.name) throw new Error("Not authenticated");
+
     return user.name;
   } catch (error: any) {
     throw error;
