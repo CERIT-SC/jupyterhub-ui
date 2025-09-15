@@ -14,10 +14,13 @@ export async function fetchNotebookPresets(): Promise<NotebookPreset[]> {
   return res.data;
 }
 
-export async function fetchNotebookPresetById(id: number
+export async function fetchNotebookPresetById(
+  id: number,
 ): Promise<NotebookPreset | null> {
   const params = new URLSearchParams({ id: id.toString() });
-  const res = await dbApiClient.get<NotebookPreset | null>(`${url}?${params.toString()}`);
+  const res = await dbApiClient.get<NotebookPreset | null>(
+    `${url}?${params.toString()}`,
+  );
 
   return res.data;
 }

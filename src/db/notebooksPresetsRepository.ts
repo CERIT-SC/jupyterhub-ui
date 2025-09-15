@@ -1,12 +1,16 @@
+import { console } from "inspector";
+
 import { eq, and } from "drizzle-orm";
 
 import { db } from "./client";
 import { notebookPresets } from "./schema";
-import { console } from "inspector";
 
 // Infer types from schema using new Drizzle syntax
 export type NotebookPreset = typeof notebookPresets.$inferSelect;
-export type CreateNotebookPresetData = Omit<typeof notebookPresets.$inferInsert, "createdAt" | "updatedAt" | "id" | "userId">;
+export type CreateNotebookPresetData = Omit<
+  typeof notebookPresets.$inferInsert,
+  "createdAt" | "updatedAt" | "id" | "userId"
+>;
 export type UpdateNotebookPresetData = Partial<CreateNotebookPresetData>;
 
 export class NotebookPresetsRepository {
@@ -20,9 +24,10 @@ export class NotebookPresetsRepository {
       .from(notebookPresets)
       .where(
         and(eq(notebookPresets.id, id), eq(notebookPresets.userId, userId)),
-      )
+      );
 
     console.log("####### findByIdForUser:", { id, userId, result });
+
     return result[0] || null;
   }
 
@@ -42,7 +47,10 @@ export class NotebookPresetsRepository {
       );
   }
 
-  async create(userId: string, data: CreateNotebookPresetData): Promise<NotebookPreset> {
+  async create(
+    userId: string,
+    data: CreateNotebookPresetData,
+  ): Promise<NotebookPreset> {
     const now = new Date();
 
     const result = await db

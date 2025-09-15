@@ -4,8 +4,13 @@ import { savedNotebooks } from "./schema";
 import { db } from "./client";
 
 export type SavedNotebook = typeof savedNotebooks.$inferSelect;
-export type CreateSavedNotebookData = Omit<typeof savedNotebooks.$inferInsert, "createdAt" | "updatedAt" | "userId" | "id">;
-export type UpdateSavedNotebookData = Partial<Omit<CreateSavedNotebookData, "name">>;
+export type CreateSavedNotebookData = Omit<
+  typeof savedNotebooks.$inferInsert,
+  "createdAt" | "updatedAt" | "userId" | "id"
+>;
+export type UpdateSavedNotebookData = Partial<
+  Omit<CreateSavedNotebookData, "name">
+>;
 
 export class SavedNotebooksRepository {
   async findByServerNameForUser(
@@ -15,7 +20,10 @@ export class SavedNotebooksRepository {
     const result = await db
       .select()
       .from(savedNotebooks)
-      .where(eq(savedNotebooks.userId, userId) && eq(savedNotebooks.name, servername))
+      .where(
+        eq(savedNotebooks.userId, userId) &&
+          eq(savedNotebooks.name, servername),
+      )
       .limit(1);
 
     return result[0] || null;
@@ -32,10 +40,16 @@ export class SavedNotebooksRepository {
     return db
       .select()
       .from(savedNotebooks)
-      .where(eq(savedNotebooks.userId, userId) && eq(savedNotebooks.name, servername));
+      .where(
+        eq(savedNotebooks.userId, userId) &&
+          eq(savedNotebooks.name, servername),
+      );
   }
 
-  async create(userId: string, data: CreateSavedNotebookData): Promise<SavedNotebook> {
+  async create(
+    userId: string,
+    data: CreateSavedNotebookData,
+  ): Promise<SavedNotebook> {
     const now = new Date();
     const result = await db
       .insert(savedNotebooks)
@@ -62,17 +76,24 @@ export class SavedNotebooksRepository {
         ...data,
         updatedAt: now,
       })
-      .where(eq(savedNotebooks.name, servername) && eq(savedNotebooks.userId, userId))
+      .where(
+        eq(savedNotebooks.name, servername) &&
+          eq(savedNotebooks.userId, userId),
+      )
       .returning();
 
     return result[0] || null;
   }
 
-
-  async deleteForUserByServerName(name: string, userId: string): Promise<boolean> {
+  async deleteForUserByServerName(
+    name: string,
+    userId: string,
+  ): Promise<boolean> {
     const result = await db
       .delete(savedNotebooks)
-      .where(eq(savedNotebooks.userId, userId) && eq(savedNotebooks.name, name));
+      .where(
+        eq(savedNotebooks.userId, userId) && eq(savedNotebooks.name, name),
+      );
 
     return result.changes > 0;
   }

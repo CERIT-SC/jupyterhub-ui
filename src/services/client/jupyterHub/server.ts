@@ -1,17 +1,20 @@
-"use client"
+"use client";
 // Server-related JupyterHub functions and types
+
+import {
+  createOrUpdateSavedNotebookByServerName,
+  deleteSavedNotebookByServerName,
+} from "../savedNotebooks";
 
 import { getUsernameOrDefault } from "./utils";
 import {
   JupyterHubServerOptions,
-  ServerOptions,
   ServerProgress,
   ServerStatus,
   UserInfo,
 } from "./types";
 
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
-import { createOrUpdateSavedNotebookByServerName, deleteSavedNotebookByServerName } from "../savedNotebooks";
 import { fetchSavedNotebookByServerName } from "@/services/client/savedNotebooks";
 
 /**
@@ -108,7 +111,9 @@ export async function createServer(
 ): Promise<void> {
   const resolvedUsername = getUsernameOrDefault(username);
 
-  await createOrUpdateSavedNotebookByServerName(serverName, { serverOptions: options });
+  await createOrUpdateSavedNotebookByServerName(serverName, {
+    serverOptions: options,
+  });
 
   await jupyterHubClient.post(
     `/users/${resolvedUsername}/servers/${serverName}`,
@@ -145,7 +150,6 @@ export async function stopServer(
   await jupyterHubClient.delete(
     `/users/${resolvedUsername}/servers/${serverName}`,
   );
-
 }
 
 /**

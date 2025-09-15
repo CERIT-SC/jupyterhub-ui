@@ -20,7 +20,6 @@ export async function createNotebook(
   userId: string,
   data: CreateSavedNotebookData,
 ): Promise<SavedNotebook> {
-
   return savedNotebooksRepository.create(userId, data);
 }
 
@@ -29,19 +28,29 @@ export async function updateNotebook(
   servername: string,
   data: UpdateSavedNotebookData,
 ): Promise<SavedNotebook | null> {
-
-  return savedNotebooksRepository.updateForUserByServerName(servername, userId, data);
+  return savedNotebooksRepository.updateForUserByServerName(
+    servername,
+    userId,
+    data,
+  );
 }
 
-export async function deleteNotebook(userId: string, servername: string): Promise<void> {
-  const success = await savedNotebooksRepository.deleteForUserByServerName(servername, userId);
+export async function deleteNotebook(
+  userId: string,
+  servername: string,
+): Promise<void> {
+  const success = await savedNotebooksRepository.deleteForUserByServerName(
+    servername,
+    userId,
+  );
 
   if (!success) {
-    throw new Error(`Notebook with name ${servername} not found or not owned by user`);
+    throw new Error(
+      `Notebook with name ${servername} not found or not owned by user`,
+    );
   }
 }
 
 export async function deleteAllNotebooks(userId: string): Promise<number> {
-
   return savedNotebooksRepository.deleteByUserId(userId);
 }

@@ -14,6 +14,7 @@ export async function getPresetById(
   id: number,
 ): Promise<NotebookPreset | null> {
   console.log("####### getPresetById:", { userId, id });
+
   return notebookPresetsRepository.findByIdForUser(id, userId);
 }
 
@@ -21,7 +22,6 @@ export async function createPreset(
   userId: string,
   data: CreateNotebookPresetData,
 ): Promise<NotebookPreset> {
-
   return notebookPresetsRepository.create(userId, data);
 }
 
@@ -30,13 +30,10 @@ export async function updatePreset(
   id: number,
   data: UpdateNotebookPresetData,
 ): Promise<NotebookPreset | null> {
-
   return notebookPresetsRepository.updateForUser(id, userId, data);
 }
 
 export async function deletePreset(userId: string, id: number): Promise<void> {
-
-
   const success = await notebookPresetsRepository.deleteForUser(id, userId);
 
   if (!success) {
@@ -45,7 +42,5 @@ export async function deletePreset(userId: string, id: number): Promise<void> {
 }
 
 export async function deleteAllPresets(userId: string): Promise<number> {
-
-
   return notebookPresetsRepository.deleteByUserId(userId);
 }
