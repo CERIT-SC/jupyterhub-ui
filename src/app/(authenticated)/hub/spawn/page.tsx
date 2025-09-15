@@ -1,16 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Zap } from "lucide-react";
+import { Settings, Zap } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import { quickstartServerPresets } from "@/config/quickpresets";
 import {
   CustomPresetCard,
   QuickPresetCard,
 } from "@/components/hub/presetCards";
+import { fetchNotebookPresets } from "@/services/client/notebookPresets";
+import { PresetCards } from "@/components/ui/preset-cards";
 
 export default function SpawnSelection() {
   const router = useRouter();
+
+  const { data: userPresets, isLoading } = useQuery({
+    queryKey: ["presets"],
+    queryFn: () => fetchNotebookPresets(),
+  });
 
   const handleCustomConfigure = () => {
     router.push("/hub/spawn/options");
@@ -40,7 +48,7 @@ export default function SpawnSelection() {
               Quick Start Presets
             </h2>
             <p className="text-sm text-infra-text-secondary">
-              Select a preset configuration or customize below
+              Pre-configured environments ready to launch
             </p>
           </div>
         </div>
@@ -54,6 +62,29 @@ export default function SpawnSelection() {
           {/* Custom Configuration Card */}
           <CustomPresetCard onConfigure={handleCustomConfigure} />
         </div>
+      </section>
+
+      {/* User Presets Section */}
+      <section aria-label="User presets" className="mb-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-infra-primary/10 rounded-lg">
+            <Settings className="h-5 w-5 text-infra-primary" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-infra-text-primary">
+              Custom Presets
+            </h2>
+            <p className="text-sm text-infra-text-secondary">
+              Your saved configurations for quick access
+            </p>
+          </div>
+        </div>
+
+        <PresetCards
+          isLoading={isLoading}
+          presets={userPresets || []}
+          onPresetClick={(id) => router.push(`/hub/presets/${id}`)}
+        />
       </section>
     </div>
   );

@@ -90,7 +90,7 @@ export default function NotebooksPage() {
   // Handler for starting a notebook
   const handleStartNotebook = async (id: string) => {
     try {
-      await startServer(id, undefined, username);
+      await startServer(id, username);
       router.push(`/hub/spawn/progress/${id}`);
     } catch (error) {
       console.error("Failed to start notebook:", error);
