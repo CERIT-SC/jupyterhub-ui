@@ -41,6 +41,16 @@ export const siteConfig: SiteConfig = {
           path: "/hub/notebooks",
         },
         {
+          name: "Create Notebook",
+          icon: LayoutDashboard,
+          path: "/hub/spawn/options?container_image=cerit.io%2Fhubs%2Fdatasciencenb%3A31-10-2024-ssh&ssh=true&cpu=2&mem=16&shmsize=16",
+        },
+        {
+          name: "Preparing Notebook",
+          icon: LayoutDashboard,
+          path: "/hub/spawn/progress/ds",
+        },
+        {
           name: "Tokens",
           icon: Server,
           path: "/hub/tokens",
