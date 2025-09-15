@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
@@ -11,7 +11,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
@@ -20,7 +20,7 @@ export async function POST(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
@@ -29,7 +29,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
@@ -38,7 +38,7 @@ export async function DELETE(
 
 export async function OPTIONS(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
@@ -47,7 +47,7 @@ export async function OPTIONS(
 
 export async function HEAD(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
@@ -56,19 +56,19 @@ export async function HEAD(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> },
+  { params }: { params: Promise<{ path?: string[] }> },
 ) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
 }
 
-async function proxyToJupyterHub(req: NextRequest, path: string[] = []) {
+async function proxyToJupyterHub(req: NextRequest, path?: string[]) {
   const token = req.cookies.get("jupyterhub_token")?.value;
 
   if (!token) return new NextResponse("Unauthorized", { status: 401 });
 
-  const upstreamUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/${path.join("/")}${req.nextUrl.search || ""}`;
+  const upstreamUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/${(path || []).join("/")}${req.nextUrl.search || ""}`;
 
   const proxyRes = await fetch(upstreamUrl, {
     method: req.method,

@@ -23,29 +23,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./dialog";
-import { Badge } from "./badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 import { minimalJupyterHubServerOptions } from "@/config/hub";
 import { cn } from "@/lib/cn";
 import { createServer } from "@/services/client/jupyterHub";
 import { useAuth } from "@/hooks/useAuth";
+import { NotebookPreset } from "@/db/notebooksPresetsRepository";
 
 // Define preset type (adjust according to your actual data structure)
-interface Preset {
-  id: string | number;
-  name: string;
-  description?: string;
-  serverOptions?: any;
-  // Add any other properties your presets have
-}
 
 // Styled PresetCard component (similar to QuickPresetCard)
 function PresetCard({
   preset,
   onClick,
 }: {
-  preset: Preset;
+  preset: NotebookPreset;
   onClick?: () => void;
 }) {
   const [showStartDialog, setShowStartDialog] = useState(false);
@@ -142,10 +135,7 @@ function PresetCard({
                 <TooltipTrigger asChild>
                   <div className="flex items-center text-sm ">
                     <MemoryStick className="h-4 w-4 mr-1" />
-                    <span>
-                      {completeOptions.memory || completeOptions.mem || "N/A"}{" "}
-                      GB
-                    </span>
+                    <span>{completeOptions.mem || "N/A"} GB</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -194,7 +184,7 @@ function PresetCard({
 
             {/* Tags */}
             <div className="flex gap-2 flex-wrap">
-              {preset.tags?.map((tag: string, index: number) => (
+              {/* {preset.tags?.map((tag: string, index: number) => (
                 <Badge
                   key={index}
                   className="text-xs text-infra-primary border-infra-primary"
@@ -202,7 +192,7 @@ function PresetCard({
                 >
                   {tag}
                 </Badge>
-              ))}
+              ))} */}
             </div>
           </CardContent>
 
@@ -275,12 +265,7 @@ function PresetCard({
                       </div>
                       <div className="flex items-center gap-1">
                         <MemoryStick className="h-3.5 w-3.5" />
-                        <span>
-                          {completeOptions.memory ||
-                            completeOptions.mem ||
-                            "N/A"}{" "}
-                          GB RAM
-                        </span>
+                        <span>{completeOptions.mem || "N/A"} GB RAM</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Gpu className="h-3.5 w-3.5" />
@@ -337,9 +322,7 @@ function PresetCard({
             </div>
             <div className="flex justify-between">
               <span>Memory:</span>
-              <span>
-                {completeOptions.memory || completeOptions.mem || "N/A"} GB
-              </span>
+              <span>{completeOptions.mem || "N/A"} GB</span>
             </div>
             <div className="flex justify-between">
               <span>GPU:</span>
@@ -353,18 +336,12 @@ function PresetCard({
               <span>SSH:</span>
               <span>{completeOptions.ssh ? "Enabled" : "Disabled"}</span>
             </div>
-            {completeOptions.image && (
+            {completeOptions.container_image && (
               <div className="flex justify-between">
                 <span>Image:</span>
                 <span className="truncate max-w-32">
-                  {completeOptions.image}
+                  {completeOptions.container_image}
                 </span>
-              </div>
-            )}
-            {completeOptions.storage && (
-              <div className="flex justify-between">
-                <span>Storage:</span>
-                <span>{completeOptions.storage} GB</span>
               </div>
             )}
           </div>
@@ -380,7 +357,7 @@ export function PresetCards({
   isLoading,
   onPresetClick,
 }: {
-  presets?: Preset[];
+  presets?: NotebookPreset[];
   isLoading?: boolean;
   onPresetClick?: (id: number | string) => void;
 }) {
