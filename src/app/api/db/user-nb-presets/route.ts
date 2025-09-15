@@ -16,11 +16,12 @@ export async function GET(req: NextRequest) {
     const id = searchParams.get("id");
 
     const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
-
+    console.log("####### Incoming GET request, userId:", userId, "id:", id);
     if (id) {
       const idNum = await getNumberOrThrow(id);
       const preset = await getPresetById(userId, idNum);
 
+      console.log("####### Incoming GET request with id:", id, "preset: ", preset?.name);
       if (!preset)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -57,12 +58,12 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url!);
+    const id = await getNumberOrThrow(searchParams.get("id"));
     const body = await req.json();
-    const { id, ...data } = body;
+    const data = body;
 
     const userId = await getCurrentUserName(req.cookies.get("jupyterhub_token")?.value || "");
-
-    if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
     const preset = await updatePreset(userId, id, data);
 

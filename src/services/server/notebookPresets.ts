@@ -4,7 +4,6 @@ import {
   UpdateNotebookPresetData,
   NotebookPreset,
 } from "@/db/notebooksPresetsRepository";
-import { getUserIdentity } from "@/services/client/jupyterHub";
 
 export async function getPresets(userId: string): Promise<NotebookPreset[]> {
   return notebookPresetsRepository.findByUserId(userId);
@@ -14,7 +13,7 @@ export async function getPresetById(
   userId: string,
   id: number,
 ): Promise<NotebookPreset | null> {
-
+  console.log("####### getPresetById:", { userId, id });
   return notebookPresetsRepository.findByIdForUser(id, userId);
 }
 

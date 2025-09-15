@@ -2,6 +2,7 @@ import { eq, and } from "drizzle-orm";
 
 import { db } from "./client";
 import { notebookPresets } from "./schema";
+import { console } from "inspector";
 
 // Infer types from schema using new Drizzle syntax
 export type NotebookPreset = typeof notebookPresets.$inferSelect;
@@ -13,14 +14,15 @@ export class NotebookPresetsRepository {
     id: number,
     userId: string,
   ): Promise<NotebookPreset | null> {
+    console.log("####### findByIdForUser called with:", { id, userId });
     const result = await db
       .select()
       .from(notebookPresets)
       .where(
         and(eq(notebookPresets.id, id), eq(notebookPresets.userId, userId)),
       )
-      .limit(1);
 
+    console.log("####### findByIdForUser:", { id, userId, result });
     return result[0] || null;
   }
 
@@ -46,6 +48,7 @@ export class NotebookPresetsRepository {
     const result = await db
       .insert(notebookPresets)
       .values({
+        userId: userId,
         ...data,
         createdAt: now,
         updatedAt: now,
