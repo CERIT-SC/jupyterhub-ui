@@ -1,17 +1,17 @@
-import { defineConfig, globalIgnores } from "eslint/config";
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import react from "eslint-plugin-react";
-import unusedImports from "eslint-plugin-unused-imports";
-import _import from "eslint-plugin-import";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import jsxA11Y from "eslint-plugin-jsx-a11y";
-import prettier from "eslint-plugin-prettier";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { FlatCompat } from "@eslint/eslintrc";
 import nextPlugin from "@next/eslint-plugin-next";
+import typescriptEslint from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+import _import from "eslint-plugin-import";
+import jsxA11Y from "eslint-plugin-jsx-a11y";
+import prettier from "eslint-plugin-prettier";
+import react from "eslint-plugin-react";
+import unusedImports from "eslint-plugin-unused-imports";
+import { defineConfig, globalIgnores } from "eslint/config";
+import globals from "globals";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,11 +43,11 @@ export default defineConfig([globalIgnores([
   "!**/tsup.config.ts",
 ]), {
   extends: fixupConfigRules(compat.extends(
-      "plugin:react/recommended",
-      "plugin:prettier/recommended",
-      "plugin:react-hooks/recommended",
-      "plugin:jsx-a11y/recommended",
-      "plugin:@next/next/recommended",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:@next/next/recommended",
   )),
 
   plugins: {
@@ -95,7 +95,10 @@ export default defineConfig([globalIgnores([
     "jsx-a11y/interactive-supports-focus": "warn",
     "prettier/prettier": "warn",
     "no-unused-vars": "off",
-    "unused-imports/no-unused-vars": "warn",
+    "unused-imports/no-unused-vars": ["warn", {
+      argsIgnorePattern: "^_.*?$",
+      varsIgnorePattern: "^_.*?$",
+    }],
     "unused-imports/no-unused-imports": "warn",
     "react/no-unescaped-entities": "warn",
 
@@ -103,6 +106,7 @@ export default defineConfig([globalIgnores([
       args: "after-used",
       ignoreRestSiblings: false,
       argsIgnorePattern: "^_.*?$",
+      varsIgnorePattern: "^_.*?$",
     }],
 
     "import/order": ["warn", {
@@ -140,13 +144,13 @@ export default defineConfig([globalIgnores([
       prev: "*",
       next: "return",
     }, {
-      blankLine: "always",
-      prev: ["const", "let", "var"],
-      next: "*",
-    }, {
-      blankLine: "any",
-      prev: ["const", "let", "var"],
-      next: ["const", "let", "var"],
-    }],
+        blankLine: "always",
+        prev: ["const", "let", "var"],
+        next: "*",
+      }, {
+        blankLine: "any",
+        prev: ["const", "let", "var"],
+        next: ["const", "let", "var"],
+      }],
   },
 }]);

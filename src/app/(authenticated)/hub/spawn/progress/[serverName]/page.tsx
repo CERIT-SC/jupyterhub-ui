@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { fetchServerProgress } from "@/services/client/jupyterHub";
+import { useServerProgress } from "@/features/servers/api/get-server-progress";
 import { useAuth } from "@/hooks/useAuth";
 
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";
@@ -18,8 +17,7 @@ type PageState = "starting" | "progress" | "ready" | "failed" | "error";
 export default function SpawnProgress() {
   const params = useParams();
 
-  const serverName =
-    typeof params.serverName === "string" ? params.serverName : "";
+  const serverName = typeof params.serverName === "string" ? params.serverName : "";
 
   const { user } = useAuth();
 
@@ -28,24 +26,21 @@ export default function SpawnProgress() {
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
   const [countdown, setCountdown] = useState<number | null>(null);
 
-  const { data, isError, error, isFetched } = useQuery({
-    queryKey: ["user", "server", serverName],
-    queryFn: () => {
-      const username = user?.name;
-
-      return fetchServerProgress(serverName, username);
+  const { data, isError, error, isFetched } = useServerProgress({
+    serverName,
+    queryConfig: {
+      enabled: running,
+      // Use a very short refetch interval (500ms) while server is starting
+      // to get near real-time updates during server initialization
+      refetchInterval: running ? 5 : false,
+      // Keep fetching even when window is not focused
+      refetchIntervalInBackground: true,
+      // Don't stale the data quickly so we can see updates
+      staleTime: 0,
+      // Don't cache the progress data for long
+      retry: 3,
+      retryDelay: 1000,
     },
-    enabled: running,
-    // Use a very short refetch interval (500ms) while server is starting
-    // to get near real-time updates during server initialization
-    refetchInterval: running ? 5 : false,
-    // Keep fetching even when window is not focused
-    refetchIntervalInBackground: true,
-    // Don't stale the data quickly so we can see updates
-    staleTime: 0,
-    // Don't cache the progress data for long
-    retry: 3,
-    retryDelay: 1000,
   });
 
   // Store previous progress value to detect changes
@@ -193,11 +188,11 @@ export default function SpawnProgress() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-3xl">
+    <div className="container mx-auto max-w-3xl p-6">
       <div className="mb-6">
         <Link href="/hub/spawn">
           <Button size="sm" variant="ghost">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Spawn
           </Button>
         </Link>
@@ -212,25 +207,19 @@ export default function SpawnProgress() {
             </CardTitle>
             {getStateBadge()}
           </div>
-          <p className="text-sm text-muted-foreground">
-            Server name:{" "}
-            <span className="text-infra-primary">{serverName}</span>
+          <p className="text-muted-foreground text-sm">
+            Server name: <span className="text-infra-primary">{serverName}</span>
           </p>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{getStatusText()}</span>
-              <span className="text-sm text-muted-foreground">
-                {data?.progress || 0}%
-              </span>
+              <span className="text-muted-foreground text-sm">{data?.progress || 0}%</span>
             </div>
-            <Progress
-              className={`h-2 ${pageState === "failed" ? "bg-red-200" : ""}`}
-              value={data?.progress || 0}
-            />
+            <Progress className={`h-2 ${pageState === "failed" ? "bg-red-200" : ""}`} value={data?.progress || 0} />
           </div>
 
           {/*/!* Current Message *!/*/}
@@ -248,8 +237,8 @@ export default function SpawnProgress() {
 
           {/* Error Message */}
           {pageState === "error" && (
-            <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+              <div className="mb-2 flex items-center gap-2">
                 <XCircle className="h-5 w-5 text-red-500" />
                 <h3 className="font-medium text-red-800">Error</h3>
               </div>
@@ -268,10 +257,8 @@ export default function SpawnProgress() {
               {/* Show JSON response if available */}
               {(error as any)?.response?.data && (
                 <details className="mt-3">
-                  <summary className="cursor-pointer text-sm font-medium text-red-800">
-                    Response Details
-                  </summary>
-                  <pre className="mt-2 text-xs bg-white p-2 rounded border border-red-200 overflow-auto max-h-32">
+                  <summary className="cursor-pointer text-sm font-medium text-red-800">Response Details</summary>
+                  <pre className="mt-2 max-h-32 overflow-auto rounded border border-red-200 bg-white p-2 text-xs">
                     {JSON.stringify((error as any).response.data, null, 2)}
                   </pre>
                 </details>
@@ -289,28 +276,23 @@ export default function SpawnProgress() {
 
           {/* Ready State - Show Open Server Button */}
           {pageState === "ready" && data?.url && (
-            <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="mb-2 flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
                 <h3 className="font-medium text-green-800">Server Ready</h3>
               </div>
-              <p className="text-green-700 mb-3">
+              <p className="mb-3 text-green-700">
                 Your server has been successfully spawned and is ready to use.
                 {countdown !== null && countdown > 0 && (
-                  <span className="block mt-2 font-medium">
+                  <span className="mt-2 block font-medium">
                     Redirecting automatically in {countdown} second
                     {countdown !== 1 ? "s" : ""}...
                   </span>
                 )}
               </p>
               <div className="flex gap-2">
-                <Button
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={handleOpenServer}
-                >
-                  {countdown !== null && countdown > 0
-                    ? `Open Server (${countdown}s)`
-                    : "Open Server"}
+                <Button className="bg-green-600 hover:bg-green-700" onClick={handleOpenServer}>
+                  {countdown !== null && countdown > 0 ? `Open Server (${countdown}s)` : "Open Server"}
                 </Button>
                 {countdown !== null && countdown > 0 && (
                   <Button
@@ -327,7 +309,7 @@ export default function SpawnProgress() {
 
           {/* Message History */}
           <div className="mt-4">
-            <h3 className="text-sm font-medium mb-2">Message History</h3>
+            <h3 className="mb-2 text-sm font-medium">Message History</h3>
             <div
               ref={(el) => {
                 // Auto-scroll to bottom when new messages are added
@@ -335,20 +317,16 @@ export default function SpawnProgress() {
                   el.scrollTop = el.scrollHeight;
                 }
               }}
-              className="border rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50"
+              className="max-h-48 overflow-y-auto rounded-lg border bg-gray-50 p-2"
             >
               {messageHistory.length > 0 ? (
                 <div className="space-y-2">
                   {messageHistory.map((message, index) => (
-                    <div
-                      key={index}
-                      className="p-2 text-xs bg-white rounded border border-gray-200"
-                    >
+                    <div key={index} className="rounded border border-gray-200 bg-white p-2 text-xs">
                       {(() => {
                         // Try to parse as JSON if message starts with { or [
                         if (
-                          (message.startsWith("{") ||
-                            message.startsWith("[")) &&
+                          (message.startsWith("{") || message.startsWith("[")) &&
                           (message.endsWith("}") || message.endsWith("]"))
                         ) {
                           try {
@@ -356,10 +334,8 @@ export default function SpawnProgress() {
 
                             return (
                               <details>
-                                <summary className="cursor-pointer font-medium">
-                                  JSON Response
-                                </summary>
-                                <pre className="mt-1 overflow-auto max-h-24 text-xs">
+                                <summary className="cursor-pointer font-medium">JSON Response</summary>
+                                <pre className="mt-1 max-h-24 overflow-auto text-xs">
                                   {JSON.stringify(jsonObj, null, 2)}
                                 </pre>
                               </details>
@@ -376,17 +352,17 @@ export default function SpawnProgress() {
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-gray-500 p-2">No messages yet</p>
+                <p className="p-2 text-xs text-gray-500">No messages yet</p>
               )}
             </div>
           </div>
 
           {/* Debug Info (only in development) */}
           {process.env.NODE_ENV === "development" && (
-            <div className="mt-4 text-xs text-muted-foreground">
+            <div className="text-muted-foreground mt-4 text-xs">
               <details className="mt-2">
                 <summary className="cursor-pointer">Debug Info</summary>
-                <div className="mt-2 p-2 bg-gray-100 rounded">
+                <div className="mt-2 rounded bg-gray-100 p-2">
                   <p>State: {pageState}</p>
                   <p>Running: {running.toString()}</p>
 
@@ -396,27 +372,15 @@ export default function SpawnProgress() {
 
                   {isError && (
                     <div className="mt-2">
-                      <h4 className="font-medium mb-1">Error Details:</h4>
-                      <div className="p-2 bg-red-100 rounded">
-                        <p>
-                          Status:{" "}
-                          {(error as any)?.response?.status || "Unknown"}
-                        </p>
-                        <p>
-                          Message:{" "}
-                          {(error as Error)?.message || "Unknown error"}
-                        </p>
+                      <h4 className="mb-1 font-medium">Error Details:</h4>
+                      <div className="rounded bg-red-100 p-2">
+                        <p>Status: {(error as any)?.response?.status || "Unknown"}</p>
+                        <p>Message: {(error as Error)?.message || "Unknown error"}</p>
                         {(error as any)?.response?.data && (
                           <details>
-                            <summary className="cursor-pointer mt-1">
-                              Response Data
-                            </summary>
-                            <pre className="mt-1 p-2 bg-white rounded overflow-auto max-h-32">
-                              {JSON.stringify(
-                                (error as any).response.data,
-                                null,
-                                2,
-                              )}
+                            <summary className="mt-1 cursor-pointer">Response Data</summary>
+                            <pre className="mt-1 max-h-32 overflow-auto rounded bg-white p-2">
+                              {JSON.stringify((error as any).response.data, null, 2)}
                             </pre>
                           </details>
                         )}
@@ -426,8 +390,8 @@ export default function SpawnProgress() {
 
                   {data && (
                     <div className="mt-2">
-                      <h4 className="font-medium mb-1">Response Data:</h4>
-                      <pre className="p-2 bg-blue-50 rounded overflow-auto max-h-40">
+                      <h4 className="mb-1 font-medium">Response Data:</h4>
+                      <pre className="max-h-40 overflow-auto rounded bg-blue-50 p-2">
                         {JSON.stringify(data, null, 2)}
                       </pre>
                     </div>

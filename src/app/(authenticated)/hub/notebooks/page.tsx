@@ -1,21 +1,20 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
 
-import { AuthContext } from "@/context/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PageHeader } from "@/components/layout/page-header";
-import { ServerStatus as StatusIndicator } from "@/components/hub/server-status";
 import { NotebooksGrid } from "@/components/hub/notebooks-grid";
+import { ServerStatus as StatusIndicator } from "@/components/hub/server-status";
+import { PageHeader } from "@/components/layout/page-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AuthContext } from "@/context/AuthContext";
+import { useNotebooks } from "@/features/notebooks/api/get-notebooks";
 import {
   deleteServer,
-  getUserNamedNotebooks,
   ServerStatus,
   startServer,
   stopServer,
@@ -36,20 +35,18 @@ export default function NotebooksPage() {
     data: servers,
     error,
     refetch,
-  } = useQuery<Record<string, ServerStatus>>({
-    queryKey: ["user-notebooks", username],
-    queryFn: () => getUserNamedNotebooks(username),
-    // Dynamic refetch interval - 1 second when notebooks are transitioning, 5 seconds otherwise
-    refetchInterval: hasTransitioning ? 1000 : 5000,
-    // Continue refetching while page is not in focus
-    refetchIntervalInBackground: hasTransitioning,
+  } = useNotebooks({
+    queryConfig: {
+      refetchInterval: hasTransitioning ? 1000 : 5000,
+      refetchIntervalInBackground: hasTransitioning,
+    },
   });
 
   // Check for transitioning notebooks whenever servers data changes
   useEffect(() => {
     if (servers) {
       const transitioning = Object.values(servers).some(
-        (server) => server.pending === "spawn" || server.pending === "stop",
+        (server) => server.pending === "spawn" || server.pending === "stop"
       );
 
       setHasTransitioning(transitioning);
@@ -83,7 +80,7 @@ export default function NotebooksPage() {
 
           return filtered;
         },
-        {} as Record<string, ServerStatus>,
+        {} as Record<string, ServerStatus>
       )
     : {};
 

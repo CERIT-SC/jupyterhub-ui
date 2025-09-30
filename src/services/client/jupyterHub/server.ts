@@ -6,49 +6,11 @@ import {
   deleteSavedNotebookByServerName,
 } from "../savedNotebooks";
 
+import { JupyterHubServerOptions, ServerStatus } from "./types";
 import { getUsernameOrDefault } from "./utils";
-import {
-  JupyterHubServerOptions,
-  ServerProgress,
-  ServerStatus,
-  UserInfo,
-} from "./types";
 
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
 import { fetchSavedNotebookByServerName } from "@/services/client/savedNotebooks";
-
-/**
- * Get all named notebooks for a user, including stopped ones but excluding the default unnamed server
- * @param username - Optional username to use instead of the current user
- * @returns Promise that resolves with only the named servers from user info
- */
-export async function getUserNamedNotebooks(
-  username?: string,
-): Promise<Record<string, ServerStatus>> {
-  const resolvedUsername = getUsernameOrDefault(username);
-  const response = await jupyterHubClient.get<UserInfo>(
-    `/users/${resolvedUsername}`,
-    {
-      params: {
-        include_stopped_servers: true,
-      },
-    },
-  );
-
-  const data = response.data;
-  const namedServers: Record<string, ServerStatus> = {};
-
-  // Only include servers with non-empty names
-  if (data.servers) {
-    Object.entries(data.servers).forEach(([name, server]) => {
-      if (name !== "") {
-        namedServers[name] = server;
-      }
-    });
-  }
-
-  return namedServers;
-}
 
 /**
  * Get status of a specific named server
@@ -57,45 +19,14 @@ export async function getUserNamedNotebooks(
  */
 export async function getServerStatus(
   serverName: string,
-  username?: string,
+  username?: string
 ): Promise<ServerStatus> {
   const resolvedUsername = getUsernameOrDefault(username);
   const response = await jupyterHubClient.get<ServerStatus>(
-    `/users/${resolvedUsername}/servers/${serverName}`,
+    `/users/${resolvedUsername}/servers/${serverName}`
   );
 
   return response.data;
-}
-
-/**
- * Fetch server progress information from Server-Sent Events (SSE) response
- * @param serverName - Name of the server
- * @param username - Optional username to use instead of the current user
- * @returns Promise that resolves with the parsed server progress information
- * @throws Error if the response cannot be parsed
- */
-export async function fetchServerProgress(
-  serverName: string,
-  username?: string,
-): Promise<ServerProgress> {
-  const resolvedUsername = getUsernameOrDefault(username);
-  const response = await jupyterHubClient.get<string>(
-    `/users/${resolvedUsername}/servers/${serverName}/progress`,
-  );
-
-  try {
-    // Extract the JSON data from SSE format (data: {json})
-    const jsonMatch = response.data.match(/data: ({.*})/);
-
-    if (!jsonMatch) {
-      throw new Error("Invalid SSE response format");
-    }
-
-    return JSON.parse(jsonMatch[1]) as ServerProgress;
-  } catch (error) {
-    console.error("Error parsing progress response:", error);
-    throw new Error("Failed to parse server progress response");
-  }
 }
 
 /**
