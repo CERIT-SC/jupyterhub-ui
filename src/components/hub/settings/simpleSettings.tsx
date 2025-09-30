@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Calculator,
@@ -14,24 +13,20 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useEffect, useState } from "react";
 
 import { ImageSelector } from "@/components/hub/ImageSelector";
-import { resourcePresets, ServerPreset } from "@/config/presets";
-import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
-import { hubConfig } from "@/config/hub";
 import {
-  cpuOptions,
-  homeOptions,
-  memoryOptions,
-  mockPvcNames,
-  mockS3Buckets,
-} from "@/config/hub/jupyterOptions";
+  SelectionCard,
+  SelectionCardGrid,
+} from "@/components/hub/settings/cardSelection";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { CardSection } from "@/components/ui/card-section";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CollapsibleCard } from "@/components/ui/collapsible-card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -40,20 +35,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CollapsibleCard } from "@/components/ui/collapsible-card";
-import { CardSection } from "@/components/ui/card-section";
-import { getAllocatableGPUS } from "@/api/prometheus/prometheusApiClient";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { hubConfig } from "@/config/hub";
 import {
-  SelectionCard,
-  SelectionCardGrid,
-} from "@/components/hub/settings/cardSelection";
+  cpuOptions,
+  homeOptions,
+  memoryOptions,
+  mockPvcNames,
+  mockS3Buckets,
+} from "@/config/hub/jupyterOptions";
+import { resourcePresets, ServerPreset } from "@/config/presets";
+import { useAllocatableGpus } from "@/features/allocatable-gpus/api/get-allocatable-gpus";
+import { cn } from "@/lib/utils";
+import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
 
 interface OptionsComponentInterface {
   options: Partial<JupyterHubServerOptions>;
@@ -714,12 +713,10 @@ export function GpuSelector({
 }: OptionsComponentInterface) {
   const [gpuNames, setGpuNames] = React.useState<Record<string, string>>({});
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["allocatable-gpus"],
-    queryFn: () => {
-      return getAllocatableGPUS();
+  const { data, isLoading, error } = useAllocatableGpus({
+    queryConfig: {
+      refetchInterval: 30_000, // Refetch every 30 seconds
     },
-    refetchInterval: 3000000, // Refetch every 30 seconds
   });
 
   const valueFromNames = (name: string) => {

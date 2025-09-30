@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { getUserNamedNotebooks } from "@/services/client/jupyterHub";
+import { useNotebooks } from "@/features/notebooks/api/get-notebooks";
 import { useAuth } from "@/hooks/useAuth";
 
 export type ValidationStatus = "checking" | "valid" | "invalid" | "idle";
@@ -79,7 +78,6 @@ export function useServerNameValidation({
   const [error, setError] = useState<string | null>(null);
   const [validationStatus, setValidationStatus] =
     useState<ValidationStatus>("idle");
-  const [isValid, setIsValid] = useState(false);
   const { user } = useAuth();
 
   // Keep track of previous value to detect changes
@@ -90,110 +88,128 @@ export function useServerNameValidation({
   // Fetch user servers names with dynamic stale time
   const {
     data: servers,
-    isLoading,
-    isRefetching,
+    status,
     refetch,
-  } = useQuery<Set<string>>({
-    queryKey: ["user-notebooks", user?.name],
-    queryFn: async () => {
-      try {
-        setValidationStatus("checking");
-        const notebooks = await getUserNamedNotebooks(user?.name);
-
-        return new Set(Object.keys(notebooks));
-      } catch (error) {
-        setError("Failed to fetch notebook server names");
-        setValidationStatus("invalid");
-        throw error;
-      }
+  } = useNotebooks({
+    queryConfig: {
+      staleTime: staleTime,
+      enabled: Boolean(user?.name),
+      refetchOnWindowFocus: false,
     },
-    staleTime: staleTime,
-    enabled: !!user?.name,
-    refetchOnWindowFocus: false,
   });
 
+  useEffect(() => {
+    switch (status) {
+      case "pending":
+        setValidationStatus("checking");
+      case "success":
+        setValidationStatus("valid");
+      case "error":
+        setError("Failed to fetch notebook server names");
+        setValidationStatus("invalid");
+    }
+  }, [status, setValidationStatus]);
+
+  useEffect(() => {
+    validate();
+  }, [serverName]);
+
+  // } = useQuery<Set<string>>({
+  //   queryKey: ["user-notebooks", user?.name],
+  //   queryFn: async () => {
+  //     try {
+  //       setValidationStatus("checking");
+  //       const notebooks = await getUserNamedNotebooks(user?.name);
+
+  //       return new Set(Object.keys(notebooks));
+  //     } catch (error) {
+  //       setError("Failed to fetch notebook server names");
+  //       setValidationStatus("invalid");
+  //       throw error;
+  //     }
+  //   },
+  //   staleTime: staleTime,
+  //   enabled: !!user?.name,
+  //   refetchOnWindowFocus: false,
+  // });
+
   // Store the set of existing server names
-  const existingServerNames = servers || new Set<string>();
+  // const existingServerNames = servers || new Set<string>();
+
+  const existingServerNames = useMemo(
+    () => new Set(Object.keys(servers ?? {})),
+    [servers],
+  );
 
   // Validate server name against rules and existing names
-  const validateServerName = async (name: string): Promise<boolean> => {
-    // Start in checking state
-    setValidationStatus("checking");
+  const validateServerName = useCallback(
+    async (name: string): Promise<boolean> => {
+      // Start in checking state
+      setValidationStatus("checking");
 
-    // Basic validation
-    if (!name) {
-      setError("Server name is required");
-      setValidationStatus("invalid");
-      setIsValid(false);
+      // Basic validation
+      if (!name) {
+        setError("Server name is required");
+        setValidationStatus("invalid");
 
-      return false;
-    }
+        return false;
+      }
 
-    if (name.length > 63) {
-      setError("Server name must be 63 characters or less");
-      setValidationStatus("invalid");
-      setIsValid(false);
+      if (name.length > 63) {
+        setError("Server name must be 63 characters or less");
+        setValidationStatus("invalid");
 
-      return false;
-    }
+        return false;
+      }
 
-    if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(name)) {
-      setError(
-        "Server name must contain only lowercase letters, numbers, and hyphens, " +
-          "and must start and end with a letter or number",
-      );
-      setValidationStatus("invalid");
-      setIsValid(false);
+      if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(name)) {
+        setError(
+          "Server name must contain only lowercase letters, numbers, and hyphens, " +
+            "and must start and end with a letter or number",
+        );
+        setValidationStatus("invalid");
 
-      return false;
-    }
+        return false;
+      }
 
-    // Check if name already exists in servers
-    if (existingServerNames.has(name)) {
-      setError(`Server name "${name}" is already in use`);
-      setValidationStatus("invalid");
-      setIsValid(false);
+      // Check if name already exists in servers
+      if (existingServerNames.has(name)) {
+        setError(`Server name "${name}" is already in use`);
+        setValidationStatus("invalid");
 
-      return false;
-    }
+        return false;
+      }
 
-    // All checks passed
-    setError(null);
-    setValidationStatus("valid");
-    setIsValid(true);
+      // All checks passed
+      setError(null);
+      setValidationStatus("valid");
 
-    return true;
-  };
+      return true;
+    },
+    [],
+  );
 
   // Update name and validate if needed
-  const updateServerName = (name: string) => {
+  const updateServerName = useCallback((name: string) => {
     setServerName(name);
 
     // If the value changed, track it and possibly trigger refetch
     if (name !== serverName) {
       setPreviousValue(serverName);
       if (validateOnChange) {
-        refetch();
+        validate();
       }
     }
-  };
+  }, []);
 
-  // Validate current name on demand
-  const validate = async (): Promise<boolean> => {
+  const validate = useCallback(async (): Promise<boolean> => {
     // Refresh server list before validation to ensure fresh data
     await refetch();
 
     return validateServerName(serverName);
-  };
+  }, [refetch, validateServerName]);
 
-  // When servers data changes or loading state changes, update validation
-  useEffect(() => {
-    if (isLoading || isRefetching) {
-      setValidationStatus("checking");
-    } else if (serverName) {
-      validateServerName(serverName);
-    }
-  }, [isLoading, isRefetching, existingServerNames, serverName]);
+  // Validate current name on demand
 
   // Create a void version of refetch that satisfies the interface
   const refreshServerNames = async (): Promise<void> => {
@@ -206,8 +222,8 @@ export function useServerNameValidation({
     updateServerName,
     error,
     validationStatus,
-    isValid,
-    isValidating: isLoading || isRefetching,
+    isValid: validationStatus === "valid",
+    isValidating: status === "pending",
     existingServerNames,
     validate,
     refreshServerNames,

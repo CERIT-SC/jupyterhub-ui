@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-import { getUnassignedGPUsByModel } from "@/api/prometheus/prometheus-gpu-metrics"; // Use Next.js proxy rewrite for Prometheus
+// Use Next.js proxy rewrite for Prometheus
 
 // Use Next.js proxy rewrite for Prometheus
 const PROMETHEUS_BASE_URL = "/api/prometheus";
@@ -148,58 +148,6 @@ export const getNodeAllocatableResources = async (): Promise<any> => {
   } catch (error) {
     console.error("Error getting node allocatable resources:", error);
     throw error;
-  }
-};
-
-/**
- * Aggregates GPU details by model name and returns count for each model
- */
-const aggregateGPUsByModel = (
-  gpuDetails: Array<{
-    deviceId: string;
-    modelName: string;
-    nodeName: string;
-    freeMemoryMB: number;
-    totalMemoryMB: number;
-    driverVersion: string;
-    uuid: string;
-    gpuInstanceId?: string;
-    gpuInstanceProfile?: string;
-  }>,
-): Record<string, number> => {
-  const gpuCounts: Record<string, number> = {};
-
-  for (const gpu of gpuDetails) {
-    // Create dictionary key: modelName + GPU_I_PROFILE (if exists)
-    const dictionaryKey = gpu.gpuInstanceProfile
-      ? `${gpu.modelName} ${gpu.gpuInstanceProfile}`
-      : gpu.modelName;
-
-    // Add to GPU count by model (including profile)
-    if (gpuCounts[dictionaryKey]) {
-      gpuCounts[dictionaryKey]++;
-    } else {
-      gpuCounts[dictionaryKey] = 1;
-    }
-  }
-
-  return gpuCounts;
-};
-
-export const getAllocatableGPUS = async () => {
-  try {
-    const allocatableNodes: Set<string> = await getGPUAllocatableNodes();
-    const unusedGPUs = await getUnassignedGPUsByModel();
-
-    const filteredGpus = unusedGPUs.gpuDetails.filter((gpu) =>
-      allocatableNodes.has(gpu.nodeName),
-    );
-
-    console.log("filteredGpus", filteredGpus);
-
-    return aggregateGPUsByModel(filteredGpus);
-  } catch (error) {
-    console.error("Failed to get allocatable GPUs:", error);
   }
 };
 
@@ -399,15 +347,16 @@ export const PROMETHEUS_ENDPOINTS = {
 
 // Export GPU metrics functions
 export {
-  getGPUAvailabilityMetrics,
-  getAllJupyterGPUMetrics,
-  getJupyterGPUHistory,
-  getFreeGPUInfo,
-  getUnassignedGPUsByModel,
-  getFreeGPUsByModel,
   discoverGPUMetrics,
-  getMetricSample,
   executePrometheusQuery,
   executePrometheusRangeQuery,
+  getAllJupyterGPUMetrics,
+  getFreeGPUInfo,
+  getFreeGPUsByModel,
+  getGPUAvailabilityMetrics,
+  getJupyterGPUHistory,
+  getMetricSample,
+  getUnassignedGPUsByModel,
   GPU_METRICS_QUERIES,
 } from "./prometheus-gpu-metrics";
+

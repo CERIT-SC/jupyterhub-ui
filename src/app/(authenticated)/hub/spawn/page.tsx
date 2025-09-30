@@ -1,24 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Settings, Zap } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
-import { quickstartServerPresets } from "@/config/quickpresets";
 import {
   CustomPresetCard,
   QuickPresetCard,
 } from "@/components/hub/presetCards";
-import { fetchNotebookPresets } from "@/services/client/notebookPresets";
 import { PresetCards } from "@/components/ui/preset-cards";
+import { quickstartServerPresets } from "@/config/quickpresets";
+import { usePresets } from "@/features/presets/api/get-presets";
 
 export default function SpawnSelection() {
   const router = useRouter();
 
-  const { data: userPresets, isLoading } = useQuery({
-    queryKey: ["presets"],
-    queryFn: () => fetchNotebookPresets(),
-  });
+  const { data: userPresets, isLoading } = usePresets();
 
   const handleCustomConfigure = () => {
     router.push("/hub/spawn/options");

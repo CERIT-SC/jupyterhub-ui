@@ -1,11 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 
 import { Input } from "@/components/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -14,11 +12,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  createNotebookPreset,
-  fetchNotebookPresets,
-} from "@/services/client/notebookPresets";
+import { Label } from "@/components/ui/label";
 import { PresetCards } from "@/components/ui/preset-cards";
+import { usePresets } from "@/features/presets/api/get-presets";
+import { createNotebookPreset } from "@/services/client/notebookPresets";
 
 export default function PresetsPage() {
   const router = useRouter();
@@ -27,10 +24,7 @@ export default function PresetsPage() {
   const [creatingPreset, setCreatingPreset] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { data: presets, isLoading } = useQuery({
-    queryKey: ["presets"],
-    queryFn: () => fetchNotebookPresets(),
-  });
+  const { data: presets, isLoading } = usePresets();
 
   async function handleCreate() {
     setCreatingPreset(true);
