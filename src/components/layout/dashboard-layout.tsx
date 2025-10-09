@@ -90,9 +90,9 @@ export function DashboardLayout({
         </main>
     
       </div>
-      <footer className="w-full border-t border-infra-border bg-white overflow-hidden flex flex-row flex-nowrap justify-between items-center px-20 py-2 text-gray-800 text-sm">
+      <footer className="w-full border-t border-infra-border bg-white overflow-hidden flex flex-row flex-nowrap justify-between items-center px-12 py-2 text-gray-800 text-sm">
         <div className="flex items-center gap-3">
-          <span className="">Powered by</span>
+          <span className="">Part of</span>
           <a
             href="https://www.e-infra.cz"
             target="_blank"
@@ -111,8 +111,8 @@ export function DashboardLayout({
           </a>
         </div>
 
-        <div className="flex items-center gap-2 pl-4">
-          <span>Provided by</span>
+        <div className="flex items-center pl-4">
+          <span>Provided by&nbsp;</span>
           <a
             href="https://www.cerit-sc.cz"
             target="_blank"
@@ -122,7 +122,7 @@ export function DashboardLayout({
           >
             CERIT-SC
           </a>
-          <span>part of Masaryk University</span>
+          <span>, Masaryk University</span>
         </div>
       </footer>
     </div>
