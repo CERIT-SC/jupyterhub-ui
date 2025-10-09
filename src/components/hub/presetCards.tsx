@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ChevronRight,
   Cpu,
@@ -63,27 +63,28 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
     [preset.options],
   );
 
+  // Clear "required" error once user types something
+  useEffect(() => {
+    if (serverNameError && serverName.trim() !== "") {
+      setServerNameError(undefined);
+    }
+  }, [serverName, serverNameError]);
+
   // Handle server creation
   const handleCreateServer = async () => {
-    // Validate server name
-    if (!serverName) {
+    const trimmed = serverName.trim();
+    if (!trimmed) {
       setServerNameError("Server name is required");
-
       return;
     }
-
     setIsSpawning(true);
-
     try {
-      // Create the server with the specified options
       await createServer(
-        serverName,
+        trimmed,
         { ...minimalJupyterHubServerOptions, ...preset.options },
         user?.name,
       );
-
-      // Redirect to the progress page
-      router.push(`/hub/spawn/progress/${serverName}`);
+      router.push(`/hub/spawn/progress/${trimmed}`);
       setShowStartDialog(false);
     } catch (error) {
       setIsSpawning(false);

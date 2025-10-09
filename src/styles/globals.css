@@ -3,11 +3,11 @@
 @theme {
 
     /*OG*/
-    --color-infra-primary: #9076f3;
-    --color-infra-secondary: #4CD9F4;
-    --color-infra-tetriary: #DE73E5;
-    --color-infra-gray: #A1A1B7;
-    --color-infra-text: #2F2557;
+    --color-primary: oklch(62% 0.22 294.44);
+    --color-secondary: #4CD9F4;
+    --color-tertiary: #DE73E5;
+    --color-gray: #A1A1B7;
+    --color-text: #2F2557;
 
     --color-primary-100: #EBDBFF;
     --color-primary-200: #D3B2FF;
@@ -89,12 +89,12 @@
     --color-infra-violet-dark: oklch(35% 0.08 289.42); /* lily - slightly lighter */
     --color-infra-primary: oklch(62% 0.22 294.44); /* fialova - softer */
 
-
     --color-infra-violet-light: oklch(90% 0.07 300.06); /* fialova light - lighter */
     --color-infra-gray-light: oklch(98% 0.003 228.82); /* sedobila - even lighter */
     --color-white: oklch(100% 0 0); /* bila */
     --color-infra-gray: oklch(75% 0.03 285.57); /* seda - lighter */
     --color-black: oklch(20% 0 0); /* cerna - not pure black */
+
     /* Status colors - softened */
     --color-infra-success: oklch(75% 0.12 150); /* Success states - softer */
     --color-infra-warning: oklch(80% 0.12 80); /* Warning states - softer */
@@ -108,8 +108,8 @@
     --color-infra-text-secondary: var(--color-gray-600);
 
     /* Gradient colors - softer */
-    --color-infra-gradient-start: oklch(65% 0.18 290);
-    --color-infra-gradient-end: oklch(70% 0.15 320);
+    --color-infra-gradient-start: var(--color-primary);
+    --color-infra-gradient-end: var(--color-primary);
 
     /* Typography */
     --font-display: "Montserrat", "sans-serif";
@@ -153,4 +153,96 @@
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
     --radius-full: 9999px;
+}
+
+
+@theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+}
+
+body {
+    background: var(--color-infra-background);
+    color: var(--color-infra-text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base styling for common elements */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: var(--text-4xl);
+    background: var(--color-infra-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+h2 {
+    font-size: var(--text-3xl);
+}
+
+h3 {
+    font-size: var(--text-2xl);
+}
+
+h4 {
+    font-size: var(--text-xl);
+}
+
+h5 {
+    font-size: var(--text-lg);
+}
+
+h6 {
+    font-size: var(--text-base);
+}
+
+a {
+    color: var(--color-infra-primary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+code {
+    font-family: var(--font-mono);
+    font-size: 90%;
+    background: var(--color-infra-gray-light);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-full);
+}
+
+/* Transition defaults */
+.transition-default {
+    transition-property: color, background-color, border-color, transform, opacity, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 250ms;
+}
+
+/* Add gradient overlay to background */
+.bg-gradient-soft {
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(240, 240, 255, 0.7));
+}
+
+/* Add soft hover effect */
+.hover-lift {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }

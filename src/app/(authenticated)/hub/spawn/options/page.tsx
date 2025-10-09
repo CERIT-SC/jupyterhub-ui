@@ -39,7 +39,8 @@ export default function SpawnPage() {
   );
   const [serverName, setServerName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [serverNameError, setServerNameError] = useState<string>("");
+  const [serverNameError, setServerNameError] = useState<string | undefined>();
+  const [isServerNameValid, setIsServerNameValid] = useState(false);
 
   // Refs for scrolling to sections
   const nameRef = useRef<HTMLDivElement>(null);
@@ -51,10 +52,8 @@ export default function SpawnPage() {
     const errors: string[] = [];
     const missingFields: string[] = [];
 
-    // Check server name
-    if (!serverName.trim()) {
-      errors.push("Server name is required");
-    }
+    // Server name validity is driven by ServerNameInput
+    // (no hardcoded server-name errors pushed here)
 
     // Check minimal required options
     const minimalKeys = Object.keys(
@@ -69,7 +68,7 @@ export default function SpawnPage() {
       }
     }
 
-    const isValid = errors.length === 0 && missingFields.length === 0;
+    const isValid = isServerNameValid && missingFields.length === 0;
 
     return {
       isValid,
@@ -77,7 +76,7 @@ export default function SpawnPage() {
       missingFields,
       hasRequiredOptions: missingFields.length === 0,
     };
-  }, [serverName, options]);
+  }, [isServerNameValid, options]);
 
   // Parse URL parameters into JupyterHubServerOptions
   useEffect(() => {
@@ -166,26 +165,25 @@ export default function SpawnPage() {
 
   // Handle create notebook
   const handleCreateNotebook = async () => {
-    // Reset errors
-    setServerNameError("");
+    // Reset forced external error
+    setServerNameError(undefined);
 
-    // Validate and scroll to first error
-    if (!serverName.trim()) {
-      setServerNameError("Server name is required");
+    // If name invalid, scroll and (if empty) surface "required" via external error
+    if (!isServerNameValid) {
+      if (!serverName.trim()) {
+        setServerNameError("Server name is required");
+      }
       scrollToSection(nameRef);
-
       return;
     }
 
     if (!options.container_image) {
       scrollToSection(imageRef);
-
       return;
     }
 
     if (!options.cpu || !options.mem) {
       scrollToSection(resourceRef);
-
       return;
     }
 
@@ -248,9 +246,13 @@ export default function SpawnPage() {
 
         <div ref={nameRef}>
           <ServerNameInput
-            error={serverNameError}
             value={serverName}
             onChangeNameAction={setServerName}
+            error={serverNameError}
+            onValidationChange={(valid) => {
+              setIsServerNameValid(valid);
+              if (valid && serverNameError) setServerNameError(undefined);
+            }}
           />
         </div>
 

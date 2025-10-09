@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ServerNameInput } from "../hub/ServerNameInput";
 
 import { Button } from "./button";
-import { Loading } from "./loading";
+import { Loading, LoadingPage } from "./loading";
 import {
   Card,
   CardContent,
@@ -363,14 +363,7 @@ export function PresetCards({
 }) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="border rounded-lg p-4 w-full h-32 bg-gray-100 animate-pulse"
-          />
-        ))}
-      </div>
+      <LoadingPage />
     );
   }
 

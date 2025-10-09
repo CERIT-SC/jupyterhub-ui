@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Bell, LogOut, Settings, User, UserCircle } from "lucide-react";
+import Image from "next/image";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
@@ -145,7 +146,14 @@ export default function AppLayout({
             </>
           }
           logo={
-            <div className="h-8 w-8 rounded-md bg-gradient-to-r from-color-infra-gradient-start to-color-infra-gradient-end flex items-center justify-center text-white font-bold" />
+            <Image
+              src="/jupyterhub_logo.svg"
+              alt="JupyterHub logo"
+              width={32}
+              height={32}
+              priority
+              className="h-8 w-8 rounded-md"
+            />
           }
           title={siteConfig.name}
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}

@@ -18,17 +18,10 @@ export async function GET(req: NextRequest) {
       req.cookies.get("jupyterhub_token")?.value || "",
     );
 
-    console.log("####### Incoming GET request, userId:", userId, "id:", id);
     if (id) {
       const idNum = await getNumberOrThrow(id);
       const preset = await getPresetById(userId, idNum);
 
-      console.log(
-        "####### Incoming GET request with id:",
-        id,
-        "preset: ",
-        preset?.name,
-      );
       if (!preset)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 
@@ -119,7 +112,6 @@ async function getNumberOrThrow(id: string | null): Promise<number> {
 
 async function getCurrentUserName(token: string) {
   try {
-    console.log("####### Fetching current user with token:", token);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/user`,
       {

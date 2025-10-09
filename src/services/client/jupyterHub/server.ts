@@ -60,15 +60,18 @@ export async function createServer(
  */
 export async function startServer(
   serverName: string,
+  options: JupyterHubServerOptions,
   username?: string,
 ): Promise<void> {
   const resolvedUsername = getUsernameOrDefault(username);
 
-  const savedNotebookOptions = await fetchSavedNotebookByServerName(serverName);
+  await createOrUpdateSavedNotebookByServerName(serverName, {
+    serverOptions: options,
+  });
 
   await jupyterHubClient.post(
     `/users/${resolvedUsername}/servers/${serverName}`,
-    savedNotebookOptions?.serverOptions || {},
+    options,
   );
 }
 

@@ -13,7 +13,6 @@ export async function getPresetById(
   userId: string,
   id: number,
 ): Promise<NotebookPreset | null> {
-  console.log("####### getPresetById:", { userId, id });
 
   return notebookPresetsRepository.findByIdForUser(id, userId);
 }

@@ -7,6 +7,7 @@ import {
   HardDrive,
   Info,
   LoaderCircle,
+  Play,
   Square,
   Terminal,
   Trash2,
@@ -32,6 +33,17 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NotebookDetailsDialog } from "@/components/hub/notebook-details-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export interface NotebookCardProps {
   server: ServerStatus;
@@ -137,6 +149,7 @@ export function NotebookCard({
   name,
   onStop,
   onRemove,
+  onStart,
   className,
 }: NotebookCardProps) {
   const notbookLink = server.url
@@ -186,8 +199,9 @@ export function NotebookCard({
             </div>
           </div>
 
-          {server.ready && server.url && (
-            <TooltipProvider>
+          {/* Top-right actions */}
+          <TooltipProvider>
+            {server.ready && server.url ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
@@ -195,6 +209,7 @@ export function NotebookCard({
                     className="h-8 w-8"
                     size="icon"
                     variant="ghost"
+                    aria-label="Open notebook"
                   >
                     <Link
                       href={notbookLink}
@@ -209,8 +224,48 @@ export function NotebookCard({
                   <p>Open notebook</p>
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          )}
+            ) : !server.ready && !server.pending ? (
+              <AlertDialog>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        className="h-8 w-8"
+                        size="icon"
+                        variant="destructive"
+                        aria-label="Remove notebook"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Remove</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove notebook?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently remove the stopped notebook. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        onRemove?.();
+                      }}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Remove
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : null}
+          </TooltipProvider>
         </div>
       </CardHeader>
 
@@ -261,16 +316,8 @@ export function NotebookCard({
 
       <CardFooter className="flex justify-between gap-2 pt-2">
         <div className="flex">
-          {!server.ready && !server.pending ? (
-            <Button
-              className="flex items-center"
-              size="sm"
-              variant="destructive"
-              onClick={onRemove}
-            >
-              <Trash2 className="h-4 w-4 mr-2" /> Remove
-            </Button>
-          ) : server.ready ? (
+          {/* No footer Remove button when stopped; action moved to top-right */}
+          {server.ready ? (
             <Button
               className="flex items-center"
               size="sm"
@@ -288,7 +335,7 @@ export function NotebookCard({
             >
               <LoaderCircle className="h-4 w-4 mr-2 animate-spin" /> Stopping...
             </Button>
-          ) : (
+          ) : server.pending ? (
             <Button
               className="flex items-center"
               size="sm"
@@ -297,7 +344,16 @@ export function NotebookCard({
             >
               <Square className="h-4 w-4 mr-2" /> Stop
             </Button>
-          )}
+          ) : server.stopped ? (
+            <Button
+              className="flex items-center"
+              size="sm"
+              variant="outline"
+              onClick={onStart}
+            >
+              <Play className="h-4 w-4 mr-2" /> Start
+            </Button>
+          ) : null}
         </div>
 
         <NotebookDetailsDialog

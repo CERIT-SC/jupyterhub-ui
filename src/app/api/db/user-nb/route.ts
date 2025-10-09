@@ -95,7 +95,6 @@ export async function DELETE(req: NextRequest) {
 
 async function getCurrentUserName(token: string) {
   try {
-    console.log("####### Fetching current user with token:", token);
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/user`,
       {

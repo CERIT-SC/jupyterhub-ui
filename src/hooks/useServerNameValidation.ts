@@ -61,6 +61,10 @@ interface UseServerNameValidationOptions {
    * Custom stale time for the server names query when value has changed (ms)
    */
   changedValueStaleTime?: number;
+  /**
+   * Delay in ms to debounce validation while typing
+   */
+  debounceDelay?: number;
 }
 
 /**
@@ -73,6 +77,7 @@ export function useServerNameValidation({
   validateOnChange = true,
   defaultStaleTime = 5000, // 5 seconds by default
   changedValueStaleTime = 2000, // 2 seconds by default
+  debounceDelay = 300, // 300ms debounce by default
 }: UseServerNameValidationOptions = {}): ServerNameValidationResult {
   const [serverName, setServerName] = useState(initialName);
   const [error, setError] = useState<string | null>(null);
@@ -89,52 +94,15 @@ export function useServerNameValidation({
   const {
     data: servers,
     status,
+    error: fetchError,
     refetch,
   } = useNotebooks({
     queryConfig: {
-      staleTime: staleTime,
+      staleTime,
       enabled: Boolean(user?.name),
       refetchOnWindowFocus: false,
     },
   });
-
-  useEffect(() => {
-    switch (status) {
-      case "pending":
-        setValidationStatus("checking");
-      case "success":
-        setValidationStatus("valid");
-      case "error":
-        setError("Failed to fetch notebook server names");
-        setValidationStatus("invalid");
-    }
-  }, [status, setValidationStatus]);
-
-  useEffect(() => {
-    validate();
-  }, [serverName]);
-
-  // } = useQuery<Set<string>>({
-  //   queryKey: ["user-notebooks", user?.name],
-  //   queryFn: async () => {
-  //     try {
-  //       setValidationStatus("checking");
-  //       const notebooks = await getUserNamedNotebooks(user?.name);
-
-  //       return new Set(Object.keys(notebooks));
-  //     } catch (error) {
-  //       setError("Failed to fetch notebook server names");
-  //       setValidationStatus("invalid");
-  //       throw error;
-  //     }
-  //   },
-  //   staleTime: staleTime,
-  //   enabled: !!user?.name,
-  //   refetchOnWindowFocus: false,
-  // });
-
-  // Store the set of existing server names
-  // const existingServerNames = servers || new Set<string>();
 
   const existingServerNames = useMemo(
     () => new Set(Object.keys(servers ?? {})),
@@ -144,25 +112,28 @@ export function useServerNameValidation({
   // Validate server name against rules and existing names
   const validateServerName = useCallback(
     async (name: string): Promise<boolean> => {
-      // Start in checking state
+      // Only set checking when there is something to validate
       setValidationStatus("checking");
 
+      const trimmed = name.trim();
+
       // Basic validation
-      if (!name) {
+      if (trimmed.length === 0) {
+        // Don't surface "required" during typing; caller (submit) can still get it
         setError("Server name is required");
         setValidationStatus("invalid");
 
         return false;
       }
 
-      if (name.length > 63) {
+      if (trimmed.length > 63) {
         setError("Server name must be 63 characters or less");
         setValidationStatus("invalid");
 
         return false;
       }
 
-      if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(name)) {
+      if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(trimmed)) {
         setError(
           "Server name must contain only lowercase letters, numbers, and hyphens, " +
             "and must start and end with a letter or number",
@@ -173,8 +144,8 @@ export function useServerNameValidation({
       }
 
       // Check if name already exists in servers
-      if (existingServerNames.has(name)) {
-        setError(`Server name "${name}" is already in use`);
+      if (existingServerNames.has(trimmed)) {
+        setError(`Server name "${trimmed}" is already in use`);
         setValidationStatus("invalid");
 
         return false;
@@ -186,35 +157,52 @@ export function useServerNameValidation({
 
       return true;
     },
-    [],
+    [existingServerNames],
   );
 
-  // Update name and validate if needed
-  const updateServerName = useCallback((name: string) => {
-    setServerName(name);
+  // Debounced on-change validation
+  useEffect(() => {
+    if (!validateOnChange) return;
 
-    // If the value changed, track it and possibly trigger refetch
-    if (name !== serverName) {
-      setPreviousValue(serverName);
-      if (validateOnChange) {
-        validate();
-      }
+    const trimmed = serverName.trim();
+
+    // If empty during typing, clear error and stay idle
+    if (trimmed.length === 0) {
+      setError(null);
+      setValidationStatus("idle");
+      return;
     }
+
+    // Begin checking, then debounce actual validation
+    setValidationStatus("checking");
+    setError(null);
+
+    const handle = setTimeout(() => {
+      // No forced refetch here; rely on react-query caching and staleTime
+      void validateServerName(serverName);
+    }, debounceDelay);
+
+    return () => clearTimeout(handle);
+  }, [serverName, validateOnChange, debounceDelay, validateServerName]);
+
+  // Public API to update the value (no immediate validate to avoid stale state)
+  const updateServerName = useCallback((name: string) => {
+    setPreviousValue((prev) => (prev !== name ? prev : prev));
+    setServerName(name);
   }, []);
 
+  // Explicit validate (e.g., on submit). Ensures latest servers first.
   const validate = useCallback(async (): Promise<boolean> => {
-    // Refresh server list before validation to ensure fresh data
-    await refetch();
-
+    try {
+      await refetch();
+    } catch {
+      // Ignore fetch error here; rule-based validation still runs
+    }
     return validateServerName(serverName);
-  }, [refetch, validateServerName]);
+  }, [refetch, validateServerName, serverName]);
 
-  // Validate current name on demand
-
-  // Create a void version of refetch that satisfies the interface
   const refreshServerNames = async (): Promise<void> => {
     await refetch();
-    // No return value needed since we want Promise<void>
   };
 
   return {

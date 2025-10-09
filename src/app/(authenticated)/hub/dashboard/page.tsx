@@ -2,19 +2,138 @@
 
 import { CheckCircle, LayoutDashboard, Loader2, Plus, Server } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { QuickPresetCard } from "@/components/hub/presetCards";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { hubConfig } from "@/config/hub";
 import { quickstartServerPresets } from "@/config/quickpresets";
+import { NotebookCard } from "@/components/hub/notebook-card";
 import { useNotebooks } from "@/features/notebooks/api/get-notebooks";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  startServer,
+  stopServer,
+  deleteServer,
+} from "@/services/client/jupyterHub";
+import type { ServerStatus } from "@/services/client/jupyterHub/types";
+import { minimalJupyterHubServerOptions } from "@/config/hub";
 
 export default function HubDashboard() {
-  const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+  const { user } = useAuth();
+  const username = user?.name;
 
-  const { data: namedNotebooks, refetch } = useNotebooks();
+  const [refreshing, setRefreshing] = useState(false);
+  const [hasTransitioning, setHasTransitioning] = useState(false);
+
+  // Recent notebooks data with dynamic refetch during transitions
+  const { data: namedNotebooks, refetch } = useNotebooks({
+    queryConfig: {
+      refetchInterval: hasTransitioning ? 1000 : 5000,
+      refetchIntervalInBackground: hasTransitioning,
+    },
+  });
+
+  // Track if any server is transitioning to speed up polling
+  useEffect(() => {
+    if (namedNotebooks) {
+      const transitioning = Object.values(namedNotebooks).some(
+        (s) => s.pending === "spawn" || s.pending === "stop",
+      );
+      setHasTransitioning(transitioning);
+    }
+  }, [namedNotebooks]);
+
+  // Build 3 most recent; stopped last, newest first
+  const recentNotebooks = useMemo(() => {
+    if (!namedNotebooks) return [] as { name: string; server: ServerStatus }[];
+
+    const recency = (s: ServerStatus) => {
+      const t =
+        (s.last_activity ? Date.parse(s.last_activity) : undefined) ??
+        (s.started ? Date.parse(s.started) : undefined) ??
+        0;
+      return Number.isFinite(t) ? t : 0;
+    };
+
+    return Object.entries(namedNotebooks)
+      .map(([name, server]) => ({ name, server }))
+      .sort((a, b) => {
+        const ra = a.server.stopped ? 1 : 0;
+        const rb = b.server.stopped ? 1 : 0;
+        if (ra !== rb) return ra - rb; // stopped last
+        return recency(b.server) - recency(a.server); // newest first
+      })
+      .slice(0, 3);
+  }, [namedNotebooks]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refetch()]);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // Handlers (same semantics as hub/notebooks)
+  const handleStartNotebook = useCallback(
+    async (id: string) => {
+      try {
+        if (namedNotebooks && namedNotebooks[id]) {
+          // Preemptive: speed up polling during transition
+          setHasTransitioning(true);
+        }
+        await startServer(
+          id,
+          namedNotebooks?.[id].user_options || minimalJupyterHubServerOptions,
+          username,
+        );
+      } catch (error) {
+        console.error("Failed to start notebook:", error);
+        await refetch();
+      }
+    },
+    [refetch, namedNotebooks, username],
+  );
+
+  const handleStopNotebook = useCallback(
+    async (id: string) => {
+      try {
+        if (namedNotebooks && namedNotebooks[id]) {
+          // Preemptive: speed up polling during transition
+          setHasTransitioning(true);
+        }
+        await stopServer(id, username);
+      } catch (error) {
+        console.error("Failed to stop notebook:", error);
+        await refetch();
+      }
+    },
+    [refetch, namedNotebooks, username],
+  );
+
+  const handleOpenSettings = useCallback(
+    (id: string) => {
+      router.push(`/hub/notebooks/${id}/settings`);
+    },
+    [router],
+  );
+
+  const handleRemoveNotebook = useCallback(
+    async (id: string) => {
+      try {
+        await deleteServer(id, username);
+        await refetch();
+      } catch (error) {
+        console.error("Failed to remove notebook:", error);
+      }
+    },
+    [refetch, username],
+  );
 
   const notebookStats = useMemo(() => {
     const servers = namedNotebooks || {};
@@ -35,15 +154,6 @@ export default function HubDashboard() {
       serverEntries,
     };
   }, [namedNotebooks]);
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await Promise.all([refetch()]);
-    } finally {
-      setRefreshing(false);
-    }
-  };
 
   return (
     <div className="container mx-auto max-w-7xl space-y-6 p-6">
@@ -136,7 +246,25 @@ export default function HubDashboard() {
         <CardHeader>
           <CardTitle>Recent Notebooks</CardTitle>
         </CardHeader>
-        <CardContent />
+        <CardContent>
+          {recentNotebooks.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No recent notebooks.</div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {recentNotebooks.map(({ name, server }) => (
+                <NotebookCard
+                  key={name}
+                  name={name}
+                  server={server}
+                  onStart={() => handleStartNotebook(name)}
+                  onStop={() => handleStopNotebook(name)}
+                  onRemove={() => handleRemoveNotebook(name)}
+                  onSettings={() => handleOpenSettings(name)}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
       </Card>
 
       <Card>

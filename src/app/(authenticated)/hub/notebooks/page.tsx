@@ -19,6 +19,7 @@ import {
   startServer,
   stopServer,
 } from "@/services/client/jupyterHub";
+import { minimalJupyterHubServerOptions } from "@/config/hub";
 
 export default function NotebooksPage() {
   const router = useRouter();
@@ -87,10 +88,24 @@ export default function NotebooksPage() {
   // Handler for starting a notebook
   const handleStartNotebook = async (id: string) => {
     try {
-      await startServer(id, username);
-      router.push(`/hub/spawn/progress/${id}`);
+      // Preemptively update local state to show stopping status
+      if (servers && servers[id]) {
+        // Create a copy of the servers data with the updated status
+        const updatedServers = { ...servers };
+
+        updatedServers[id] = {
+          ...updatedServers[id],
+          pending: "spawn",
+          ready: false,
+        };
+
+        setHasTransitioning(true);
+      }
+
+      await startServer(id, servers?.[id].user_options || minimalJupyterHubServerOptions, username);
     } catch (error) {
       console.error("Failed to start notebook:", error);
+      await refetch();
     } finally {
     }
   };

@@ -18,16 +18,12 @@ export class NotebookPresetsRepository {
     id: number,
     userId: string,
   ): Promise<NotebookPreset | null> {
-    console.log("####### findByIdForUser called with:", { id, userId });
     const result = await db
       .select()
       .from(notebookPresets)
       .where(
         and(eq(notebookPresets.id, id), eq(notebookPresets.userId, userId)),
       );
-
-    console.log("####### findByIdForUser:", { id, userId, result });
-
     return result[0] || null;
   }
 
