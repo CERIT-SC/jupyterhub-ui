@@ -61,6 +61,11 @@ export const siteConfig: SiteConfig = {
           path: "/preferences",
           disabled: true,
         },
+        {
+          name: "About",
+          icon: Server,
+          path: "/hub/about",
+        }
       ],
     },
     {
