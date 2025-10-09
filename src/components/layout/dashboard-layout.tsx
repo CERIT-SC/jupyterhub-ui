@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -87,7 +88,43 @@ export function DashboardLayout({
         >
           {children}
         </main>
+    
       </div>
+      <footer className="w-full border-t border-infra-border bg-white overflow-hidden flex flex-row flex-nowrap justify-between items-center px-20 py-2 text-gray-800 text-sm">
+        <div className="flex items-center gap-3">
+          <span className="">Powered by</span>
+          <a
+            href="https://www.e-infra.cz"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="e-INFRA CZ"
+            className="inline-flex items-center"
+          >
+            {/* Red-colored e-INFRA logo via mask */}
+            <span
+              className="inline-block h-8 w-40 bg-primary
+                         [mask-image:url('/e-infra_logo.svg')] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:left_center]
+                         [-webkit-mask-image:url('/e-infra_logo.svg')] [-webkit-mask-size:contain] [-webkit-mask-repeat:no-repeat] [-webkit-mask-position:left_center]"
+              aria-hidden="true"
+              title="e-INFRA CZ"
+            />
+          </a>
+        </div>
+
+        <div className="flex items-center gap-2 pl-4">
+          <span>Provided by</span>
+          <a
+            href="https://www.cerit-sc.cz"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="CERIT-SC"
+            className="underline"
+          >
+            CERIT-SC
+          </a>
+          <span>part of Masaryk University</span>
+        </div>
+      </footer>
     </div>
   );
 }

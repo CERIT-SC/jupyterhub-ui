@@ -24,7 +24,7 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "JupyterHub Client",
+  name: "JupyterHub",
   description: "A modern client for JupyterHub",
   navigation: [
     {
