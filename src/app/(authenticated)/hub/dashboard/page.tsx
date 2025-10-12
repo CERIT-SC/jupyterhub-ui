@@ -1,6 +1,16 @@
 "use client";
 
-import { CheckCircle, LayoutDashboard, Loader2, Plus, Server } from "lucide-react";
+import {
+  CheckCircle,
+  LayoutDashboard,
+  Loader2,
+  Plus,
+  Server,
+  Rocket,
+  Play,
+  StopCircle,
+  RefreshCw,
+} from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,6 +30,18 @@ import {
 } from "@/services/client/jupyterHub";
 import type { ServerStatus } from "@/services/client/jupyterHub/types";
 import { minimalJupyterHubServerOptions } from "@/config/hub";
+// Add dialog/input components
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ServerNameInput } from "@/components/hub/ServerNameInput";
 
 export default function HubDashboard() {
   const router = useRouter();
@@ -139,21 +161,122 @@ export default function HubDashboard() {
     const servers = namedNotebooks || {};
     const serverEntries = Object.entries(servers);
     const totalServers = serverEntries.length;
-    const runningServers = serverEntries.filter(([, s]) => s.ready).length;
-    const startingServers = serverEntries.filter(([, s]) => s.pending === "spawn").length;
-    const stoppingServers = serverEntries.filter(([, s]) => s.pending === "stop").length;
-    const stoppedServers = totalServers - runningServers - startingServers - stoppingServers;
+
+    // Count starting/stopping as running
+    const runningServers = serverEntries.filter(
+      ([, s]) => s.ready || s.pending === "spawn" || s.pending === "stop",
+    ).length;
+
+    const stoppedServers = totalServers - runningServers;
 
     return {
       totalServers,
       runningServers,
-      startingServers,
-      stoppingServers,
       stoppedServers,
       servers,
       serverEntries,
     };
   }, [namedNotebooks]);
+
+  // Add a usage helper for clarity
+  const usage = useMemo(() => {
+    const used = notebookStats.totalServers;
+    const max = hubConfig.max_notebooks_per_user;
+    const pct = Math.max(0, Math.min(100, Math.round((used / Math.max(1, max)) * 100)));
+    const remaining = Math.max(0, max - used);
+    const atLimit = used >= max;
+    return { used, max, pct, remaining, atLimit };
+  }, [notebookStats.totalServers]);
+
+  // Dialog state for "Launch minimal"
+  const [showMinimalDialog, setShowMinimalDialog] = useState(false);
+  const [minimalName, setMinimalName] = useState("");
+
+  // Helper: generate a unique minimal name like notebook-1, notebook-2, ...
+  const generateUniqueName = useCallback(() => {
+    const base = "notebook";
+    const existing = new Set(Object.keys(namedNotebooks || {}));
+    let i = 1;
+    while (existing.has(`${base}-${i}`)) i++;
+    return `${base}-${i}`;
+  }, [namedNotebooks]);
+
+  // Open dialog
+  const handleOpenMinimalDialog = useCallback(() => {
+    if (usage.atLimit) return;
+    setMinimalName(generateUniqueName());
+    setShowMinimalDialog(true);
+  }, [usage.atLimit, generateUniqueName]);
+
+  // Confirm launch
+  const handleConfirmLaunchMinimal = useCallback(async () => {
+    if (!username || usage.atLimit) return;
+    const name = (minimalName || "").trim();
+    if (!name) return;
+
+    try {
+      setHasTransitioning(true);
+      await startServer(name, minimalJupyterHubServerOptions, username);
+      setShowMinimalDialog(false);
+      router.push(`/hub/spawn/progress/${encodeURIComponent(name)}`);
+    } catch (err) {
+      console.error("Failed to launch minimal notebook:", err);
+      await refetch();
+    }
+  }, [username, usage.atLimit, minimalName, router, refetch, setHasTransitioning]);
+
+  const handleResumeLast = useCallback(async () => {
+    if (!username || !namedNotebooks) return;
+    // pick most recent by last_activity/started
+    const entries = Object.entries(namedNotebooks);
+    if (entries.length === 0) return;
+
+    const ts = (s: ServerStatus) =>
+      (s.last_activity ? Date.parse(s.last_activity) : undefined) ??
+      (s.started ? Date.parse(s.started) : undefined) ??
+      0;
+
+    const [name, server] =
+      entries.sort((a, b) => ts(b[1]) - ts(a[1]))[0];
+
+    try {
+      if (server.ready && server.url) {
+        // open the running notebook
+        window.location.href = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/${server.url}`;
+        return;
+      }
+      // start with previous options if available, else minimal
+      setHasTransitioning(true);
+      await startServer(name, server.user_options || minimalJupyterHubServerOptions, username);
+      router.push(`/hub/spawn/progress/${encodeURIComponent(name)}`);
+    } catch (err) {
+      console.error("Failed to resume notebook:", err);
+      await refetch();
+    }
+  }, [username, namedNotebooks, router, refetch]);
+
+  const handleStopAll = useCallback(async () => {
+    if (!username || !namedNotebooks) return;
+    try {
+      setHasTransitioning(true);
+      const running = Object.entries(namedNotebooks)
+        .filter(([, s]) => s.ready || s.pending === "spawn" || s.pending === "stop")
+        .map(([id]) => id);
+
+      await Promise.all(
+        running.map(async (id) => {
+          try {
+            await stopServer(id, username);
+          } catch (e) {
+            console.error(`Failed to stop ${id}:`, e);
+          }
+        }),
+      );
+      await refetch();
+    } finally {
+      // polling already sped up by hasTransitioning
+    }
+  }, [username, namedNotebooks, refetch]);
 
   return (
     <div className="container mx-auto max-w-7xl space-y-6 p-6">
@@ -172,26 +295,33 @@ export default function HubDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+        <Card >
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Notebook Stats</CardTitle>
+            <CardTitle className="text-lg">Notebooks</CardTitle>
+            <CardDescription>
+              Limit: {usage.max} per user
+            </CardDescription>
           </CardHeader>
-          <CardContent className={"flex justify-center"}>
-            <div className={"flex gap-4"}>
-              <div className={"text-6xl"}>
-                {notebookStats.totalServers}/{hubConfig.max_notebooks_per_user}
-              </div>
-              <div>
-                <div>
-                  running:{" "}
-                  {notebookStats.runningServers + notebookStats.stoppingServers + notebookStats.startingServers}
-                </div>
-                <div>
-                  stopped:{""}
-                  {notebookStats.stoppedServers}
-                </div>
+          <CardContent>
+            <div className="mb-2 flex items-baseline justify-between">
+              <div className="text-4xl font-semibold">{usage.used} of {usage.max}</div>
+              <div className={`text-sm ${usage.atLimit ? "text-destructive" : "text-muted-foreground"}`}>
+                {usage.atLimit ? "Limit reached" : `${usage.remaining} remaining`}
               </div>
             </div>
+
+            <div className="mt-4 flex items-baseline justify-between">
+              <div className="text-muted-foreground">Running / Stopped</div>
+              <div>
+                {notebookStats.runningServers} / {notebookStats.stoppedServers}
+              </div>
+            </div>
+
+            {usage.atLimit && (
+              <div className="mt-3 text-sm text-destructive">
+                You’ve reached your notebook limit. Remove an existing notebook to create a new one.
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -214,33 +344,84 @@ export default function HubDashboard() {
             <CardTitle className="text-lg">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-2">
-              <Link className="w-full" href="/hub/spawn">
-                <Button className="w-full" size="sm" variant="outline">
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Server
-                </Button>
-              </Link>
-              <Link className="w-full" href="/hub/tokens">
-                <Button className="w-full" size="sm" variant="outline">
-                  <Server className="mr-2 h-4 w-4" />
-                  Manage Tokens
-                </Button>
-              </Link>
-              <Link className="w-full" href="/hub/notebooks">
-                <Button className="w-full" size="sm" variant="outline">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  All Notebooks
-                </Button>
-              </Link>
-              <Button className="w-full" size="sm" variant="outline" onClick={handleRefresh}>
-                <Loader2 className={`mr-2 h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-                Refresh
+            <div className="flex flex-col gap-2">
+              <Button
+                className="w-full"
+                variant={"outline"}
+                onClick={handleOpenMinimalDialog}
+                disabled={usage.atLimit}
+                title={usage.atLimit ? "Limit reached" : "Launch a minimal notebook"}
+              >
+                <Rocket className="mr-2 h-4 w-4" />
+                Launch minimal
               </Button>
+
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={handleResumeLast}
+                disabled={!namedNotebooks || Object.keys(namedNotebooks).length === 0}
+                title="Open if running, otherwise start your most recent notebook"
+              >
+                <Play className="mr-2 h-4 w-4" />
+                Resume last
+              </Button>
+
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={handleStopAll}
+                disabled={
+                  !namedNotebooks ||
+                  Object.values(namedNotebooks).every(
+                    (s) => !s.ready && s.pending !== "spawn" && s.pending !== "stop",
+                  )
+                }
+                title="Stop all running notebooks"
+              >
+                <StopCircle className="mr-2 h-4 w-4" />
+                Stop all
+              </Button>
+
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Minimal launch dialog */}
+      <Dialog open={showMinimalDialog} onOpenChange={setShowMinimalDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Launch minimal notebook</DialogTitle>
+            <DialogDescription>
+              Start a lightweight server with default resources. Choose a unique name.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-2 py-2">
+            <ServerNameInput
+                value={minimalName}
+                onChangeNameAction={setMinimalName}
+              />
+          
+            {usage.atLimit && (
+              <p className="text-sm text-destructive">You’ve reached your notebook limit.</p>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowMinimalDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmLaunchMinimal}
+              disabled={usage.atLimit || !minimalName.trim() || !username}
+            >
+              Launch
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
