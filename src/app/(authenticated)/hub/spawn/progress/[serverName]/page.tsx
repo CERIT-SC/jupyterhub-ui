@@ -3,7 +3,7 @@
 import { ArrowLeft, CheckCircle, Loader2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useServerProgress } from "@/features/servers/api/get-server-progress";
 import { useAuth } from "@/hooks/useAuth";
+import { getUsernameOrDefault, ServerProgress } from "@/services/client/jupyterHub";
+import axios from "axios";
+import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
 
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";
+
+
+
+
 
 export default function SpawnProgress() {
   const params = useParams();
@@ -26,22 +33,66 @@ export default function SpawnProgress() {
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
   const [countdown, setCountdown] = useState<number | null>(null);
 
-  const { data, isError, error, isFetched } = useServerProgress({
+  const { data, isError, error, isFetched, isStreaming, start, stop } = useServerProgress({
     serverName,
-    queryConfig: {
-      enabled: running,
-      // Use a very short refetch interval (500ms) while server is starting
-      // to get near real-time updates during server initialization
-      refetchInterval: running ? 5 : false,
-      // Keep fetching even when window is not focused
-      refetchIntervalInBackground: true,
-      // Don't stale the data quickly so we can see updates
-      staleTime: 0,
-      // Don't cache the progress data for long
-      retry: 3,
-      retryDelay: 1000,
-    },
+    username: user?.name,
+    autoStart: true,
   });
+
+  // Reflect connection state: starting while connecting, progress when open
+  useEffect(() => {
+    if (!isStreaming) {
+      setPageState("starting");
+    } else {
+      setPageState((prev) => (prev === "ready" || prev === "failed" ? prev : "progress"));
+    }
+  }, [isStreaming]);
+
+  // Drive UI and history from stream data
+  useEffect(() => {
+    if (data) {
+      // progress history
+      if (data.progress !== prevProgressRef.current) {
+        const progressChange = data.progress - prevProgressRef.current;
+        if (progressChange > 0) {
+          const timestamp = new Date().toLocaleTimeString();
+          setMessageHistory((prev) => [
+            ...prev,
+            `[${timestamp}] Progress update: ${prevProgressRef.current}% → ${data.progress}% (+${progressChange}%)`,
+          ]);
+        }
+        prevProgressRef.current = data.progress;
+      }
+
+      // append event message if present
+      if (data.message && data.message.trim() !== "") {
+        setMessageHistory((prev) => {
+          if (prev.length > 0 && prev[prev.length - 1] === data.message) return prev;
+          const timestamp = new Date().toLocaleTimeString();
+          return [...prev, `[${timestamp}] ${data.message}`];
+        });
+      }
+
+      // terminal states when stream stops at 100
+      if (data.progress >= 100) {
+        setRunning(false);
+        if (data.ready) {
+          setPageState("ready");
+          if (countdown === null) setCountdown(4);
+        } else if (data.failed) {
+          setPageState("failed");
+        } else {
+          // 100 but not ready => treat as failed
+          setPageState("failed");
+        }
+      }
+    }
+
+    if (isError) {
+      setPageState("error");
+      setRunning(false);
+    }
+  }, [data, isError, error, serverName]);
 
   // Store previous progress value to detect changes
   const prevProgressRef = useRef<number>(0);
