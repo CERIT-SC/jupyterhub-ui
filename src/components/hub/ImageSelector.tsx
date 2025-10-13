@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Server } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
@@ -39,7 +39,7 @@ interface ImageSelectorProps {
  */
 export function ImageSelector({
   value = getDefaultImage(),
-  onChangeImageAction, // Updated parameter name
+  onChangeImageAction,
   className,
 }: ImageSelectorProps) {
   // Track the current category
@@ -48,36 +48,42 @@ export function ImageSelector({
   >("simple");
   // Track custom image input
   const [customImage, setCustomImage] = useState("");
+  // Validation error for custom image
+  const [customError, setCustomError] = useState<string | null>(null);
   // Track specific image for the selected category
   const [selectedImage, setSelectedImage] = useState<string>("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // When component mounts or value changes, determine if we need to update the category
+  // When value changes externally, update category if we're not in custom mode
   useEffect(() => {
-    // Check if this is a known image
-    const foundCategory = findCategoryForImage(value);
+    if (category === "custom") return; // ignore external value while editing custom
+
+    const foundCategory = value ? findCategoryForImage(value) : undefined;
 
     if (foundCategory) {
-      // It's a known image, set the category
       setCategory(foundCategory);
-      setSelectedImage(value);
+      setSelectedImage(value || "");
+      setCustomError(null);
     } else if (value) {
-      // It's a custom image
       setCategory("custom");
       setCustomImage(value);
+      setCustomError(value.trim() ? null : "Image is required");
     }
-  }, [value]);
+  }, [value, category]);
 
   // Handle category change
   const handleCategoryChange = (newCategory: string) => {
     const typedCategory = newCategory as keyof typeof imageOptions | "custom";
-
     setCategory(typedCategory);
 
     if (typedCategory === "custom") {
-      // If switching to custom, use the custom image value if available
-      if (customImage) {
-        onChangeImageAction(customImage); // Updated function call
-      }
+      // Prefill with current selection if present
+      const prefill = (value || selectedImage || customImage || "").trim();
+      setCustomImage(prefill);
+      setCustomError(prefill ? null : "Image is required");
+
+      // IMPORTANT: Do NOT push value to parent here to avoid auto-detection
+      // The parent will be updated as the user types in the input.
     } else {
       // When switching categories, select the first image in that category
       const firstImageKey = Object.keys(
@@ -86,7 +92,8 @@ export function ImageSelector({
 
       if (firstImageKey) {
         setSelectedImage(firstImageKey);
-        onChangeImageAction(firstImageKey); // Updated function call
+        setCustomError(null);
+        onChangeImageAction(firstImageKey);
       }
     }
   };
@@ -94,16 +101,30 @@ export function ImageSelector({
   // Handle specific image selection within a category
   const handleImageSelect = (newSelectedImage: string) => {
     setSelectedImage(newSelectedImage);
-    onChangeImageAction(newSelectedImage); // Updated function call
+    onChangeImageAction(newSelectedImage);
   };
 
   // Handle custom image input
   const handleCustomImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-
     setCustomImage(newValue);
-    onChangeImageAction(newValue); // Updated function call
+    setCustomError(newValue.trim() ? null : "Image is required");
+    // Do not push immediately; debounced below
   };
+
+  // Debounce pushing custom image to parent
+  useEffect(() => {
+    if (category !== "custom") return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      onChangeImageAction(customImage);
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [customImage, category, onChangeImageAction]);
 
   return (
     <div className={className}>
@@ -158,7 +179,16 @@ export function ImageSelector({
               placeholder="repo/image_name:tag"
               value={customImage}
               onChange={handleCustomImageChange}
+              onBlur={() => {
+                if (debounceRef.current) clearTimeout(debounceRef.current);
+                onChangeImageAction(customImage);
+              }}
+              aria-invalid={!!customError}
+              required
             />
+            {customError && (
+              <p className="text-sm text-destructive">{customError}</p>
+            )}
           </div>
         )}
       </div>

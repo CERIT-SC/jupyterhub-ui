@@ -93,19 +93,6 @@ export default function AppLayout({
         <AppHeader
           actions={
             <>
-              <Button size="icon" variant="ghost">
-                <Bell className="h-5 w-5" />
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="relative " size="icon" variant="ghost">
-                    <User className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 mr-2 bg-white/95 backdrop-blur-sm"
-                >
                   <div className="flex items-center gap-2 p-2">
                     <Avatar className="h-9 w-9 border border-infra-gray-light/50">
                       <AvatarImage src={""} />
@@ -114,35 +101,21 @@ export default function AppLayout({
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <DropdownMenuLabel className="p-0 font-medium">
-                        {getDisplayName()}
-                      </DropdownMenuLabel>
+                      
+                      {getDisplayName()}
+     
                       {user?.name && (
                         <span className="text-xs text-infra-text-secondary truncate max-w-[11rem]">
                           {user.roles?.join(", ")}
                         </span>
                       )}
                     </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="hover:bg-infra-gray-light/30 focus:bg-infra-gray-light/30">
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-infra-gray-light/30 focus:bg-infra-gray-light/30">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-infra-error hover:bg-infra-error/10 focus:bg-infra-error/10 focus:text-infra-error"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </div>
+            <Button className={"text-red-500 hover:border hover:border-red-500 hover:bg-white"} variant={'ghost'} onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
+            </Button>
+              
             </>
           }
           logo={

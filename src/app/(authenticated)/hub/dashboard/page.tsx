@@ -10,6 +10,7 @@ import {
   Play,
   StopCircle,
   RefreshCw,
+  ChevronRight, // added
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -278,6 +279,9 @@ export default function HubDashboard() {
     }
   }, [username, namedNotebooks, refetch]);
 
+  // Add count of extra notebooks (beyond the 3 shown)
+  const extraNotebooksCount = Math.max(0, notebookStats.totalServers - 3);
+
   return (
     <div className="container mx-auto max-w-7xl space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -424,8 +428,30 @@ export default function HubDashboard() {
       </Dialog>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Recent Notebooks</CardTitle>
+          <Button
+            variant={"ghost"}
+            onClick={() => router.push("/hub/notebooks")}
+            className="relative"
+            aria-label={
+              extraNotebooksCount > 0
+                ? `View all notebooks (${extraNotebooksCount} more)`
+                : "View all notebooks"
+            }
+            title={
+              extraNotebooksCount > 0
+                ? `${extraNotebooksCount} more notebooks`
+                : "View all notebooks"
+            }
+          >
+            <ChevronRight className="h-5 w-5" />
+            {extraNotebooksCount > 0 && (
+              <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                +{extraNotebooksCount}
+              </span>
+            )}
+          </Button>
         </CardHeader>
         <CardContent>
           {recentNotebooks.length === 0 ? (

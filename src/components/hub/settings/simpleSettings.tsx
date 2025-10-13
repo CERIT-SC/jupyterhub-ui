@@ -86,18 +86,11 @@ export function ResourcePresetCard({
     <SelectionCard selected={selected} onClick={onClick}>
       <CardContent className="p-4 space-y-2">
         <h4
-          className={cn(
-            "font-medium text-lg transition-colors duration-200",
-            selected ? "text-primary" : "text-gray-900",
-          )}
-        >
+          className={"font-medium text-lg"}        >
           {preset.name}
         </h4>
         <p
-          className={cn(
-            "text-sm transition-colors duration-200",
-            selected ? "text-primary/70" : "text-muted-foreground",
-          )}
+          className="text-sm text-muted-foreground mb-3"
         >
           {preset.description}
         </p>
@@ -164,14 +157,7 @@ export function ResourcePresetCard({
         </div>
       </CardContent>
 
-      {/* Selected overlay effect */}
-      <div
-        className={cn(
-          "absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10",
-          "transition-opacity duration-300",
-          selected ? "opacity-100" : "opacity-0",
-        )}
-      />
+
     </SelectionCard>
   );
 }
@@ -373,15 +359,39 @@ export const ImageSettings = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Server className="h-5 w-5" />
-          Choose Image
-          <Switch
-            checked={!isSimple}
-            onCheckedChange={() => setIsSimple(!isSimple)}
-          />
-          <SimpleStatus isSimple={isSimple} />
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Server className="h-5 w-5" />
+            Choose Image
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsSimple(true)}
+              className={cn(
+                "text-sm",
+                isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
+              )}
+            >
+              Simple
+            </button>
+            <Switch
+              checked={!isSimple}
+              onCheckedChange={(checked) => setIsSimple(!checked)}
+              aria-label="Toggle advanced image settings"
+            />
+            <button
+              type="button"
+              onClick={() => setIsSimple(false)}
+              className={cn(
+                "text-sm",
+                !isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
+              )}
+            >
+              Advanced
+            </button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {isSimple ? (
@@ -824,15 +834,39 @@ export const ResourceSettings = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Cpu className="h-5 w-5" />
-          Choose Resources
-          <Switch
-            checked={!isSimple}
-            onCheckedChange={() => setIsSimple(!isSimple)}
-          />
-          <SimpleStatus isSimple={isSimple} />
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Cpu className="h-5 w-5" />
+            Choose Resources
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsSimple(true)}
+              className={cn(
+                "text-sm",
+                isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
+              )}
+            >
+              Simple
+            </button>
+            <Switch
+              checked={!isSimple}
+              onCheckedChange={(checked) => setIsSimple(!checked)}
+              aria-label="Toggle advanced resource settings"
+            />
+            <button
+              type="button"
+              onClick={() => setIsSimple(false)}
+              className={cn(
+                "text-sm",
+                !isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
+              )}
+            >
+              Advanced
+            </button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         {isSimple ? (
@@ -936,9 +970,9 @@ export const StorageSettingPhome = ({
               </p>
             </div>
           )}
-
+{/* 
           <div className="flex items-center space-x-2">
-            {/*//TODO*/}
+            {//TODO}
             <RadioGroupItem
               disabled={true}
               id="phome-existing"
@@ -950,7 +984,7 @@ export const StorageSettingPhome = ({
             >
               Use existing persistent home (Feature not available yet)
             </Label>
-          </div>
+          </div> */}
 
           {phomeType === "existing" && (
             <div className="ml-6 mt-3">
