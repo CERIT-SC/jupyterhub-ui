@@ -56,7 +56,7 @@ export function ImageSelector({
     // Check if this is a known image
     const foundCategory = findCategoryForImage(value);
 
-    if (foundCategory) {
+    if (category !== "custom" && foundCategory) {
       // It's a known image, set the category
       setCategory(foundCategory);
       setSelectedImage(value);
