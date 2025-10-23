@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getUsernameOrDefault, ServerProgress } from "@/services/client/jupyterHub";
 import axios from "axios";
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
+import { useRuntimeConfig } from "@/hooks/useRuntimeConfig";
 
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";
 
@@ -38,6 +39,8 @@ export default function SpawnProgress() {
     username: user?.name,
     autoStart: true,
   });
+
+  const cfg = useRuntimeConfig();
 
   // Reflect connection state: starting while connecting, progress when open
   useEffect(() => {
@@ -185,10 +188,8 @@ export default function SpawnProgress() {
 
   // Handle manual redirect
   const handleOpenServer = () => {
-    if (data?.url) {
-      const redirectUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/${data.url}`;
-
-      window.location.href = redirectUrl;
+    if (data?.url && cfg?.hubOrigin) {
+      window.location.href = cfg.hubOrigin + data.url;
     }
   };
 

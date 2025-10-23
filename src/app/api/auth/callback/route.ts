@@ -23,6 +23,12 @@ export async function GET(req: Request) {
     return new NextResponse("Missing code", { status: 400 });
   }
 
+  // Derive origin from the incoming request (supports proxies)
+  const proto = req.headers.get("x-forwarded-proto") ?? "https";
+  const host =
+    req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
+  const origin = host ? `${proto}://${host}` : new URL(req.url).origin;
+
   try {
     const tokenRes = await fetch(
       `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/oauth2/token`,
@@ -36,7 +42,7 @@ export async function GET(req: Request) {
           client_secret: `${process.env.JUPYTERHUB_API_TOKEN}`,
           code,
           grant_type: "authorization_code",
-          redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/callback`,
+          redirect_uri: `${origin}/api/auth/callback`,
         }),
       },
     );
@@ -47,9 +53,7 @@ export async function GET(req: Request) {
       return NextResponse.json(tokenData, { status: tokenRes.status });
     }
 
-    const response = NextResponse.redirect(
-      new URL("/", process.env.NEXT_PUBLIC_BASE_URL),
-    );
+    const response = NextResponse.redirect(new URL("/", origin));
 
     response.headers.set(
       "Set-Cookie",

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance with the JupyterHub API base URL
 const jupyterHubApiClient = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_BASE_URL}/api/hub`, // This will be proxied through Next.js
+  baseURL: `/api/hub`, // This will be proxied through Next.js
   timeout: 30000, // 30 seconds timeout
   headers: {
     "Content-Type": "application/json",

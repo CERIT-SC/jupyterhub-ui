@@ -44,6 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useRuntimeConfig } from "@/hooks/useRuntimeConfig";
 
 export interface NotebookCardProps {
   server: ServerStatus;
@@ -152,9 +153,9 @@ export function NotebookCard({
   onStart,
   className,
 }: NotebookCardProps) {
-  const notbookLink = server.url
-    ? `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub` + server.url
-    : "";
+  const cfg = useRuntimeConfig();
+  const notbookLink =
+    server.url && cfg?.hubOrigin ? cfg.hubOrigin + server.url : "";
 
   // Get status information from server
   const statusInfo = getStatusInfo(server);
@@ -201,7 +202,7 @@ export function NotebookCard({
 
           {/* Top-right actions */}
           <TooltipProvider>
-            {server.ready && server.url ? (
+            {server.ready && server.url && cfg?.hubOrigin ? (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button

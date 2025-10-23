@@ -30,7 +30,7 @@ COPY . .
 # ENV NEXT_TELEMETRY_DISABLED=1
 
 ENV NEXT_PUBLIC_BASE_URL=https://hub-dev-react.cloud.e-infra.cz
-ENV NEXT_PUBLIC_JUPYTERHUB_URL=https://hub-dev-python.cloud.e-infra.cz
+ENV NEXT_PUBLIC_JUPYTERHUB_URL=https://hub-dev-react.cloud.e-infra.cz/jupyter
 ENV NEXT_PUBLIC_JUPYTERHUB_CLIENT_ID=service-my-frontend
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
