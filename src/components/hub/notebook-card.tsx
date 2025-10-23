@@ -44,7 +44,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useRuntimeConfig } from "@/hooks/useRuntimeConfig";
+import { useRuntimeConfig } from "@/context/RuntimeConfigContext";
 
 export interface NotebookCardProps {
   server: ServerStatus;

@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getUsernameOrDefault, ServerProgress } from "@/services/client/jupyterHub";
 import axios from "axios";
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
-import { useRuntimeConfig } from "@/hooks/useRuntimeConfig";
+import { useRuntimeConfig } from "@/context/RuntimeConfigContext";
 
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";
 
@@ -41,7 +41,6 @@ export default function SpawnProgress() {
   });
 
   const cfg = useRuntimeConfig();
-
   // Reflect connection state: starting while connecting, progress when open
   useEffect(() => {
     if (!isStreaming) {

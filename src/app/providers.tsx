@@ -6,9 +6,16 @@ import React, { ReactNode, useState } from "react";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/context/AuthContext";
+import { ClientRuntimeConfigProvider } from "@/context/RuntimeConfigContext";
+import { getRuntimeConfig } from "@/lib/runtime-config";
 
 export interface ProvidersProps {
   children: React.ReactNode;
+}
+
+function RuntimeConfigProvider({ children }: { children: React.ReactNode }) {
+  const cfg = getRuntimeConfig();
+  return <ClientRuntimeConfigProvider value={cfg}>{children}</ClientRuntimeConfigProvider>;
 }
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -26,13 +33,15 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          {children}
-          <ReactQueryDevtools initialIsOpen={false} />
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <RuntimeConfigProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <TooltipProvider>
+            {children}
+            <ReactQueryDevtools initialIsOpen={false} />
+          </TooltipProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </RuntimeConfigProvider>
   );
 }

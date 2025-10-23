@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, use } from "react";
 import { Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useRuntimeConfig } from "@/hooks/useRuntimeConfig";
+import { useRuntimeConfig } from "@/context/RuntimeConfigContext";
 
-export default function Login() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const { error } = useAuth();
   const cfg = useRuntimeConfig();
@@ -76,12 +76,25 @@ export default function Login() {
             )}
           </div>
           <CardDescription className="text-center">
-            {`Using official JupyterHub instance at ${
-              cfg?.jupyterhubUrl ?? "…"
-            } in background`}
+            {`Using official Jupyterhub instance at ${cfg?.jupyterhubUrl}
+            in background`}
           </CardDescription>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
