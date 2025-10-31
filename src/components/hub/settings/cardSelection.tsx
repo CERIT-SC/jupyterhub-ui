@@ -51,38 +51,70 @@ SelectionCard.displayName = "SelectionCard";
 const SelectionCardGrid = ({
   cards,
   customCard,
-  isCardSelected,
 }: {
   cards: React.ReactNode[];
   customCard?: React.ReactNode;
-  isCardSelected?: boolean;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const shouldCollapse = customCard !== undefined || isCardSelected;
+
+  // data state logic
+  
+  const { allCards, selectionIndex } = React.useMemo(() => {
+    const allCards = customCard ? [customCard, ...cards] : cards;
+    const selectedIndex = allCards.findIndex((el) => {
+      if (!React.isValidElement(el)) return false;
+      return Boolean((el as any).props?.selected);
+    });
+
+    return { allCards: allCards, selectionIndex: selectedIndex };
+  }, [customCard, cards]);
+
+  // UI state logic
 
   useEffect(() => {
-    if (isCardSelected) {
-      setIsExpanded(false);
-    }
-  }, [isCardSelected]);
+    setIsExpanded(false);
+  }, [selectionIndex]);
 
-  const cardNum = 3;
-  const visibleCards =
-    shouldCollapse && !isExpanded
-      ? cards.slice(0, customCard ? cardNum - 1 : cardNum)
-      : cards;
-  const hasMoreCards = customCard
-    ? cards.length + 1 > cardNum
-    : cards.length > cardNum;
+  const { visibleCards, hiddenCount, showMoreButton } = React.useMemo(() => {
+    const columns = 3;
+
+    if (selectionIndex === -1)
+    {
+      return {
+        visibleCards: allCards,
+        hiddenCount: 0,
+        showMoreButton: false,
+      };
+    }
+
+    if (isExpanded) {
+      return {
+        visibleCards: allCards,
+        hiddenCount: 0,
+        showMoreButton: true,
+      };
+    }
+
+    const rowIndex = Math.floor(selectionIndex / columns);
+    const sliceStart = rowIndex * columns;
+    const sliceEnd = Math.min(sliceStart + columns, allCards.length);
+
+    const visibleCards = allCards.slice(sliceStart, sliceEnd);
+
+    return {
+      visibleCards: visibleCards,
+      hiddenCount: Math.max(0, allCards.length - visibleCards.length),
+      showMoreButton: visibleCards.length < allCards.length,
+    };
+  }, [allCards, selectionIndex, isExpanded]);
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {customCard}
         {visibleCards}
       </div>
 
-      {shouldCollapse && hasMoreCards && (
+      { showMoreButton && (
         <div className="flex justify-center">
           <Button
             className="gap-2"
@@ -97,7 +129,7 @@ const SelectionCardGrid = ({
               </>
             ) : (
               <>
-                Show More ({cards.length - cardNum} more)
+                {hiddenCount > 0 ? `Show More (${hiddenCount} more)` : "Show More"}
                 <ChevronDown className="h-4 w-4" />
               </>
             )}

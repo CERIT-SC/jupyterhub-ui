@@ -13,7 +13,7 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { ImageSelector } from "@/components/hub/ImageSelector";
 import {
@@ -237,9 +237,9 @@ export const ImageSettingsSimple = ({
   });
 
   // Determine which images to show
-  const getVisibleImages = () => {
+  const getVisibleImages = useCallback(() => {
     return hubConfig.simpleOptions.image;
-  };
+  }, []);
 
   const visibleImages = getVisibleImages();
 
@@ -255,28 +255,7 @@ export const ImageSettingsSimple = ({
       </div>
       <SelectionCardGrid
         cards={(() => {
-          // Find the selected image
-          const selectedImage = visibleImages.find(
-            (image) =>
-              selectedPresetImage !== undefined &&
-              image.id === selectedPresetImage?.id,
-          );
-
-          // Get all other images
-          const otherImages = visibleImages.filter(
-            (image) =>
-              !(
-                selectedPresetImage !== undefined &&
-                image.id === selectedPresetImage?.id
-              ),
-          );
-
-          // Put selected image first, then others
-          const orderedImages = selectedImage
-            ? [selectedImage, ...otherImages]
-            : visibleImages;
-
-          return orderedImages.map((image) => (
+          return visibleImages.map((image) => (
             <SimpleImageCards
               key={image.id}
               image={image}
@@ -315,7 +294,6 @@ export const ImageSettingsSimple = ({
             </SelectionCard>
           ) : undefined
         }
-        isCardSelected={selectedPresetImage !== undefined}
       />
     </div>
   );
@@ -591,22 +569,7 @@ export const ResourceSettingsSimple = ({
       {/*//TODO too slow memo or alt*/}
       <SelectionCardGrid
         cards={(() => {
-          // Find the selected preset
-          const selectedPreset = resourcePresets.find(
-            (preset) => preset.id === selectedPresetId,
-          );
-
-          // Get all other presets
-          const otherPresets = resourcePresets.filter(
-            (preset) => preset.id !== selectedPresetId,
-          );
-
-          // Put selected preset first, then others
-          const orderedPresets = selectedPreset
-            ? [selectedPreset, ...otherPresets]
-            : resourcePresets;
-
-          return orderedPresets.map((preset) => (
+          return resourcePresets.map((preset) => (
             <ResourcePresetCard
               key={preset.id}
               preset={preset}
@@ -711,7 +674,6 @@ export const ResourceSettingsSimple = ({
             </SelectionCard>
           ) : undefined
         }
-        isCardSelected={selectedPresetId !== undefined}
       />
     </div>
   );
