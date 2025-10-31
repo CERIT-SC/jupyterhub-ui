@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ServerStatus } from "@/services/client/jupyterHub";
 import { cn } from "@/lib/cn";
+import { useRouter } from "next/navigation";
 
 interface NotebookDetailsDialogProps {
   notebook?: ServerStatus | null;
@@ -42,6 +43,7 @@ export function NotebookDetailsDialog({
   trigger,
   onDelete,
 }: NotebookDetailsDialogProps) {
+  const router = useRouter();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleDeleteConfirm = () => {
@@ -59,6 +61,10 @@ export function NotebookDetailsDialog({
   if (!notebook) {
     return null;
   }
+
+  const handleShowProgress = () => {
+    router.push(`/hub/spawn/progress/${encodeURIComponent(notebookName)}`);
+  };
 
   return (
     <Dialog>
@@ -150,15 +156,11 @@ export function NotebookDetailsDialog({
                   <Info className="h-4 w-4 text-gray-500 mr-2" />
                   <h4 className="text-sm font-medium">Progress Information</h4>
                 </div>
-                <Button asChild className="w-full" size="sm" variant="outline">
-                  <a
-                    href={notebook.url}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
+                <Button asChild className="w-full" size="sm" variant="outline" onClick={handleShowProgress}>
+                  <span>
                     <RefreshCw className="h-3 w-3 mr-2" />
                     View Progress Details
-                  </a>
+                  </span>
                 </Button>
               </div>
             )}

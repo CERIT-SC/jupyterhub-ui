@@ -99,76 +99,6 @@ export default function SpawnProgress() {
   // Store previous progress value to detect changes
   const prevProgressRef = useRef<number>(0);
 
-  // Track message history and update state based on progress
-  useEffect(() => {
-    if (data) {
-      // Check if progress has changed
-      if (data.progress !== prevProgressRef.current) {
-        // Add progress update to message history
-        const progressChange = data.progress - prevProgressRef.current;
-
-        if (progressChange > 0) {
-          const timestamp = new Date().toLocaleTimeString();
-
-          setMessageHistory((prev) => [
-            ...prev,
-            `[${timestamp}] Progress update: ${prevProgressRef.current}% → ${data.progress}% (+${progressChange}%)`,
-          ]);
-        }
-        prevProgressRef.current = data.progress;
-      }
-      // Update state based on progress and ready/failed status
-      if (data.progress === 0) {
-        setPageState("starting");
-      } else if (data.progress > 0 && data.progress < 100) {
-        setPageState("progress");
-      } else if (data.progress >= 100) {
-        if (data.ready) {
-          setPageState("ready");
-          setRunning(false);
-          // Start countdown when server is ready
-          if (countdown === null) {
-            setCountdown(4);
-          }
-        } else if (data.failed) {
-          setPageState("failed");
-          setRunning(false);
-        }
-      }
-
-      // Add message to history if it's not empty and not already in the list
-      if (data.message && data.message.trim() !== "") {
-        setMessageHistory((prev) => {
-          // Don't add duplicate consecutive messages
-          if (prev.length > 0 && prev[prev.length - 1] === data.message) {
-            return prev;
-          }
-
-          // Include timestamp with message for more detailed history
-          const timestamp = new Date().toLocaleTimeString();
-          const messageWithTime = `[${timestamp}] ${data.message}`;
-
-          return [...prev, messageWithTime];
-        });
-      }
-    }
-
-    if (isError) {
-      setPageState("error");
-      setRunning(false);
-
-      // Check if error is a 404 (server doesn't exist)
-      const errorObj = error as any;
-
-      if (errorObj?.response?.status === 404) {
-        setMessageHistory((prev) => [
-          ...prev,
-          `Server '${serverName}' does not exist. Please check the server name and try again.`,
-        ]);
-      }
-    }
-  }, [data, isError, error, serverName]);
-
   // Countdown timer effect
   useEffect(() => {
     if (countdown !== null && countdown > 0) {
@@ -179,9 +109,7 @@ export default function SpawnProgress() {
       return () => clearTimeout(timer);
     } else if (countdown === 0 && data?.url) {
       // Auto-redirect when countdown reaches 0
-      const redirectUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/${data.url}`;
-
-      window.location.href = redirectUrl;
+      handleOpenServer();
     }
   }, [countdown, data?.url]);
 
