@@ -268,7 +268,7 @@ export default function SpawnPage() {
       </div>
 
       {/* Floating Create Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-14 right-6 z-50">
         <Button
           className={cn(
             "shadow-lg  transition-all duration-200",
