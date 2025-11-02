@@ -53,7 +53,10 @@ export default function SpawnPage() {
     const missingFields: string[] = [];
 
     // Server name validity is driven by ServerNameInput
-    // (no hardcoded server-name errors pushed here)
+    if (serverNameError) {
+      errors.push(serverNameError);
+    }
+
 
     // Check minimal required options
     const minimalKeys = Object.keys(
@@ -77,6 +80,7 @@ export default function SpawnPage() {
       hasRequiredOptions: missingFields.length === 0,
     };
   }, [isServerNameValid, options]);
+    console.log(serverNameError)
 
   // Parse URL parameters into JupyterHubServerOptions
   useEffect(() => {
