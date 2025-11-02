@@ -212,7 +212,7 @@ export default function SpawnPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
+    <div className="container mx-auto p-6 space-y-6 max-w-7xl relative">
       {/* Back button */}
       <div className="flex items-center space-x-2">
         <Button
@@ -271,56 +271,58 @@ export default function SpawnPage() {
         <StorageSettings options={options} setOptions={setOptions} />
       </div>
 
-      {/* Floating Create Button */}
-      <div className="fixed bottom-14 right-6 z-50">
-        <Button
-          className={cn(
-            "shadow-lg  transition-all duration-200",
-            "min-w-[160px] gap-2 text-base font-medium",
-          )}
-          disabled={isCreating}
-          size="lg"
-          onClick={handleCreateNotebook}
-        >
-          {isCreating ? (
-            <>
-              <Loading className="h-5 w-5" />
-              Creating...
-            </>
-          ) : (
-            <>
-              {!validation.hasRequiredOptions ? (
-                <AlertCircle className="h-5 w-5" />
-              ) : (
-                <Rocket className="h-5 w-5" />
+      {/* Floating Create Button (sticks to viewport bottom, within container) */}
+      <div className="sticky bottom-0 z-50">
+        <div className="flex justify-end">
+          <div className="relative inline-flex">
+            <Button
+              className={cn(
+                "shadow-lg transition-all duration-200",
+                "min-w-[160px] gap-2 text-base font-medium",
               )}
-              {!validation.hasRequiredOptions
-                ? "Missing Options"
-                : "Create Notebook"}
-            </>
-          )}
-        </Button>
+              disabled={isCreating}
+              size="lg"
+              onClick={handleCreateNotebook}
+            >
+              {isCreating ? (
+                <>
+                  <Loading className="h-5 w-5" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  {!validation.hasRequiredOptions ? (
+                    <AlertCircle className="h-5 w-5" />
+                  ) : (
+                    <Rocket className="h-5 w-5" />
+                  )}
+                  {!validation.hasRequiredOptions ? "Missing Options" : "Create Notebook"}
+                </>
+              )}
+            </Button>
 
-        {/* Validation tooltip */}
-        {!validation.isValid && (
-          <div className="absolute bottom-full right-0 mb-2 p-2 bg-gray-900 text-white text-xs rounded shadow-lg max-w-xs">
-            {validation.errors.length > 0 && (
-              <div className="mb-1">
-                <strong>Errors:</strong>
-                <ul className="list-disc list-inside">
-                  {validation.errors.map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {validation.missingFields.length > 0 && (
-              <div>
-                <strong>Missing:</strong> {validation.missingFields.join(", ")}
+            {/* Validation tooltip */}
+            {!validation.isValid && (
+              <div className="absolute bottom-full right-0 mb-2 p-2 bg-gray-900 text-white text-xs rounded shadow-lg max-w-xs">
+                {validation.errors.length > 0 && (
+                  <div className="mb-1">
+                    <strong>Errors:</strong>
+                    <ul className="list-disc list-inside">
+                      {validation.errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {validation.missingFields.length > 0 && (
+                  <div>
+                    <strong>Missing:</strong> {validation.missingFields.join(", ")}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

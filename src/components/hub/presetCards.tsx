@@ -119,25 +119,25 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
   return (
     <Card
       className={cn(
-        "overflow-hidden cursor-pointer transition-all duration-300 flex flex-col h-full group",
+        "overflow-hidden transition-all duration-300 flex flex-col h-full group",
         "border border-infra-border ",
         "] hover:ring-infra-primary hover:border-infra-primary shadow-lg ",
       )}
     >
-      <CardHeader className="pb-3 group-hover:text-infra-primary">
+      <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
           <div
             className={cn(
-              "p-2 rounded-lg transition-colors flex-shrink-0, group-hover:bg-infra-primary/10",
+              "p-2 rounded-lg transition-colors flex-shrink-0 ",
             )}
           >
             {preset.icon}
           </div>
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-medium text-infra-text-primary group-hover:text-infra-primary">
+            <CardTitle className="text-lg font-medium text-infra-text-primary">
               {preset.name}
             </CardTitle>
-            <CardDescription className="text-sm mt-1 group-hover:text-infra-primary">
+            <CardDescription className="text-sm mt-1">
               {preset.description}
             </CardDescription>
           </div>
