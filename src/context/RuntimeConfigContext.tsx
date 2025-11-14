@@ -1,4 +1,4 @@
-"use client";
+
 import React, { createContext, useContext } from "react";
 import type { RuntimeConfig } from "@/lib/runtime-config";
 
