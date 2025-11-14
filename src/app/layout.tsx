@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/cn";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "@/app/providers";
+import { PublicEnvScript } from "next-runtime-env";
 
 export const metadata: Metadata = {
   title: {
@@ -43,12 +44,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={cn(
-          "min-h-screen g bg-background font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
+      <head>
+        <PublicEnvScript />
+      </head>
+      <body className={cn("g bg-background min-h-screen font-sans antialiased", fontSans.variable)}>
         <Providers>{children}</Providers>
       </body>
     </html>

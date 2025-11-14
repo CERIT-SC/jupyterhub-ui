@@ -18,20 +18,9 @@ import { cn } from "@/lib/cn";
 import { formatRelativeTime } from "@/lib/utils";
 import { ServerStatus } from "@/services/client/jupyterHub";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { NotebookDetailsDialog } from "@/components/hub/notebook-details-dialog";
 import {
   AlertDialog,
@@ -44,7 +33,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useRuntimeConfig } from "@/context/RuntimeConfigContext";
+import { env } from "next-runtime-env";
 
 export interface NotebookCardProps {
   server: ServerStatus;
@@ -122,7 +111,7 @@ interface ServerInfoItemProps {
 
 function ServerInfoItem({ icon, label, value, tooltip }: ServerInfoItemProps) {
   const content = (
-    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+    <div className="flex items-center justify-between border-b border-gray-100 py-2 last:border-b-0">
       <div className="flex items-center gap-2 text-sm text-gray-600">
         {icon}
         <span>{label}</span>
@@ -145,55 +134,38 @@ function ServerInfoItem({ icon, label, value, tooltip }: ServerInfoItemProps) {
   return content;
 }
 
-export function NotebookCard({
-  server,
-  name,
-  onStop,
-  onRemove,
-  onStart,
-  className,
-}: NotebookCardProps) {
-  const cfg = useRuntimeConfig();
-  const notbookLink =
-    server.url && cfg?.hubOrigin ? cfg.hubOrigin + server.url : "";
+export function NotebookCard({ server, name, onStop, onRemove, onStart, className }: NotebookCardProps) {
+  const JUPYTERHUB_URL = env("NEXT_PUBLIC_JUPYTERHUB_URL");
+  const notbookLink = server.url && JUPYTERHUB_URL ? JUPYTERHUB_URL + server.url : "";
 
   // Get status information from server
   const statusInfo = getStatusInfo(server);
 
   // Format timestamps
-  const lastActive = server.last_activity
-    ? formatRelativeTime(new Date(server.last_activity))
-    : "Never";
+  const lastActive = server.last_activity ? formatRelativeTime(new Date(server.last_activity)) : "Never";
 
-  const startedTime = server.started
-    ? formatRelativeTime(new Date(server.started))
-    : "Not started";
+  const startedTime = server.started ? formatRelativeTime(new Date(server.started)) : "Not started";
 
   return (
     <Card
       className={cn(
-        "transition-all overflow-hidden",
+        "overflow-hidden transition-all",
         server.ready
-          ? "hover:shadow-md border-infra-primary/50"
+          ? "border-infra-primary/50 hover:shadow-md"
           : server.pending === "stop"
-            ? "opacity-85 border-orange-200"
+            ? "border-orange-200 opacity-85"
             : server.pending
-              ? "hover:shadow-md border-yellow-200"
-              : "hover:shadow-md border-gray-200",
+              ? "border-yellow-200 hover:shadow-md"
+              : "border-gray-200 hover:shadow-md",
         className,
       )}
     >
       <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
+        <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-lg font-semibold">{name}</CardTitle>
-            <div className="flex items-center mt-1">
-              <Badge
-                className={cn(
-                  "flex items-center gap-1 text-xs font-normal",
-                  statusInfo.className,
-                )}
-              >
+            <div className="mt-1 flex items-center">
+              <Badge className={cn("flex items-center gap-1 text-xs font-normal", statusInfo.className)}>
                 {statusInfo.icon}
                 {statusInfo.status}
               </Badge>
@@ -202,21 +174,11 @@ export function NotebookCard({
 
           {/* Top-right actions */}
           <TooltipProvider>
-            {server.ready && server.url && cfg?.hubOrigin ? (
+            {server.ready && server.url && JUPYTERHUB_URL ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    asChild
-                    className="h-8 w-8"
-                    size="icon"
-                    variant="ghost"
-                    aria-label="Open notebook"
-                  >
-                    <Link
-                      href={notbookLink}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
+                  <Button asChild className="h-8 w-8" size="icon" variant="ghost" aria-label="Open notebook">
+                    <Link href={notbookLink} rel="noopener noreferrer" target="_blank">
                       <ExternalLink className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -230,12 +192,7 @@ export function NotebookCard({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        className="h-8 w-8"
-                        size="icon"
-                        variant="destructive"
-                        aria-label="Remove notebook"
-                      >
+                      <Button className="h-8 w-8" size="icon" variant="destructive" aria-label="Remove notebook">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
@@ -258,7 +215,7 @@ export function NotebookCard({
                       onClick={() => {
                         onRemove?.();
                       }}
-                      className="bg-red-600 hover:bg-red-700 text-white"
+                      className="bg-red-600 text-white hover:bg-red-700"
                     >
                       Remove
                     </AlertDialogAction>
@@ -272,17 +229,9 @@ export function NotebookCard({
 
       <CardContent className="space-y-4 pb-2">
         <div className="space-y-0.5">
-          <ServerInfoItem
-            icon={<Clock className="h-4 w-4 text-gray-400" />}
-            label="Last activity"
-            value={lastActive}
-          />
+          <ServerInfoItem icon={<Clock className="h-4 w-4 text-gray-400" />} label="Last activity" value={lastActive} />
 
-          <ServerInfoItem
-            icon={<Terminal className="h-4 w-4 text-gray-400" />}
-            label="Started"
-            value={startedTime}
-          />
+          <ServerInfoItem icon={<Terminal className="h-4 w-4 text-gray-400" />} label="Started" value={startedTime} />
 
           {server.state?.pod_name && (
             <ServerInfoItem
@@ -290,10 +239,7 @@ export function NotebookCard({
               label="Pod"
               tooltip={server.state.pod_name}
               value={
-                <span
-                  className="truncate max-w-[120px] inline-block"
-                  title={server.state.pod_name}
-                >
+                <span className="inline-block max-w-[120px] truncate" title={server.state.pod_name}>
                   {server.state.pod_name}
                 </span>
               }
@@ -302,13 +248,11 @@ export function NotebookCard({
 
           {server.pending && (
             <div className="pt-2">
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-2 bg-yellow-400 rounded-full animate-pulse w-full" />
+              <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                <div className="h-2 w-full animate-pulse rounded-full bg-yellow-400" />
               </div>
-              <p className="text-xs text-center mt-1 text-gray-500">
-                {server.pending === "spawn"
-                  ? "Starting server..."
-                  : "Stopping server..."}
+              <p className="mt-1 text-center text-xs text-gray-500">
+                {server.pending === "spawn" ? "Starting server..." : "Stopping server..."}
               </p>
             </div>
           )}
@@ -319,40 +263,20 @@ export function NotebookCard({
         <div className="flex">
           {/* No footer Remove button when stopped; action moved to top-right */}
           {server.ready ? (
-            <Button
-              className="flex items-center"
-              size="sm"
-              variant="outline"
-              onClick={onStop}
-            >
-              <Square className="h-4 w-4 mr-2" /> Stop
+            <Button className="flex items-center" size="sm" variant="outline" onClick={onStop}>
+              <Square className="mr-2 h-4 w-4" /> Stop
             </Button>
           ) : server.pending === "stop" ? (
-            <Button
-              disabled
-              className="flex items-center"
-              size="sm"
-              variant="outline"
-            >
-              <LoaderCircle className="h-4 w-4 mr-2 animate-spin" /> Stopping...
+            <Button disabled className="flex items-center" size="sm" variant="outline">
+              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Stopping...
             </Button>
           ) : server.pending ? (
-            <Button
-              className="flex items-center"
-              size="sm"
-              variant="outline"
-              onClick={onStop}
-            >
-              <Square className="h-4 w-4 mr-2" /> Stop
+            <Button className="flex items-center" size="sm" variant="outline" onClick={onStop}>
+              <Square className="mr-2 h-4 w-4" /> Stop
             </Button>
           ) : server.stopped ? (
-            <Button
-              className="flex items-center"
-              size="sm"
-              variant="outline"
-              onClick={onStart}
-            >
-              <Play className="h-4 w-4 mr-2" /> Start
+            <Button className="flex items-center" size="sm" variant="outline" onClick={onStart}>
+              <Play className="mr-2 h-4 w-4" /> Start
             </Button>
           ) : null}
         </div>
@@ -362,7 +286,7 @@ export function NotebookCard({
           notebookName={name}
           trigger={
             <Button size="sm" variant="ghost">
-              <Info className="h-4 w-4 mr-2" />
+              <Info className="mr-2 h-4 w-4" />
               Details
             </Button>
           }
