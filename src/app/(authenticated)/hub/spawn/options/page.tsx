@@ -6,25 +6,10 @@ import { ArrowLeft, Rocket, AlertCircle } from "lucide-react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import {
-  JupyterHubServerOptions,
-  createServer,
-} from "@/services/client/jupyterHub";
-import {
-  defaultJupyterHubServerOptions,
-  minimalJupyterHubServerOptions,
-} from "@/config/hub";
-import {
-  ImageSettings,
-  ResourceSettings,
-  StorageSettings,
-} from "@/components/hub/settings/simpleSettings";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { JupyterHubServerOptions, createServer } from "@/services/client/jupyterHub";
+import { defaultJupyterHubServerOptions, minimalJupyterHubServerOptions } from "@/config/hub";
+import { ImageSettings, ResourceSettings, StorageSettings } from "@/components/hub/settings/simpleSettings";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ServerNameInput } from "@/components/hub/ServerNameInput";
 import { useAuth } from "@/hooks/useAuth";
 import { Loading } from "@/components/ui/loading";
@@ -34,9 +19,7 @@ export default function SpawnPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
-  const [options, setOptions] = useState<Partial<JupyterHubServerOptions>>(
-    defaultJupyterHubServerOptions,
-  );
+  const [options, setOptions] = useState<Partial<JupyterHubServerOptions>>(defaultJupyterHubServerOptions);
   const [serverName, setServerName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [serverNameError, setServerNameError] = useState<string | undefined>();
@@ -46,6 +29,9 @@ export default function SpawnPage() {
   const nameRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const resourceRef = useRef<HTMLDivElement>(null);
+
+  // Read error passed from spawn progress
+  const spawnError = searchParams.get("error") || undefined;
 
   // Validation logic
   const validation = useMemo(() => {
@@ -57,11 +43,8 @@ export default function SpawnPage() {
       errors.push(serverNameError);
     }
 
-
     // Check minimal required options
-    const minimalKeys = Object.keys(
-      minimalJupyterHubServerOptions,
-    ) as (keyof JupyterHubServerOptions)[];
+    const minimalKeys = Object.keys(minimalJupyterHubServerOptions) as (keyof JupyterHubServerOptions)[];
 
     for (const key of minimalKeys) {
       const currentValue = options[key];
@@ -80,7 +63,7 @@ export default function SpawnPage() {
       hasRequiredOptions: missingFields.length === 0,
     };
   }, [isServerNameValid, options]);
-    console.log(serverNameError)
+  console.log(serverNameError);
 
   // Parse URL parameters into JupyterHubServerOptions
   useEffect(() => {
@@ -212,27 +195,25 @@ export default function SpawnPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl relative">
+    <div className="relative container mx-auto max-w-7xl space-y-6 p-6">
+      {spawnError && (
+        <div className="border-destructive/30 bg-destructive/10 text-destructive mb-4 rounded-md border p-3 text-sm">
+          {spawnError}
+        </div>
+      )}
       {/* Back button */}
       <div className="flex items-center space-x-2">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => router.push("/hub/notebooks")}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+        <Button size="sm" variant="ghost" onClick={() => router.push("/hub/notebooks")}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Notebooks
         </Button>
       </div>
 
       {/* Page header */}
-      <PageHeader
-        description="Configure your JupyterHub notebook server"
-        title="Create New Notebook"
-      />
+      <PageHeader description="Configure your JupyterHub notebook server" title="Create New Notebook" />
 
-      <div className="space-y-6  mx-auto py-6">
-        <div className="flex justify-end mb-2">
+      <div className="mx-auto space-y-6 py-6">
+        <div className="mb-2 flex justify-end">
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline">
@@ -241,9 +222,7 @@ export default function SpawnPage() {
             </DialogTrigger>
             <DialogContent>
               <DialogTitle>Options Configuration</DialogTitle>
-              <pre className="text-xs whitespace-pre-wrap">
-                {JSON.stringify(options, null, 2)}
-              </pre>
+              <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(options, null, 2)}</pre>
             </DialogContent>
           </Dialog>
         </div>
@@ -276,10 +255,7 @@ export default function SpawnPage() {
         <div className="flex justify-end">
           <div className="relative inline-flex">
             <Button
-              className={cn(
-                "shadow-lg transition-all duration-200",
-                "min-w-[160px] gap-2 text-base font-medium",
-              )}
+              className={cn("shadow-lg transition-all duration-200", "min-w-[160px] gap-2 text-base font-medium")}
               disabled={isCreating}
               size="lg"
               onClick={handleCreateNotebook}
@@ -303,11 +279,11 @@ export default function SpawnPage() {
 
             {/* Validation tooltip */}
             {!validation.isValid && (
-              <div className="absolute bottom-full right-0 mb-2 p-2 bg-gray-900 text-white text-xs rounded shadow-lg max-w-xs">
+              <div className="absolute right-0 bottom-full mb-2 max-w-xs rounded bg-gray-900 p-2 text-xs text-white shadow-lg">
                 {validation.errors.length > 0 && (
                   <div className="mb-1">
                     <strong>Errors:</strong>
-                    <ul className="list-disc list-inside">
+                    <ul className="list-inside list-disc">
                       {validation.errors.map((error, index) => (
                         <li key={index}>{error}</li>
                       ))}

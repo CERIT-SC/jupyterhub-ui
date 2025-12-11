@@ -9,12 +9,13 @@ type Options = {
 
 type Result = {
   data?: ServerProgress;
-  isFetched: boolean;        // saw at least one event
+  isFetched: boolean; // saw at least one event
   isError: boolean;
   error?: Error;
-  isStreaming: boolean;      // connection open
+  isStreaming: boolean; // connection open
   start: () => void;
   stop: () => void;
+  streamSource: EventSource | null;
 };
 
 export function useServerProgress({ serverName, username, autoStart = true }: Options): Result {
@@ -28,9 +29,7 @@ export function useServerProgress({ serverName, username, autoStart = true }: Op
     if (!serverName || esRef.current) return;
 
     const resolvedUser = getUsernameOrDefault(username);
-    const url = `/api/hub/users/${encodeURIComponent(resolvedUser)}/servers/${encodeURIComponent(
-      serverName,
-    )}/progress`;
+    const url = `/api/hub/api/users/${encodeURIComponent(resolvedUser)}/servers/${encodeURIComponent(serverName)}/progress`;
 
     const es = new EventSource(url); // cookies flow to /api/hub
     esRef.current = es;
@@ -90,5 +89,6 @@ export function useServerProgress({ serverName, username, autoStart = true }: Op
     isStreaming,
     start,
     stop,
+    streamSource: esRef.current,
   };
 }

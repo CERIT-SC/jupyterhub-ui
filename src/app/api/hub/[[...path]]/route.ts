@@ -2,63 +2,42 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs"; // enable streaming in Node runtime
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
   return proxyToJupyterHub(req, path);
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
 }
 
-export async function OPTIONS(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function OPTIONS(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
 }
 
-export async function HEAD(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function HEAD(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ path?: string[] }> },
-) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path } = await params;
 
   return proxyToJupyterHub(req, path);
@@ -68,15 +47,14 @@ async function proxyToJupyterHub(req: NextRequest, path?: string[]) {
   const token = req.cookies.get("jupyterhub_token")?.value;
   if (!token) return new NextResponse("Unauthorized", { status: 401 });
 
-  const upstreamUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/api/${(path || []).join("/")}${req.nextUrl.search || ""}`;
-
-  const isSSERequest = (req.headers.get("accept") || "")
-    .toLowerCase()
-    .includes("text/event-stream");
+  const upstreamUrl = `${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}/hub/${(path || []).join("/")}${req.nextUrl.search || ""}`;
+  console.log(`Proxying request to JupyterHub upstream URL: ${upstreamUrl}`);
+  const isSSERequest = (req.headers.get("accept") || "").toLowerCase().includes("text/event-stream");
 
   const outgoing = new Headers(req.headers);
   outgoing.set("host", new URL(`${process.env.NEXT_PUBLIC_JUPYTERHUB_URL}`).host);
   outgoing.set("authorization", `token ${token}`);
+
   if (isSSERequest) {
     // avoid compression buffering breaking SSE
     outgoing.delete("accept-encoding");
@@ -92,8 +70,8 @@ async function proxyToJupyterHub(req: NextRequest, path?: string[]) {
   });
 
   const resHeaders = new Headers(proxyRes.headers);
-  const isSSEResponse =
-    resHeaders.get("content-type")?.toLowerCase().includes("text/event-stream") ?? false;
+
+  const isSSEResponse = resHeaders.get("content-type")?.toLowerCase().includes("text/event-stream") ?? false;
 
   if (isSSERequest || isSSEResponse) {
     resHeaders.set("content-type", "text/event-stream; charset=utf-8");

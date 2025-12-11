@@ -1,31 +1,9 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
-import {
-  ChevronRight,
-  Cpu,
-  Gpu,
-  MemoryStick,
-  Rocket,
-  Settings,
-  Settings2,
-  Shield,
-} from "lucide-react";
+import { ChevronRight, Cpu, Gpu, MemoryStick, Rocket, Settings, Settings2, Shield } from "lucide-react";
 
-import {
-  CardTitle,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-} from "../ui/card";
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { CardTitle, Card, CardContent, CardDescription, CardFooter, CardHeader } from "../ui/card";
+import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { DialogContent } from "../ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -36,10 +14,7 @@ import { cn } from "@/lib/cn";
 import { Loading } from "@/components/ui/loading";
 import { Badge } from "@/components/ui/badge";
 import { createServer } from "@/services/client/jupyterHub";
-import {
-  defaultJupyterHubServerOptions,
-  minimalJupyterHubServerOptions,
-} from "@/config/hub";
+import { defaultJupyterHubServerOptions, minimalJupyterHubServerOptions } from "@/config/hub";
 import { useAuth } from "@/hooks/useAuth";
 import { ServerPreset } from "@/config/quickpresets";
 
@@ -79,11 +54,7 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
     }
     setIsSpawning(true);
     try {
-      await createServer(
-        trimmed,
-        { ...minimalJupyterHubServerOptions, ...preset.options },
-        user?.name,
-      );
+      await createServer(trimmed, { ...minimalJupyterHubServerOptions, ...preset.options }, user?.name);
       router.push(`/hub/spawn/progress/${trimmed}`);
       setShowStartDialog(false);
     } catch (error) {
@@ -119,38 +90,28 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
   return (
     <Card
       className={cn(
-        "overflow-hidden transition-all duration-300 flex flex-col h-full group",
-        "border border-infra-border ",
-        "] hover:ring-infra-primary hover:border-infra-primary shadow-lg ",
+        "group flex h-full flex-col overflow-hidden transition-all duration-300",
+        "border-infra-border border",
+        "] hover:ring-infra-primary hover:border-infra-primary shadow-lg",
       )}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
-          <div
-            className={cn(
-              "p-2 rounded-lg transition-colors flex-shrink-0 ",
-            )}
-          >
-            {preset.icon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-medium text-infra-text-primary">
-              {preset.name}
-            </CardTitle>
-            <CardDescription className="text-sm mt-1">
-              {preset.description}
-            </CardDescription>
+          <div className={cn("flex-shrink-0 rounded-lg p-2 transition-colors")}>{preset.icon}</div>
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-infra-text-primary text-lg font-medium">{preset.name}</CardTitle>
+            <CardDescription className="mt-1 text-sm">{preset.description}</CardDescription>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-8 flex-1">
+      <CardContent className="flex-1 space-y-8">
         {/* Resource specifications - inline layout like PresetSelector */}
-        <div className="grid grid-cols-2 gap-2 jus">
+        <div className="jus grid grid-cols-2 gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center text-sm ">
-                <Cpu className="h-4 w-4 mr-1" />
+              <div className="flex items-center text-sm">
+                <Cpu className="mr-1 h-4 w-4" />
                 <span>{completeOptions.cpu} CPU</span>
               </div>
             </TooltipTrigger>
@@ -161,8 +122,8 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center text-sm ">
-                <MemoryStick className="h-4 w-4 mr-1" />
+              <div className="flex items-center text-sm">
+                <MemoryStick className="mr-1 h-4 w-4" />
                 <span>{completeOptions.mem} GB</span>
               </div>
             </TooltipTrigger>
@@ -173,11 +134,10 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center text-sm ">
-                <Gpu className="h-4 w-4 mr-1" />
+              <div className="flex items-center text-sm">
+                <Gpu className="mr-1 h-4 w-4" />
                 <span>
-                  {completeOptions.gpu === "none" ||
-                  completeOptions.gpu === undefined
+                  {completeOptions.gpu === "none" || completeOptions.gpu === undefined
                     ? "No GPU"
                     : completeOptions.gpu.toUpperCase()}
                 </span>
@@ -190,13 +150,8 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center text-sm ">
-                <Shield
-                  className={cn(
-                    "h-4 w-4 mr-1",
-                    completeOptions.ssh ? "text-emerald-600" : "text-gray-400",
-                  )}
-                />
+              <div className="flex items-center text-sm">
+                <Shield className={cn("mr-1 h-4 w-4", completeOptions.ssh ? "text-emerald-600" : "text-gray-400")} />
                 <span>{completeOptions.ssh ? "SSH" : "No SSH"}</span>
               </div>
             </TooltipTrigger>
@@ -207,20 +162,16 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
         </div>
 
         {/* Tags */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex flex-wrap gap-2">
           {preset.tags?.map((tag: string, index: number) => (
-            <Badge
-              key={index}
-              className="text-xs text-infra-primary border-infra-primary"
-              variant="outline"
-            >
+            <Badge key={index} className="text-infra-primary border-infra-primary text-xs" variant="outline">
               {tag}
             </Badge>
           ))}
         </div>
       </CardContent>
 
-      <CardFooter className="pt-6 flex gap-2 mt-auto">
+      <CardFooter className="mt-auto flex gap-2 pt-6">
         <Button
           className="flex-1 gap-2"
           size="sm"
@@ -264,21 +215,15 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
           >
             <DialogHeader>
               <DialogTitle>Start Notebook Server</DialogTitle>
-              <DialogDescription>
-                Create a new notebook server with {preset.name} configuration
-              </DialogDescription>
+              <DialogDescription>Create a new notebook server with {preset.name} configuration</DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
-              <ServerNameInput
-                error={serverNameError}
-                value={serverName}
-                onChangeNameAction={setServerName}
-              />
+              <ServerNameInput error={serverNameError} value={serverName} onChangeNameAction={setServerName} />
 
               {/* Server configuration summary */}
-              <div className="bg-secondary/30 p-4 rounded-md space-y-3">
-                <h4 className="font-medium text-sm">Configuration Summary:</h4>
+              <div className="bg-secondary/30 space-y-3 rounded-md p-4">
+                <h4 className="text-sm font-medium">Configuration Summary:</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="flex items-center gap-1">
                     <Cpu className="h-3.5 w-3.5" />
@@ -290,11 +235,7 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
                   </div>
                   <div className="flex items-center gap-1">
                     <Gpu className="h-3.5 w-3.5" />
-                    <span>
-                      {preset.options.gpu === "none"
-                        ? "No GPU"
-                        : preset.options.gpu}
-                    </span>
+                    <span>{preset.options.gpu === "none" ? "No GPU" : preset.options.gpu}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Shield className="h-3.5 w-3.5" />
@@ -305,24 +246,11 @@ function QuickPresetCard({ preset }: QuickPresetCardProps) {
             </div>
 
             <DialogFooter className="flex sm:justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowStartDialog(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setShowStartDialog(false)}>
                 Cancel
               </Button>
-              <Button
-                className="gap-2"
-                disabled={isSpawning}
-                type="button"
-                onClick={handleCreateServer}
-              >
-                {isSpawning ? (
-                  <Loading className="h-4 w-4" />
-                ) : (
-                  <Rocket className="h-4 w-4" />
-                )}
+              <Button className="gap-2" disabled={isSpawning} type="button" onClick={handleCreateServer}>
+                {isSpawning ? <Loading className="h-4 w-4" /> : <Rocket className="h-4 w-4" />}
                 Create Notebook
               </Button>
             </DialogFooter>
@@ -337,51 +265,49 @@ function CustomPresetCard({ onConfigure }: { onConfigure: () => void }) {
   return (
     <Card
       className={cn(
-        "overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg flex flex-col h-full",
-        "border-2 border-dashed border-infra-border hover:border-infra-primary/50",
+        "flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300 hover:shadow-lg",
+        "border-infra-border hover:border-infra-primary/50 border-2 border-dashed",
       )}
       onClick={onConfigure}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start gap-3">
-          <div className="p-2 rounded-lg bg-infra-surface-secondary flex-shrink-0">
-            <Settings2 className="h-6 w-6 " />
+          <div className="bg-infra-surface-secondary flex-shrink-0 rounded-lg p-2">
+            <Settings2 className="h-6 w-6" />
           </div>
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-medium text-infra-text-primary">
-              Custom Configuration
-            </CardTitle>
-            <CardDescription className="text-sm text-infra-text-secondary mt-1">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-infra-text-primary text-lg font-medium">Custom Configuration</CardTitle>
+            <CardDescription className="text-infra-text-secondary mt-1 text-sm">
               Full control over server specifications
             </CardDescription>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="py-2 space-y-4 flex-1">
-        <div className="flex justify-between items-center">
+      <CardContent className="flex-1 space-y-4 py-2">
+        <div className="flex items-center justify-between">
           <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center text-sm ">
-              <Cpu className="h-4 w-4 mr-1" />
+            <div className="flex items-center text-sm">
+              <Cpu className="mr-1 h-4 w-4" />
               <span>Custom CPU</span>
             </div>
-            <div className="flex items-center text-sm ">
-              <MemoryStick className="h-4 w-4 mr-1" />
+            <div className="flex items-center text-sm">
+              <MemoryStick className="mr-1 h-4 w-4" />
               <span>Custom RAM</span>
             </div>
-            <div className="flex items-center text-sm ">
-              <Gpu className="h-4 w-4 mr-1" />
+            <div className="flex items-center text-sm">
+              <Gpu className="mr-1 h-4 w-4" />
               <span>GPU Options</span>
             </div>
-            <div className="flex items-center text-sm ">
-              <Gpu className="h-4 w-4 mr-1" />
+            <div className="flex items-center text-sm">
+              <Gpu className="mr-1 h-4 w-4" />
               <span>Storage Options</span>
             </div>
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="pt-6 mt-auto">
+      <CardFooter className="mt-auto pt-6">
         <Button
           className="w-full gap-2"
           variant="outline"
@@ -392,7 +318,7 @@ function CustomPresetCard({ onConfigure }: { onConfigure: () => void }) {
         >
           <Settings className="h-4 w-4" />
           Configure Options
-          <ChevronRight className="h-4 w-4 ml-auto" />
+          <ChevronRight className="ml-auto h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>

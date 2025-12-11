@@ -9,12 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useServerProgress } from "@/features/servers/api/get-server-progress";
+import { useServerProgress } from "@/features/spawn/api/get-server-progress";
 import { useAuth } from "@/hooks/useAuth";
 import { getUsernameOrDefault, ServerProgress } from "@/services/client/jupyterHub";
 import axios from "axios";
 import { jupyterHubClient } from "@/api/jupyterhub/jupyerhubApiClient";
 import { env } from "next-runtime-env";
+import { useSpawnEvents } from "@/features/spawn/hooks/useSpawnEvents";
 type PageState = "starting" | "progress" | "ready" | "failed" | "error";
 
 export default function SpawnProgress() {
@@ -29,10 +30,28 @@ export default function SpawnProgress() {
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
   const [countdown, setCountdown] = useState<number | null>(null);
 
-  const { data, isError, error, isFetched, isStreaming, start, stop } = useServerProgress({
+  const { data, isError, error, isFetched, isStreaming, start, stop, streamSource } = useServerProgress({
     serverName,
     username: user?.name,
     autoStart: true,
+  });
+
+  const {} = useSpawnEvents({
+    serverName,
+    username: user?.name,
+    ctx: {
+      navigateToOptions: ({ error }) => {
+        console.log("Navigate to options with error:", error);
+      },
+      toast: ({ title, description, variant }) => {
+        console.log(`Toast [${variant}]: ${title} - ${description}`);
+      },
+      stopServer: async () => {
+        await void 0;
+        console.log("Stopping server...");
+      },
+    },
+    eventSource: streamSource,
   });
 
   const JUPYTERHUB_URL = env("NEXT_PUBLIC_JUPYTERHUB_URL");

@@ -1,7 +1,7 @@
 "use client";
 
 import { Clipboard, Eye, EyeOff, Loader2, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useOptimistic, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,7 @@ import { Input } from "@/components/ui/input";
 import { useTokens } from "@/features/tokens/api/get-tokens";
 import { useAuth } from "@/hooks/useAuth";
 import { createUserToken, deleteUserToken } from "@/services/client/jupyterHub";
-
-// Using ApiToken interface from jupyterHub service
+import { useServerOptions } from "@/features/options/api/get-options";
 
 export default function TokensPage1() {
   const [tokenNote, setTokenNote] = useState("");
@@ -19,6 +18,12 @@ export default function TokensPage1() {
   const [showToken, setShowToken] = useState(false);
   const { user } = useAuth();
   const { data: tokens, isLoading, refetch } = useTokens();
+
+  const { data: options } = useServerOptions({
+    serverName: "czcz",
+  });
+
+  console.log("Server Options:", options);
 
   const handleCreateToken = async () => {
     try {

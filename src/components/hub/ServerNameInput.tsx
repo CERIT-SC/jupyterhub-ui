@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import {
-  CheckCircle,
-  ServerIcon,
-  XCircle,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
+import { CheckCircle, ServerIcon, XCircle, AlertCircle, Loader2 } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -18,25 +12,14 @@ import { cn } from "@/lib/utils";
 import { useServerNameValidation } from "@/hooks/useServerNameValidation";
 
 interface ServerNameInputProps {
-  /**
-   * Current server name value
-   */
   value: string;
-  /**
-   * Callback when server name changes
-   */
+
   onChangeNameAction: (value: string) => void;
-  /**
-   * Additional CSS class
-   */
+
   className?: string;
-  /**
-   * Custom error message from parent component
-   */
+
   error?: string;
-  /**
-   * Callback when validation state changes
-   */
+
   onValidationChange?: (isValid: boolean) => void;
 }
 
@@ -114,22 +97,13 @@ export function ServerNameInput({
           </Label>
           <div className="relative mt-2">
             <Input
-              className={cn(
-                "pr-10",
-                error
-                  ? "border-red-500"
-                  : validationStatus === "valid"
-                    ? "border-green-500"
-                    : "",
-              )}
+              className={cn("pr-10", error ? "border-red-500" : validationStatus === "valid" ? "border-green-500" : "")}
               id="server-name"
               placeholder="my-notebook"
               value={serverName}
               onChange={(e) => handleInputChange(e.target.value)}
             />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              {renderStatusIcon()}
-            </div>
+            <div className="absolute top-1/2 right-3 -translate-y-1/2">{renderStatusIcon()}</div>
           </div>
           <FormError message={error === null ? undefined : error} />
           <HelpText
@@ -137,15 +111,14 @@ export function ServerNameInput({
             tooltip={
               <>
                 <p className="font-medium">Naming Rules:</p>
-                <ul className="list-disc pl-4 mt-1 space-y-1">
+                <ul className="mt-1 list-disc space-y-1 pl-4">
                   <li>Must start and end with a letter or number</li>
                   <li>Can contain lowercase letters, numbers, and hyphens</li>
                   <li>Maximum 63 characters long</li>
                   <li>Must be unique across your notebooks</li>
                 </ul>
                 <p className="mt-2">
-                  Examples: <code>data-analysis</code>,{" "}
-                  <code>jupyter-gpu-1</code>, <code>ml-project-2025</code>
+                  Examples: <code>data-analysis</code>, <code>jupyter-gpu-1</code>, <code>ml-project-2025</code>
                 </p>
               </>
             }

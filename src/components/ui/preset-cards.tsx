@@ -7,22 +7,8 @@ import { ServerNameInput } from "../hub/ServerNameInput";
 
 import { Button } from "./button";
 import { Loading, LoadingPage } from "./loading";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "./dialog";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 import { minimalJupyterHubServerOptions } from "@/config/hub";
@@ -34,13 +20,7 @@ import { NotebookPreset } from "@/db/notebooksPresetsRepository";
 // Define preset type (adjust according to your actual data structure)
 
 // Styled PresetCard component (similar to QuickPresetCard)
-function PresetCard({
-  preset,
-  onClick,
-}: {
-  preset: NotebookPreset;
-  onClick?: () => void;
-}) {
+function PresetCard({ preset, onClick }: { preset: NotebookPreset; onClick?: () => void }) {
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [serverName, setServerName] = useState("");
   const [serverNameError, setServerNameError] = useState("");
@@ -61,11 +41,7 @@ function PresetCard({
     }
     setIsSpawning(true);
     try {
-      await createServer(
-        serverName,
-        { ...minimalJupyterHubServerOptions, ...preset.serverOptions },
-        user?.name,
-      );
+      await createServer(serverName, { ...minimalJupyterHubServerOptions, ...preset.serverOptions }, user?.name);
 
       // Redirect to the progress page
       router.push(`/hub/spawn/progress/${serverName}`);
@@ -91,38 +67,34 @@ function PresetCard({
       <TooltipTrigger asChild>
         <Card
           className={cn(
-            "overflow-hidden cursor-pointer transition-all duration-300 flex flex-col h-full group",
-            "border border-infra-border ",
-            "hover:ring-infra-primary hover:border-infra-primary shadow-lg ",
+            "group flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-300",
+            "border-infra-border border",
+            "hover:ring-infra-primary hover:border-infra-primary shadow-lg",
           )}
         >
-          <CardHeader className="pb-3 group-hover:text-infra-primary">
+          <CardHeader className="group-hover:text-infra-primary pb-3">
             <div className="flex items-start gap-3">
-              <div
-                className={cn(
-                  "p-2 rounded-lg transition-colors flex-shrink-0 group-hover:bg-infra-primary/10",
-                )}
-              >
-                <Settings className="h-5 w-5 text-infra-primary" />
+              <div className={cn("group-hover:bg-infra-primary/10 flex-shrink-0 rounded-lg p-2 transition-colors")}>
+                <Settings className="text-infra-primary h-5 w-5" />
               </div>
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-lg font-medium text-infra-text-primary group-hover:text-infra-primary">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-infra-text-primary group-hover:text-infra-primary text-lg font-medium">
                   {preset.name}
                 </CardTitle>
-                <CardDescription className="text-sm mt-1 group-hover:text-infra-primary">
+                <CardDescription className="group-hover:text-infra-primary mt-1 text-sm">
                   {preset.description}
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-8 flex-1">
+          <CardContent className="flex-1 space-y-8">
             {/* Resource specifications - inline layout like PresetSelector */}
             <div className="grid grid-cols-2 gap-2">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center text-sm ">
-                    <Cpu className="h-4 w-4 mr-1" />
+                  <div className="flex items-center text-sm">
+                    <Cpu className="mr-1 h-4 w-4" />
                     <span>{completeOptions.cpu || "N/A"} CPU</span>
                   </div>
                 </TooltipTrigger>
@@ -133,8 +105,8 @@ function PresetCard({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center text-sm ">
-                    <MemoryStick className="h-4 w-4 mr-1" />
+                  <div className="flex items-center text-sm">
+                    <MemoryStick className="mr-1 h-4 w-4" />
                     <span>{completeOptions.mem || "N/A"} GB</span>
                   </div>
                 </TooltipTrigger>
@@ -145,11 +117,10 @@ function PresetCard({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center text-sm ">
-                    <Gpu className="h-4 w-4 mr-1" />
+                  <div className="flex items-center text-sm">
+                    <Gpu className="mr-1 h-4 w-4" />
                     <span>
-                      {completeOptions.gpu === "none" ||
-                      completeOptions.gpu === undefined
+                      {completeOptions.gpu === "none" || completeOptions.gpu === undefined
                         ? "No GPU"
                         : completeOptions.gpu.toUpperCase()}
                     </span>
@@ -162,28 +133,21 @@ function PresetCard({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center text-sm ">
+                  <div className="flex items-center text-sm">
                     <Shield
-                      className={cn(
-                        "h-4 w-4 mr-1",
-                        completeOptions.ssh
-                          ? "text-emerald-600"
-                          : "text-gray-400",
-                      )}
+                      className={cn("mr-1 h-4 w-4", completeOptions.ssh ? "text-emerald-600" : "text-gray-400")}
                     />
                     <span>{completeOptions.ssh ? "SSH" : "No SSH"}</span>
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>
-                    SSH access {completeOptions.ssh ? "enabled" : "disabled"}
-                  </p>
+                  <p>SSH access {completeOptions.ssh ? "enabled" : "disabled"}</p>
                 </TooltipContent>
               </Tooltip>
             </div>
 
             {/* Tags */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-2">
               {/* {preset.tags?.map((tag: string, index: number) => (
                 <Badge
                   key={index}
@@ -196,7 +160,7 @@ function PresetCard({
             </div>
           </CardContent>
 
-          <CardFooter className="pt-6 flex gap-2 mt-auto">
+          <CardFooter className="mt-auto flex gap-2 pt-6">
             <Button
               className="flex-1 gap-2"
               size="sm"
@@ -240,24 +204,15 @@ function PresetCard({
               >
                 <DialogHeader>
                   <DialogTitle>Start Notebook Server</DialogTitle>
-                  <DialogDescription>
-                    Create a new notebook server with {preset.name}{" "}
-                    configuration
-                  </DialogDescription>
+                  <DialogDescription>Create a new notebook server with {preset.name} configuration</DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">
-                  <ServerNameInput
-                    error={serverNameError}
-                    value={serverName}
-                    onChangeNameAction={setServerName}
-                  />
+                  <ServerNameInput error={serverNameError} value={serverName} onChangeNameAction={setServerName} />
 
                   {/* Server configuration summary */}
-                  <div className="bg-secondary/30 p-4 rounded-md space-y-3">
-                    <h4 className="font-medium text-sm">
-                      Configuration Summary:
-                    </h4>
+                  <div className="bg-secondary/30 space-y-3 rounded-md p-4">
+                    <h4 className="text-sm font-medium">Configuration Summary:</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       <div className="flex items-center gap-1">
                         <Cpu className="h-3.5 w-3.5" />
@@ -269,41 +224,22 @@ function PresetCard({
                       </div>
                       <div className="flex items-center gap-1">
                         <Gpu className="h-3.5 w-3.5" />
-                        <span>
-                          {completeOptions.gpu === "none"
-                            ? "No GPU"
-                            : completeOptions.gpu || "No GPU"}
-                        </span>
+                        <span>{completeOptions.gpu === "none" ? "No GPU" : completeOptions.gpu || "No GPU"}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Shield className="h-3.5 w-3.5" />
-                        <span>
-                          {completeOptions.ssh ? "SSH Enabled" : "No SSH"}
-                        </span>
+                        <span>{completeOptions.ssh ? "SSH Enabled" : "No SSH"}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <DialogFooter className="flex sm:justify-between">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowStartDialog(false)}
-                  >
+                  <Button type="button" variant="outline" onClick={() => setShowStartDialog(false)}>
                     Cancel
                   </Button>
-                  <Button
-                    className="gap-2"
-                    disabled={isSpawning}
-                    type="button"
-                    onClick={handleCreateServer}
-                  >
-                    {isSpawning ? (
-                      <Loading className="h-4 w-4" />
-                    ) : (
-                      <Rocket className="h-4 w-4" />
-                    )}
+                  <Button className="gap-2" disabled={isSpawning} type="button" onClick={handleCreateServer}>
+                    {isSpawning ? <Loading className="h-4 w-4" /> : <Rocket className="h-4 w-4" />}
                     Create Notebook
                   </Button>
                 </DialogFooter>
@@ -314,7 +250,7 @@ function PresetCard({
       </TooltipTrigger>
       <TooltipContent className="max-w-sm" side="right">
         <div className="space-y-2">
-          <h4 className="font-medium text-sm">{preset.name} Configuration</h4>
+          <h4 className="text-sm font-medium">{preset.name} Configuration</h4>
           <div className="space-y-1 text-xs">
             <div className="flex justify-between">
               <span>CPU:</span>
@@ -326,11 +262,7 @@ function PresetCard({
             </div>
             <div className="flex justify-between">
               <span>GPU:</span>
-              <span>
-                {completeOptions.gpu === "none" || !completeOptions.gpu
-                  ? "No GPU"
-                  : completeOptions.gpu}
-              </span>
+              <span>{completeOptions.gpu === "none" || !completeOptions.gpu ? "No GPU" : completeOptions.gpu}</span>
             </div>
             <div className="flex justify-between">
               <span>SSH:</span>
@@ -339,9 +271,7 @@ function PresetCard({
             {completeOptions.container_image && (
               <div className="flex justify-between">
                 <span>Image:</span>
-                <span className="truncate max-w-32">
-                  {completeOptions.container_image}
-                </span>
+                <span className="max-w-32 truncate">{completeOptions.container_image}</span>
               </div>
             )}
           </div>
@@ -362,9 +292,7 @@ export function PresetCards({
   onPresetClick?: (id: number | string) => void;
 }) {
   if (isLoading) {
-    return (
-      <LoadingPage />
-    );
+    return <LoadingPage />;
   }
 
   if (!presets || presets.length === 0) {
@@ -372,13 +300,9 @@ export function PresetCards({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {presets.map((preset) => (
-        <PresetCard
-          key={preset.id}
-          preset={preset}
-          onClick={() => onPresetClick && onPresetClick(preset.id)}
-        />
+        <PresetCard key={preset.id} preset={preset} onClick={() => onPresetClick && onPresetClick(preset.id)} />
       ))}
     </div>
   );

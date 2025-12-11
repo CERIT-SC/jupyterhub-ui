@@ -16,10 +16,7 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 
 import { ImageSelector } from "@/components/hub/ImageSelector";
-import {
-  SelectionCard,
-  SelectionCardGrid,
-} from "@/components/hub/settings/cardSelection";
+import { SelectionCard, SelectionCardGrid } from "@/components/hub/settings/cardSelection";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CardSection } from "@/components/ui/card-section";
@@ -28,37 +25,20 @@ import { CollapsibleCard } from "@/components/ui/collapsible-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { hubConfig } from "@/config/hub";
-import {
-  cpuOptions,
-  homeOptions,
-  memoryOptions,
-  mockPvcNames,
-  mockS3Buckets,
-} from "@/config/hub/jupyterOptions";
+import { cpuOptions, homeOptions, memoryOptions, mockPvcNames, mockS3Buckets } from "@/config/hub/jupyterOptions";
 import { resourcePresets, ServerPreset } from "@/config/presets";
 import { useAllocatableGpus } from "@/features/allocatable-gpus/api/get-allocatable-gpus";
 import { cn } from "@/lib/utils";
 import { JupyterHubServerOptions } from "@/services/client/jupyterHub";
+import { SimpleAdvancedToggle } from "@/components/common/SimpleAdvancedToggle";
 
 interface OptionsComponentInterface {
   options: Partial<JupyterHubServerOptions>;
-  setOptions: React.Dispatch<
-    React.SetStateAction<Partial<JupyterHubServerOptions>>
-  >;
+  setOptions: React.Dispatch<React.SetStateAction<Partial<JupyterHubServerOptions>>>;
 }
 
 // Icon mapping
@@ -77,23 +57,12 @@ interface ResourcePresetCardProps {
   onClick: () => void;
 }
 
-export function ResourcePresetCard({
-  preset,
-  selected,
-  onClick,
-}: ResourcePresetCardProps) {
+export function ResourcePresetCard({ preset, selected, onClick }: ResourcePresetCardProps) {
   return (
     <SelectionCard selected={selected} onClick={onClick}>
-      <CardContent className="p-4 space-y-2">
-        <h4
-          className={"font-medium text-lg"}        >
-          {preset.name}
-        </h4>
-        <p
-          className="text-sm text-muted-foreground mb-3"
-        >
-          {preset.description}
-        </p>
+      <CardContent className="space-y-2 p-4">
+        <h4 className={"text-lg font-medium"}>{preset.name}</h4>
+        <p className="text-muted-foreground mb-3 text-sm">{preset.description}</p>
 
         <div className="pt-2">
           <div className="flex space-x-3">
@@ -105,7 +74,7 @@ export function ResourcePresetCard({
                     selected ? "text-primary" : "text-gray-600",
                   )}
                 >
-                  <Cpu className="h-4 w-4 mr-1" />
+                  <Cpu className="mr-1 h-4 w-4" />
                   <span>{preset.options.cpu} CPU</span>
                 </div>
               </TooltipTrigger>
@@ -122,7 +91,7 @@ export function ResourcePresetCard({
                     selected ? "text-primary" : "text-gray-600",
                   )}
                 >
-                  <MemoryStick className="h-4 w-4 mr-1" />
+                  <MemoryStick className="mr-1 h-4 w-4" />
                   <span>{preset.options.mem} GB</span>
                 </div>
               </TooltipTrigger>
@@ -139,25 +108,17 @@ export function ResourcePresetCard({
                     selected ? "text-primary" : "text-gray-600",
                   )}
                 >
-                  <Zap className="h-4 w-4 mr-1" />
-                  <span>
-                    {preset.options.gpu === "none" ? "No GPU" : `GPU`}
-                  </span>
+                  <Zap className="mr-1 h-4 w-4" />
+                  <span>{preset.options.gpu === "none" ? "No GPU" : `GPU`}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p>
-                  {preset.options.gpu === "none"
-                    ? "No GPU acceleration"
-                    : `GPU: ${preset.options.gpu}`}
-                </p>
+                <p>{preset.options.gpu === "none" ? "No GPU acceleration" : `GPU: ${preset.options.gpu}`}</p>
               </TooltipContent>
             </Tooltip>
           </div>
         </div>
       </CardContent>
-
-
     </SelectionCard>
   );
 }
@@ -185,14 +146,12 @@ export const SimpleImageCards = ({
   return (
     <SelectionCard selected={selected} onClick={onClick}>
       <CardContent className="space-y-2">
-        <div className="flex items-center gap-2 mb-2">
-          <IconComponent className="h-5 w-5 text-primary" />
-          <h4 className="font-medium text-lg">{image.name}</h4>
+        <div className="mb-2 flex items-center gap-2">
+          <IconComponent className="text-primary h-5 w-5" />
+          <h4 className="text-lg font-medium">{image.name}</h4>
         </div>
-        <p className="text-sm text-muted-foreground mb-3">
-          {image.description}
-        </p>
-        <div className="flex flex-wrap gap-1 mb-3">
+        <p className="text-muted-foreground mb-3 text-sm">{image.description}</p>
+        <div className="mb-3 flex flex-wrap gap-1">
           {image.tags.map((tag) => (
             <Badge key={tag} variant="outline">
               {tag}
@@ -209,18 +168,10 @@ export const SimpleStatus = ({ isSimple }: { isSimple: boolean }) => {
   return <>{isSimple ? <div>Simple</div> : <div>Advanced</div>}</>;
 };
 
-export const ImageSettingsSimple = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const ImageSettingsSimple = ({ options, setOptions }: OptionsComponentInterface) => {
   // Handle selection of an image card with toggle functionality
-  const handleSelectImage = (
-    image: (typeof hubConfig.simpleOptions.image)[0],
-  ) => {
-    if (
-      options.container_image &&
-      image.options.container_image === options.container_image
-    ) {
+  const handleSelectImage = (image: (typeof hubConfig.simpleOptions.image)[0]) => {
+    if (options.container_image && image.options.container_image === options.container_image) {
       const { container_image, ...restOptions } = options;
 
       setOptions(restOptions);
@@ -247,9 +198,8 @@ export const ImageSettingsSimple = ({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">
-            Select a pre-configured notebook environment. Click again to
-            unselect.
+          <p className="text-muted-foreground text-sm">
+            Select a pre-configured notebook environment. Click again to unselect.
           </p>
         </div>
       </div>
@@ -259,10 +209,7 @@ export const ImageSettingsSimple = ({
             <SimpleImageCards
               key={image.id}
               image={image}
-              selected={
-                selectedPresetImage !== undefined &&
-                image.id === selectedPresetImage?.id
-              }
+              selected={selectedPresetImage !== undefined && image.id === selectedPresetImage?.id}
               onClick={() => handleSelectImage(image)}
             />
           ));
@@ -280,16 +227,12 @@ export const ImageSettingsSimple = ({
               }}
             >
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Code className="h-5 w-5 text-primary" />
-                  <h4 className="font-medium text-lg">Custom Image</h4>
+                <div className="mb-2 flex items-center gap-2">
+                  <Code className="text-primary h-5 w-5" />
+                  <h4 className="text-lg font-medium">Custom Image</h4>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Your custom container image
-                </p>
-                <div className="text-xs bg-secondary px-2 py-1 rounded break-all mb-3">
-                  {options.container_image}
-                </div>
+                <p className="text-muted-foreground mb-2 text-sm">Your custom container image</p>
+                <div className="bg-secondary mb-3 rounded px-2 py-1 text-xs break-all">{options.container_image}</div>
               </CardContent>
             </SelectionCard>
           ) : undefined
@@ -299,10 +242,7 @@ export const ImageSettingsSimple = ({
   );
 };
 
-export const ImageSettingsAdvanced = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const ImageSettingsAdvanced = ({ options, setOptions }: OptionsComponentInterface) => {
   const handleImageChange = (imagePath: string) => {
     setOptions({
       ...options,
@@ -312,18 +252,12 @@ export const ImageSettingsAdvanced = ({
 
   return (
     <div>
-      <ImageSelector
-        value={options.container_image}
-        onChangeImageAction={handleImageChange}
-      />
+      <ImageSelector value={options.container_image} onChangeImageAction={handleImageChange} />
     </div>
   );
 };
 
-export const ImageSettings = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const ImageSettings = ({ options, setOptions }: OptionsComponentInterface) => {
   const [isSimple, setIsSimple] = useState(true);
 
   // Toggle SSH access
@@ -342,33 +276,7 @@ export const ImageSettings = ({
             <Server className="h-5 w-5" />
             Choose Image
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsSimple(true)}
-              className={cn(
-                "text-sm",
-                isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
-              )}
-            >
-              Simple
-            </button>
-            <Switch
-              checked={!isSimple}
-              onCheckedChange={(checked) => setIsSimple(!checked)}
-              aria-label="Toggle advanced image settings"
-            />
-            <button
-              type="button"
-              onClick={() => setIsSimple(false)}
-              className={cn(
-                "text-sm",
-                !isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
-              )}
-            >
-              Advanced
-            </button>
-          </div>
+          <SimpleAdvancedToggle isSimple={isSimple} onChange={setIsSimple} />
         </div>
       </CardHeader>
       <CardContent>
@@ -379,11 +287,7 @@ export const ImageSettings = ({
         )}
         <CardSection className={"mt-4"} title={"Enable SSH Access"}>
           <div className="mt-4 flex items-center gap-2">
-            <Switch
-              checked={!!options.ssh}
-              id="sshaccess"
-              onCheckedChange={handleSshChange}
-            />
+            <Switch checked={!!options.ssh} id="sshaccess" onCheckedChange={handleSshChange} />
             <label className="cursor-pointer" htmlFor="sshaccess">
               SSH access
             </label>
@@ -394,10 +298,7 @@ export const ImageSettings = ({
   );
 };
 
-export const ResourceSettingsAdvanced = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const ResourceSettingsAdvanced = ({ options, setOptions }: OptionsComponentInterface) => {
   // Track GPU-specific state to show/hide MIG amount selector
   const [showMigAmount, setShowMigAmount] = useState(false);
 
@@ -454,10 +355,8 @@ export const ResourceSettingsAdvanced = ({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium mb-2">
-          Configure computing resources
-        </h3>
-        <p className="text-sm text-muted-foreground mb-4">
+        <h3 className="mb-2 text-lg font-medium">Configure computing resources</h3>
+        <p className="text-muted-foreground mb-4 text-sm">
           Customize CPU, memory, and GPU resources for your specific workload
         </p>
       </div>
@@ -478,9 +377,8 @@ export const ResourceSettingsAdvanced = ({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-sm text-muted-foreground">
-            CPU cores determine how many computational tasks your notebook can
-            handle simultaneously
+          <p className="text-muted-foreground text-sm">
+            CPU cores determine how many computational tasks your notebook can handle simultaneously
           </p>
         </div>
 
@@ -499,7 +397,7 @@ export const ResourceSettingsAdvanced = ({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Memory determines how much data your notebook can work with at once
           </p>
         </div>
@@ -508,22 +406,15 @@ export const ResourceSettingsAdvanced = ({
   );
 };
 
-export const ResourceSettingsSimple = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
-  const [selectedPresetId, setSelectedPresetId] = useState<
-    string | undefined
-  >();
+export const ResourceSettingsSimple = ({ options, setOptions }: OptionsComponentInterface) => {
+  const [selectedPresetId, setSelectedPresetId] = useState<string | undefined>();
 
   // Initialize selected preset when component mounts
   useEffect(() => {
     // Try to find a preset that matches current options
     const matchingPreset = resourcePresets.find(
       (preset) =>
-        preset.options.cpu === options.cpu &&
-        preset.options.mem === options.mem &&
-        preset.options.gpu === options.gpu,
+        preset.options.cpu === options.cpu && preset.options.mem === options.mem && preset.options.gpu === options.gpu,
     );
 
     if (matchingPreset) {
@@ -559,14 +450,10 @@ export const ResourceSettingsSimple = ({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium mb-2">
-          Choose resource configuration
-        </h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Select a pre-configured resource profile for your notebook
-        </p>
+        <h3 className="mb-2 text-lg font-medium">Choose resource configuration</h3>
+        <p className="text-muted-foreground mb-4 text-sm">Select a pre-configured resource profile for your notebook</p>
       </div>
-      {/*//TODO too slow memo or alt*/}
+
       <SelectionCardGrid
         cards={(() => {
           return resourcePresets.map((preset) => (
@@ -590,21 +477,9 @@ export const ResourceSettingsSimple = ({
                 });
               }}
             >
-              <CardContent className="p-4 space-y-2">
-                <h4
-                  className={cn(
-                    "font-medium text-lg transition-colors duration-200",
-                    "text-primary",
-                  )}
-                >
-                  Custom
-                </h4>
-                <p
-                  className={cn(
-                    "text-sm transition-colors duration-200",
-                    "text-primary/70",
-                  )}
-                >
+              <CardContent className="space-y-2 p-4">
+                <h4 className={cn("text-lg font-medium transition-colors duration-200", "text-primary")}>Custom</h4>
+                <p className={cn("text-sm transition-colors duration-200", "text-primary/70")}>
                   Cuatom resource configuration
                 </p>
 
@@ -612,13 +487,8 @@ export const ResourceSettingsSimple = ({
                   <div className="flex space-x-3">
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div
-                          className={cn(
-                            "flex items-center text-sm transition-colors duration-200",
-                            "text-primary",
-                          )}
-                        >
-                          <Cpu className="h-4 w-4 mr-1" />
+                        <div className={cn("flex items-center text-sm transition-colors duration-200", "text-primary")}>
+                          <Cpu className="mr-1 h-4 w-4" />
                           <span>{options.cpu} CPU</span>
                         </div>
                       </TooltipTrigger>
@@ -629,13 +499,8 @@ export const ResourceSettingsSimple = ({
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div
-                          className={cn(
-                            "flex items-center text-sm transition-colors duration-200",
-                            "text-primary",
-                          )}
-                        >
-                          <MemoryStick className="h-4 w-4 mr-1" />
+                        <div className={cn("flex items-center text-sm transition-colors duration-200", "text-primary")}>
+                          <MemoryStick className="mr-1 h-4 w-4" />
                           <span>{options.mem} GB</span>
                         </div>
                       </TooltipTrigger>
@@ -646,26 +511,13 @@ export const ResourceSettingsSimple = ({
 
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div
-                          className={cn(
-                            "flex items-center text-sm transition-colors duration-200",
-                            "text-primary",
-                          )}
-                        >
-                          <Zap className="h-4 w-4 mr-1" />
-                          <span>
-                            {options.gpu === undefined || options.gpu === "none"
-                              ? "No GPU"
-                              : `GPU`}
-                          </span>
+                        <div className={cn("flex items-center text-sm transition-colors duration-200", "text-primary")}>
+                          <Zap className="mr-1 h-4 w-4" />
+                          <span>{options.gpu === undefined || options.gpu === "none" ? "No GPU" : `GPU`}</span>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>
-                          {options?.gpu === "none"
-                            ? "No GPU acceleration"
-                            : `GPU: ${options.gpu}`}
-                        </p>
+                        <p>{options?.gpu === "none" ? "No GPU acceleration" : `GPU: ${options.gpu}`}</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -679,10 +531,7 @@ export const ResourceSettingsSimple = ({
   );
 };
 
-export function GpuSelector({
-  options,
-  setOptions,
-}: OptionsComponentInterface) {
+export function GpuSelector({ options, setOptions }: OptionsComponentInterface) {
   const [gpuNames, setGpuNames] = React.useState<Record<string, string>>({});
 
   const { data, isLoading, error } = useAllocatableGpus({
@@ -743,26 +592,15 @@ export function GpuSelector({
 
   return (
     <div>
-      <p className="text-muted-foreground mb-3">
-        Select the GPU type for your notebook environment.
-      </p>
+      <p className="text-muted-foreground mb-3">Select the GPU type for your notebook environment.</p>
       <div className="flex items-center gap-2">
         <Select
-          disabled={
-            isLoading ||
-            error !== null ||
-            !data ||
-            Object.keys(data).length === 0
-          }
+          disabled={isLoading || error !== null || !data || Object.keys(data).length === 0}
           value={options.gpu || "none"}
           onValueChange={handleGpuChange}
         >
-          <SelectTrigger className="w-full flex">
-            <SelectValue
-              placeholder={
-                isLoading ? "Loading ..." : error ? "" : "Select GPU"
-              }
-            />
+          <SelectTrigger className="flex w-full">
+            <SelectValue placeholder={isLoading ? "Loading ..." : error ? "" : "Select GPU"} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">None</SelectItem>
@@ -787,10 +625,7 @@ export function GpuSelector({
   );
 }
 
-export const ResourceSettings = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const ResourceSettings = ({ options, setOptions }: OptionsComponentInterface) => {
   const [isSimple, setIsSimple] = useState(true);
 
   return (
@@ -801,33 +636,7 @@ export const ResourceSettings = ({
             <Cpu className="h-5 w-5" />
             Choose Resources
           </CardTitle>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsSimple(true)}
-              className={cn(
-                "text-sm",
-                isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
-              )}
-            >
-              Simple
-            </button>
-            <Switch
-              checked={!isSimple}
-              onCheckedChange={(checked) => setIsSimple(!checked)}
-              aria-label="Toggle advanced resource settings"
-            />
-            <button
-              type="button"
-              onClick={() => setIsSimple(false)}
-              className={cn(
-                "text-sm",
-                !isSimple ? "font-semibold text-foreground" : "text-muted-foreground",
-              )}
-            >
-              Advanced
-            </button>
-          </div>
+          <SimpleAdvancedToggle isSimple={isSimple} onChange={setIsSimple} />
         </div>
       </CardHeader>
       <CardContent>
@@ -844,16 +653,11 @@ export const ResourceSettings = ({
   );
 };
 
-export const StorageSettingPhome = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const StorageSettingPhome = ({ options, setOptions }: OptionsComponentInterface) => {
   // Persistent Home state
   const [isPersistentHomeEnabled, setIsPersistentHomeEnabled] = useState(false);
   const [phomeType, setPhomeType] = useState<"new" | "existing">(
-    options.phome === "delete" || options.phome === "remain"
-      ? "new"
-      : "existing",
+    options.phome === "delete" || options.phome === "remain" ? "new" : "existing",
   );
 
   // Handle Persistent Home toggle
@@ -894,19 +698,11 @@ export const StorageSettingPhome = ({
       description="Keep your files safe between notebook sessions"
       icon={<HardDrive className="h-4 w-4" />}
       isEnabled={isPersistentHomeEnabled}
-      title={
-        options.phome === "remain"
-          ? "Persistent Home (default)"
-          : "Persistent Home (changed)"
-      }
+      title={options.phome === "remain" ? "Persistent Home (default)" : "Persistent Home (changed)"}
       onToggle={handlePersistentHomeToggle}
     >
-      <div className="space-y-4 mt-2">
-        <RadioGroup
-          className="space-y-3"
-          value={phomeType}
-          onValueChange={handlePhomeTypeChange}
-        >
+      <div className="mt-2 space-y-4">
+        <RadioGroup className="space-y-3" value={phomeType} onValueChange={handlePhomeTypeChange}>
           <div className="flex items-center space-x-2">
             <RadioGroupItem id="phome-new" value="new" />
             <Label className="font-medium" htmlFor="phome-new">
@@ -915,7 +711,7 @@ export const StorageSettingPhome = ({
           </div>
 
           {phomeType === "new" && (
-            <div className="ml-6 mt-3">
+            <div className="mt-3 ml-6">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   checked={options.phome === "delete"}
@@ -926,13 +722,12 @@ export const StorageSettingPhome = ({
                   Erase if home already exists
                 </Label>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                If checked, any existing home directory with the same name will
-                be erased and recreated.
+              <p className="text-muted-foreground mt-1 text-xs">
+                If checked, any existing home directory with the same name will be erased and recreated.
               </p>
             </div>
           )}
-{/* 
+          {/* 
           <div className="flex items-center space-x-2">
             {//TODO}
             <RadioGroupItem
@@ -949,15 +744,11 @@ export const StorageSettingPhome = ({
           </div> */}
 
           {phomeType === "existing" && (
-            <div className="ml-6 mt-3">
-              <Label className="text-sm mb-1 block">
-                Select existing persistent home:
-              </Label>
+            <div className="mt-3 ml-6">
+              <Label className="mb-1 block text-sm">Select existing persistent home:</Label>
               <Select
                 value={
-                  typeof options.phome === "string" &&
-                  options.phome !== "delete" &&
-                  options.phome !== "remain"
+                  typeof options.phome === "string" && options.phome !== "delete" && options.phome !== "remain"
                     ? options.phome
                     : undefined
                 }
@@ -987,22 +778,13 @@ export const StorageSettingPhome = ({
   );
 };
 
-export const StorageSettings = ({
-  options,
-  setOptions,
-}: OptionsComponentInterface) => {
+export const StorageSettings = ({ options, setOptions }: OptionsComponentInterface) => {
   // MetaCentrum Home state
-  const [isMetacentrumHomeEnabled, setIsMetacentrumHomeEnabled] = useState(
-    !!options.home,
-  );
+  const [isMetacentrumHomeEnabled, setIsMetacentrumHomeEnabled] = useState(!!options.home);
 
   // S3 Storage state
-  const [isS3Enabled, setIsS3Enabled] = useState(
-    !!options.s3url || !!options.s3existing,
-  );
-  const [s3Type, setS3Type] = useState<"new" | "existing">(
-    options.s3url ? "new" : "existing",
-  );
+  const [isS3Enabled, setIsS3Enabled] = useState(!!options.s3url || !!options.s3existing);
+  const [s3Type, setS3Type] = useState<"new" | "existing">(options.s3url ? "new" : "existing");
 
   // Handle MetaCentrum Home toggle
   const handleMetacentrumHomeToggle = (enabled: boolean) => {
@@ -1100,10 +882,7 @@ export const StorageSettings = ({
   };
 
   // Handle S3 field changes
-  const handleS3FieldChange = (
-    field: "s3url" | "s3bucket" | "s3accesskey" | "s3secretkey",
-    value: string,
-  ) => {
+  const handleS3FieldChange = (field: "s3url" | "s3bucket" | "s3accesskey" | "s3secretkey", value: string) => {
     setOptions({
       ...options,
       [field]: value,
@@ -1138,13 +917,10 @@ export const StorageSettings = ({
           title="MetaCentrum Storage"
           onToggle={handleMetacentrumHomeToggle}
         >
-          <div className="space-y-4 mt-2">
+          <div className="mt-2 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="home-selection">Select home storage:</Label>
-              <Select
-                value={options.home || undefined}
-                onValueChange={handleHomeChange}
-              >
+              <Select value={options.home || undefined} onValueChange={handleHomeChange}>
                 <SelectTrigger id="home-selection">
                   <SelectValue placeholder="Select home storage" />
                 </SelectTrigger>
@@ -1156,9 +932,7 @@ export const StorageSettings = ({
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                Choose which MetaCentrum home to mount
-              </p>
+              <p className="text-muted-foreground text-xs">Choose which MetaCentrum home to mount</p>
             </div>
 
             <div className="space-y-2">
@@ -1172,12 +946,9 @@ export const StorageSettings = ({
                   Also mount to storage path
                 </Label>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 Mount MetaCentrum home to{" "}
-                <code className="text-xs">
-                  /storage/[chosen_storage]/home/[meta_username]
-                </code>{" "}
-                as well
+                <code className="text-xs">/storage/[chosen_storage]/home/[meta_username]</code> as well
               </p>
             </div>
 
@@ -1192,9 +963,8 @@ export const StorageSettings = ({
                   Mount project directories
                 </Label>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Access your MetaCentrum project directories from within your
-                notebook
+              <p className="text-muted-foreground text-xs">
+                Access your MetaCentrum project directories from within your notebook
               </p>
             </div>
           </div>
@@ -1209,12 +979,8 @@ export const StorageSettings = ({
           title="S3 Storage"
           onToggle={handleS3Toggle}
         >
-          <div className="space-y-4 mt-2">
-            <RadioGroup
-              className="space-y-3"
-              value={s3Type}
-              onValueChange={handleS3TypeChange}
-            >
+          <div className="mt-2 space-y-4">
+            <RadioGroup className="space-y-3" value={s3Type} onValueChange={handleS3TypeChange}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem id="s3-new" value="new" />
                 <Label className="font-medium" htmlFor="s3-new">
@@ -1223,20 +989,16 @@ export const StorageSettings = ({
               </div>
 
               {s3Type === "new" && (
-                <div className="ml-6 space-y-4 mt-2">
+                <div className="mt-2 ml-6 space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="s3-url">S3 URL:</Label>
                     <Input
                       id="s3-url"
                       placeholder="https://s3.amazonaws.com"
                       value={options.s3url || ""}
-                      onChange={(e) =>
-                        handleS3FieldChange("s3url", e.target.value)
-                      }
+                      onChange={(e) => handleS3FieldChange("s3url", e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      The endpoint URL of your S3 service
-                    </p>
+                    <p className="text-muted-foreground text-xs">The endpoint URL of your S3 service</p>
                   </div>
 
                   <div className="space-y-2">
@@ -1245,13 +1007,9 @@ export const StorageSettings = ({
                       id="s3-bucket"
                       placeholder="my-data-bucket"
                       value={options.s3bucket || ""}
-                      onChange={(e) =>
-                        handleS3FieldChange("s3bucket", e.target.value)
-                      }
+                      onChange={(e) => handleS3FieldChange("s3bucket", e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Name of the S3 bucket to connect to
-                    </p>
+                    <p className="text-muted-foreground text-xs">Name of the S3 bucket to connect to</p>
                   </div>
 
                   <div className="space-y-2">
@@ -1259,13 +1017,9 @@ export const StorageSettings = ({
                     <Input
                       id="s3-access-key"
                       value={options.s3accesskey || ""}
-                      onChange={(e) =>
-                        handleS3FieldChange("s3accesskey", e.target.value)
-                      }
+                      onChange={(e) => handleS3FieldChange("s3accesskey", e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Your S3 access key credential
-                    </p>
+                    <p className="text-muted-foreground text-xs">Your S3 access key credential</p>
                   </div>
 
                   <div className="space-y-2">
@@ -1274,13 +1028,9 @@ export const StorageSettings = ({
                       id="s3-secret-key"
                       type="password"
                       value={options.s3secretkey || ""}
-                      onChange={(e) =>
-                        handleS3FieldChange("s3secretkey", e.target.value)
-                      }
+                      onChange={(e) => handleS3FieldChange("s3secretkey", e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Your S3 secret key credential (securely stored)
-                    </p>
+                    <p className="text-muted-foreground text-xs">Your S3 secret key credential (securely stored)</p>
                   </div>
                 </div>
               )}
@@ -1293,14 +1043,9 @@ export const StorageSettings = ({
               </div>
 
               {s3Type === "existing" && (
-                <div className="ml-6 mt-3">
-                  <Label className="text-sm mb-1 block">
-                    Select existing S3 connection:
-                  </Label>
-                  <Select
-                    value={options.s3existing}
-                    onValueChange={handleExistingS3Change}
-                  >
+                <div className="mt-3 ml-6">
+                  <Label className="mb-1 block text-sm">Select existing S3 connection:</Label>
+                  <Select value={options.s3existing} onValueChange={handleExistingS3Change}>
                     <SelectTrigger id="s3-existing-bucket">
                       <SelectValue placeholder="Select an S3 bucket" />
                     </SelectTrigger>

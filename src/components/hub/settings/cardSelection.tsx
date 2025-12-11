@@ -5,60 +5,46 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-const SelectionCard = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & { selected: boolean }
->(({ className, children, selected, ...props }, ref) => (
-  <Card
-    ref={ref}
-    className={cn(
-      "relative overflow-hidden cursor-pointer group",
-      "transition-all duration-300 ease-in-out transform",
-      "hover:shadow-lg  hover:-translate-y-1",
-      "border-2 transition-colors ",
-      selected
-        ? "border-infra-primary shadow-md shadow-primary/20 bg-linear-45  from-white from-85% via-infra-primary to-infra-accent"
-        : "border-infra-border hover:border-infra-primary/30",
-      "active:scale-95",
-      className,
-    )}
-    {...props}
-  >
-    {/* Check mark indicator */}
-    <div
+const SelectionCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { selected: boolean }>(
+  ({ className, children, selected, ...props }, ref) => (
+    <Card
+      ref={ref}
       className={cn(
-        "absolute top-0 right-0 z-10",
-        "size-12 rounded-full flex items-center justify-center",
-        "transition-all duration-300 ease-in-out",
+        "group relative cursor-pointer overflow-hidden",
+        "transform transition-all duration-300 ease-in-out",
+        "hover:-translate-y-1 hover:shadow-lg",
+        "border-2 transition-colors",
         selected
-          ? ""
-          : "bg-infra-accent/20 scale-0 opacity-0 group-hover:scale-75 group-hover:opacity-50",
+          ? "border-infra-primary shadow-primary/20 via-infra-primary to-infra-accent bg-linear-45 from-white from-85% shadow-md"
+          : "border-infra-border hover:border-infra-primary/30",
+        "active:scale-95",
+        className,
       )}
+      {...props}
     >
-      <Check
+      {/* Check mark indicator */}
+      <div
         className={cn(
-          "size-7 transition-all duration-200",
-          selected ? "text-white" : "text-infra-primary",
+          "absolute top-0 right-0 z-10",
+          "flex size-12 items-center justify-center rounded-full",
+          "transition-all duration-300 ease-in-out",
+          selected ? "" : "bg-infra-accent/20 scale-0 opacity-0 group-hover:scale-75 group-hover:opacity-50",
         )}
-      />
-    </div>
-    {children}
-  </Card>
-));
+      >
+        <Check className={cn("size-7 transition-all duration-200", selected ? "text-white" : "text-infra-primary")} />
+      </div>
+      {children}
+    </Card>
+  ),
+);
 
 SelectionCard.displayName = "SelectionCard";
 
-const SelectionCardGrid = ({
-  cards,
-  customCard,
-}: {
-  cards: React.ReactNode[];
-  customCard?: React.ReactNode;
-}) => {
+const SelectionCardGrid = ({ cards, customCard }: { cards: React.ReactNode[]; customCard?: React.ReactNode }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // data state logic
-  
+
   const { allCards, selectionIndex } = React.useMemo(() => {
     const allCards = customCard ? [customCard, ...cards] : cards;
     const selectedIndex = allCards.findIndex((el) => {
@@ -78,8 +64,7 @@ const SelectionCardGrid = ({
   const { visibleCards, hiddenCount, showMoreButton } = React.useMemo(() => {
     const columns = 3;
 
-    if (selectionIndex === -1)
-    {
+    if (selectionIndex === -1) {
       return {
         visibleCards: allCards,
         hiddenCount: 0,
@@ -110,18 +95,11 @@ const SelectionCardGrid = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {visibleCards}
-      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">{visibleCards}</div>
 
-      { showMoreButton && (
+      {showMoreButton && (
         <div className="flex justify-center">
-          <Button
-            className="gap-2"
-            size="sm"
-            variant="outline"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
+          <Button className="gap-2" size="sm" variant="outline" onClick={() => setIsExpanded(!isExpanded)}>
             {isExpanded ? (
               <>
                 Show Less
